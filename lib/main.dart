@@ -1,4 +1,4 @@
-import 'package:bolt/homeScreen.dart';
+import 'package:bolt/splashScreen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -13,10 +13,10 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.grey,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: HomeScreen(),
+      home: SplashScreen(),
     );
   }
 }
