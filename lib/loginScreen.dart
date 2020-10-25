@@ -124,6 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               width: width * 0.91,
                               height: 50,
                               child: TextFormField(
+                                // ignore: missing_return
                                 validator: (input) {
                                   emailValidatorvar = validateStructure(input);
                                 },
