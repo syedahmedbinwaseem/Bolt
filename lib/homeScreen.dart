@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:bolt/productScreen.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -94,10 +95,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       SizedBox(
                         width: MediaQuery.of(context).size.width * 0.03,
                       ),
-                      _buildFeatured(
-                        '\$ 55',
-                        'Women T-Shirt',
-                        AssetImage('assets/images/womant.jpg'),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ProductScreen()));
+                        },
+                        child: _buildFeatured(
+                          '\$ 55',
+                          'Women T-Shirt',
+                          AssetImage('assets/images/womant.jpg'),
+                        ),
                       ),
                       SizedBox(
                         width: MediaQuery.of(context).size.width * 0.03,
@@ -194,10 +203,8 @@ class _HomeScreenState extends State<HomeScreen> {
           decoration: InputDecoration(
             contentPadding: EdgeInsets.symmetric(vertical: 18),
             hintText: 'Search your Product',
-            hintStyle: TextStyle(
-              fontSize: 15,
-              height: 0.3,
-            ),
+            hintStyle:
+                TextStyle(fontSize: 15, height: 0.3, fontFamily: "Segoe"),
             prefixIcon: Icon(Icons.search),
             focusedBorder: OutlineInputBorder(
               borderSide: BorderSide.none,
@@ -221,16 +228,12 @@ class _HomeScreenState extends State<HomeScreen> {
           Text(
             text,
             style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w500,
-            ),
+                fontSize: 20, fontWeight: FontWeight.w500, fontFamily: 'Segoe'),
           ),
           Text(
             'See all',
             style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-            ),
+                fontSize: 16, fontWeight: FontWeight.w400, fontFamily: 'Segoe'),
           )
         ],
       ),
@@ -263,6 +266,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Text(
                 text,
                 style: TextStyle(
+                  fontFamily: 'Segoe',
                   color: Colors.white,
                   fontSize: 25,
                   fontWeight: FontWeight.bold,
@@ -292,11 +296,14 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               Text(
                 price,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    fontSize: 16,
+                    fontFamily: 'Segoe',
+                    fontWeight: FontWeight.bold),
               ),
               Text(
                 text,
-                style: TextStyle(fontSize: 15),
+                style: TextStyle(fontSize: 15, fontFamily: 'Segoe'),
               )
             ],
           ),
