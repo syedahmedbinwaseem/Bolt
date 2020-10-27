@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:bolt/drawer.dart';
 import 'package:bolt/productScreen.dart';
 import 'package:flutter/material.dart';
 
@@ -9,13 +10,21 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
+    var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.of(context).size.width;
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: ImageIcon(AssetImage('assets/icons/menubar.png')),
+        leading: GestureDetector(
+            onTap: () {
+              scaffoldKey.currentState.openDrawer();
+            },
+            child: ImageIcon(AssetImage('assets/icons/menubar.png'))),
         actions: <Widget>[
           Padding(
             padding: const EdgeInsets.only(right: 12),
@@ -27,6 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
         iconTheme: IconThemeData(color: Colors.black),
       ),
+      drawer: DrawerScreen(),
       body: GestureDetector(
         onTap: () {
           FocusScope.of(context).unfocus();

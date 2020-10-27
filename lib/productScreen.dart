@@ -1,3 +1,5 @@
+import 'package:bolt/drawer.dart';
+import 'package:bolt/testscreen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -50,6 +52,7 @@ class _ProductScreenState extends State<ProductScreen> {
             ),
           ],
         ),
+        drawer: DrawerScreen(),
         body: Container(
           height: height,
           width: width,
@@ -376,16 +379,24 @@ class _ProductScreenState extends State<ProductScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         Expanded(
-                          child: Container(
-                            color: Colors.grey[400],
-                            child: Center(
-                              child: Text(
-                                'ADD TO CART',
-                                style: TextStyle(
-                                    fontFamily: 'Segoe',
-                                    color: Colors.black,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => Test()));
+                            },
+                            child: Container(
+                              color: Colors.grey[400],
+                              child: Center(
+                                child: Text(
+                                  'ADD TO CART',
+                                  style: TextStyle(
+                                      fontFamily: 'Segoe',
+                                      color: Colors.black,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
+                                ),
                               ),
                             ),
                           ),
