@@ -3,6 +3,7 @@ import 'package:bolt/testscreen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_swiper/flutter_swiper.dart';
 
 class ProductScreen extends StatefulWidget {
   @override
@@ -60,40 +61,77 @@ class _ProductScreenState extends State<ProductScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CarouselSlider(
-                options: CarouselOptions(
-                  height: height * 0.25,
-                  aspectRatio: 16 / 9,
-                ),
-                items: [
-                  Container(
-                      padding: EdgeInsets.all(10),
-                      height: height * 0.23,
-                      width: width * 0.8,
-                      child: Image.asset(
-                        'assets/images/turtle.jpg',
-                        fit: BoxFit.cover,
-                      )),
-                  Container(
-                    padding: EdgeInsets.all(10),
-                    height: height * 0.23,
-                    width: width * 0.8,
-                    child: Image.asset(
-                      'assets/images/turtle2.jpg',
-                      fit: BoxFit.cover,
-                    ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: width * 0.0416,
                   ),
                   Container(
-                    padding: EdgeInsets.all(10),
                     height: 200,
-                    width: width * 0.8,
-                    child: Image.asset(
-                      'assets/images/turtle3.jpg',
-                      fit: BoxFit.cover,
+                    width: width - width * 0.06,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(6),
+                      child: Swiper(
+                        curve: Curves.ease,
+                        itemBuilder: (BuildContext context, int index) {
+                          return new Image.asset(
+                            'assets/images/turtle3.jpg',
+                            fit: BoxFit.cover,
+                          );
+                        },
+                        itemCount: 3,
+                        // pagination: new SwiperPagination(
+                        //     alignment: Alignment.bottomLeft),
+                        pagination: new SwiperPagination(
+                            alignment: Alignment.bottomLeft),
+                      ),
                     ),
-                  ),
+                  )
                 ],
               ),
+              // Container(
+              //   padding: EdgeInsets.only(
+              //       left: width * 0.0416, right: height * 0.017),
+              //   color: Colors.green,
+              //   width: width
+              //   height: 200,
+              // child: CarouselSlider(
+              //   options: CarouselOptions(
+              //     enlargeCenterPage: true,
+              //     enlargeStrategy: CenterPageEnlargeStrategy.scale,
+              //     enableInfiniteScroll: false,
+              //     height: height * 0.25,
+              //   ),
+              //   items: [
+              //     Container(
+              //         // padding: EdgeInsets.only(right: 10, left: 10),
+              //         // height: height * 0.23,
+              //         width: width,
+              //         child: Image.asset(
+              //           'assets/images/turtle.jpg',
+              //           fit: BoxFit.cover,
+              //         )),
+              //     Container(
+              //       // padding: EdgeInsets.all(10),
+              //       // height: height * 0.23,
+              //       width: width,
+              //       child: Image.asset(
+              //         'assets/images/turtle2.jpg',
+              //         fit: BoxFit.cover,
+              //       ),
+              //     ),
+              //     Container(
+              //       // padding: EdgeInsets.all(10),
+              //       // height: 200,
+              //       width: width,
+              //       child: Image.asset(
+              //         'assets/images/turtle3.jpg',
+              //         fit: BoxFit.cover,
+              //       ),
+              //     ),
+              //   ],
+              // ),
+              // ),
               SizedBox(
                 height: height * 0.01,
               ),
