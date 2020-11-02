@@ -47,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
           backgroundColor: Colors.white,
           leading: IconButton(
               icon: Icon(
-                Icons.west,
+                Icons.arrow_back,
                 color: Colors.grey[700],
               ),
               onPressed: () {

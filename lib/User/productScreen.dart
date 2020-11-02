@@ -18,6 +18,7 @@ class _ProductScreenState extends State<ProductScreen> {
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
+    // ignore: unused_local_variable
     var color = Color.fromRGBO(102, 126, 234, 1);
 
     double textSize = ((height * 0.2) - (height * 0.035)) -
@@ -39,7 +40,7 @@ class _ProductScreenState extends State<ProductScreen> {
           elevation: 0,
           leading: IconButton(
             icon: Icon(
-              Icons.west,
+              Icons.arrow_back,
               color: Colors.grey[700],
             ),
             onPressed: () {
@@ -493,7 +494,9 @@ class ExpandableTextState extends State<ExpandableText> {
 
   @override
   Widget build(BuildContext context) {
+    // ignore: unused_local_variable
     final DefaultTextStyle defaultTextStyle = DefaultTextStyle.of(context);
+    // ignore: unused_local_variable
     final colorClickableText = Colors.blue;
     final widgetColor = Colors.black;
     var height = MediaQuery.of(context).size.height;
