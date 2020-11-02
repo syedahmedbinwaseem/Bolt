@@ -1,7 +1,9 @@
 import 'dart:math';
 
-import 'package:bolt/loginScreen.dart';
-import 'package:bolt/signupScreen.dart';
+import 'package:bolt/User/loginScreen.dart';
+import 'package:bolt/User/signupScreen.dart';
+import 'package:bolt/Vendor/vendorLogin.dart';
+import 'package:bolt/Vendor/vendorSignup.dart';
 import 'package:flutter/material.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -260,7 +262,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  LoginScreen()));
+                                                  VendorLogin()));
                                     },
                                     child: Center(
                                       child: Container(
@@ -302,7 +304,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                              builder: (context) => SignUp()));
+                                              builder: (context) =>
+                                                  VendorSignup()));
                                     },
                                     child: Container(
                                       child: Center(

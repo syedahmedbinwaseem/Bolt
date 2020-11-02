@@ -1,16 +1,17 @@
-import 'package:bolt/homeScreen.dart';
-import 'package:bolt/signupScreen.dart';
+import 'package:bolt/User/homeScreen.dart';
+import 'package:bolt/User/signupScreen.dart';
+import 'package:bolt/Vendor/vendorProduct.dart';
+import 'package:bolt/Vendor/vendorSignup.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-class LoginScreen extends StatefulWidget {
+class VendorLogin extends StatefulWidget {
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _VendorLoginState createState() => _VendorLoginState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _VendorLoginState extends State<VendorLogin> {
   GlobalKey fkey = GlobalKey<FormState>();
   final emailCon = TextEditingController();
   final passCon = TextEditingController();
@@ -30,7 +31,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
     int emailValidate;
     bool emailValidatorvar;
-    print(emailValidate);
     return WillPopScope(
       onWillPop: () {
         if (FocusScope.of(context).isFirstFocus == false) {
@@ -40,13 +40,12 @@ class _LoginScreenState extends State<LoginScreen> {
         }
 
         count++;
-        print(count);
         return null;
       },
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.grey[400],
           leading: IconButton(
               icon: Icon(
                 Icons.west,
@@ -65,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Form(
               key: fkey,
               child: Container(
-                color: Colors.white,
+                color: Colors.grey[400],
                 height: height,
                 width: width,
                 child: Row(
@@ -155,7 +154,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 onTap: () {
                                   FormState fs = fkey.currentState;
                                   fs.validate();
-                                  print(emailValidate);
                                   if (emailValidate == 1) {
                                     Fluttertoast.showToast(
                                       msg: "Invalid Email",
@@ -182,7 +180,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => HomeScreen()),
+                                          builder: (context) =>
+                                              VendorProduct()),
                                     );
                                   } else {
                                     Fluttertoast.showToast(
@@ -249,11 +248,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                           recognizer: new TapGestureRecognizer()
                                             ..onTap = () {
                                               print('asas');
-                                              Navigator.push(
+                                              Navigator.pushReplacement(
                                                   context,
                                                   MaterialPageRoute(
                                                       builder: (context) =>
-                                                          SignUp()));
+                                                          VendorSignup()));
                                             },
                                           style: TextStyle(
                                               fontSize: height * 0.02,

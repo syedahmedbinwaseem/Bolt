@@ -1,15 +1,15 @@
-import 'package:bolt/homeScreen.dart';
-import 'package:bolt/loginScreen.dart';
+import 'package:bolt/User/homeScreen.dart';
+import 'package:bolt/Vendor/vendorLogin.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-class SignUp extends StatefulWidget {
+class VendorSignup extends StatefulWidget {
   @override
-  _SignUpState createState() => _SignUpState();
+  _VendorSignupState createState() => _VendorSignupState();
 }
 
-class _SignUpState extends State<SignUp> {
+class _VendorSignupState extends State<VendorSignup> {
   GlobalKey fkey = GlobalKey<FormState>();
   final emailCon = TextEditingController();
   final passCon = TextEditingController();
@@ -30,7 +30,6 @@ class _SignUpState extends State<SignUp> {
 
     int emailValidate;
     bool emailValidatorvar;
-    print(emailValidate);
     return WillPopScope(
       onWillPop: () {
         if (FocusScope.of(context).isFirstFocus == false) {
@@ -40,13 +39,12 @@ class _SignUpState extends State<SignUp> {
         }
 
         count++;
-        print(count);
         return null;
       },
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.grey[400],
           leading: IconButton(
               icon: Icon(
                 Icons.west,
@@ -68,7 +66,7 @@ class _SignUpState extends State<SignUp> {
                 child: Form(
                   key: fkey,
                   child: Container(
-                    color: Colors.white,
+                    color: Colors.grey[400],
                     height: height,
                     width: width,
                     child: Row(
@@ -181,7 +179,6 @@ class _SignUpState extends State<SignUp> {
                                     onTap: () {
                                       FormState fs = fkey.currentState;
                                       fs.validate();
-                                      print(emailValidate);
                                       if (emailValidate == 1) {
                                         Fluttertoast.showToast(
                                           msg: "Invalid Email",
@@ -280,11 +277,11 @@ class _SignUpState extends State<SignUp> {
                                                   new TapGestureRecognizer()
                                                     ..onTap = () {
                                                       print('asas');
-                                                      Navigator.push(
+                                                      Navigator.pushReplacement(
                                                           context,
                                                           MaterialPageRoute(
                                                               builder: (context) =>
-                                                                  LoginScreen()));
+                                                                  VendorLogin()));
                                                     },
                                               style: TextStyle(
                                                   fontSize: height * 0.02,

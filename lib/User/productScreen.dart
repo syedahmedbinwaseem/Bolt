@@ -1,5 +1,4 @@
-import 'package:bolt/drawer.dart';
-import 'package:bolt/testscreen.dart';
+import 'package:bolt/Utils/drawer.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +10,7 @@ class ProductScreen extends StatefulWidget {
 }
 
 class _ProductScreenState extends State<ProductScreen> {
+  final GlobalKey key1 = new GlobalKey();
   bool stap = false;
   bool mtap = false;
   bool ltap = false;
@@ -20,12 +20,18 @@ class _ProductScreenState extends State<ProductScreen> {
     var width = MediaQuery.of(context).size.width;
     var color = Color.fromRGBO(102, 126, 234, 1);
 
+    double textSize = ((height * 0.2) - (height * 0.035)) -
+        (height * 0.004) -
+        (height * 0.006);
+    double font = height * 0.02016;
+
+    double finalt = (textSize / font);
+
     TextStyle style1 =
         TextStyle(fontFamily: 'Segoe', fontSize: 17, color: Colors.white);
     TextStyle defaultStyle = TextStyle(
         color: Colors.black, fontFamily: 'Segoe', fontSize: height * 0.020);
-    print(height);
-    print(width);
+
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -67,7 +73,8 @@ class _ProductScreenState extends State<ProductScreen> {
                     width: width * 0.0416,
                   ),
                   Container(
-                    height: 200,
+                    key: key1,
+                    height: height * 0.23,
                     width: width - width * 0.06,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(6),
@@ -238,7 +245,7 @@ class _ProductScreenState extends State<ProductScreen> {
                   children: [
                     Container(
                       width: width,
-                      height: height * 0.03,
+                      height: height * 0.035,
                       padding: EdgeInsets.only(
                           left: width * 0.0416, top: height * 0.006),
                       child: Text(
@@ -251,7 +258,8 @@ class _ProductScreenState extends State<ProductScreen> {
                     ),
                     Container(
                       width: width,
-                      height: (height * 0.2) - (height * 0.03),
+                      color: Colors.green,
+                      height: (height * 0.2) - (height * 0.035),
                       padding: EdgeInsets.only(
                           left: width * 0.0416,
                           top: height * 0.004,
@@ -260,7 +268,7 @@ class _ProductScreenState extends State<ProductScreen> {
                       child: SingleChildScrollView(
                         child: ExpandableText(
                           'Lorem ipsum dolor sit amet, consecte Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer dictum facilisis arcu. Phasellus sodales varius mattis. Sed a diam a erat fermentum vulputate. Nullam pharetra, turpis mollis pulvinar gravida, ex sapien blandit eros, ullamcorper tempus lectus neque ut orci. Donec non tincidunt mauris, sed condimentum massa. Quisque et sollicituditur adipiscing elit. Integer dictum facilisis arcu. Phasellus sodales varius mattis. Sed a diam a erat fermentum vulputate. Nullam pharetra, turpis mollis pulvinar gravida, ex sapien blandit eros, ullamcorper tempus lectus neque ut orci. Donec non tincidunt mauris, sed condimentum  Lorem ipsum dolor sit amet, consecte Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer dictum facilisis arcu. Phasellus sodales varius mattis. Sed a diam a erat fermentum vulputate. Nullam pharetra, turpis mollis pulvinar gravida, ex sapien blandit eros, ullamcorper tempus lectus neque ut orci. Donec non tincidunt mauris, sed condimentum massa. Quisque et sollicituditur adipiscing elit. Integer dictum facilisis arcu. Phasellus sodales varius mattis. Sed a diam a erat fermentum vulputate. Nullam pharetra, turpis mollis pulvinar gravida, ex sapien blandit eros, ullamcorper tempus lectus neque ut orci. Donec non tincidunt mauris, sed condimentumassa. Quisque et sollicitudi ',
-                          trimLines: 9,
+                          trimLines: 7,
                         ),
                       ),
                     ),
@@ -418,12 +426,7 @@ class _ProductScreenState extends State<ProductScreen> {
                       children: [
                         Expanded(
                           child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Test()));
-                            },
+                            onTap: () {},
                             child: Container(
                               color: Colors.grey[400],
                               child: Center(
@@ -493,6 +496,7 @@ class ExpandableTextState extends State<ExpandableText> {
     final DefaultTextStyle defaultTextStyle = DefaultTextStyle.of(context);
     final colorClickableText = Colors.blue;
     final widgetColor = Colors.black;
+    var height = MediaQuery.of(context).size.height;
     TextSpan link = TextSpan(
         text: _readMore ? "  More" : "  Less",
         style: TextStyle(
@@ -522,6 +526,7 @@ class ExpandableTextState extends State<ExpandableText> {
         textPainter.text = text;
         textPainter.layout(minWidth: constraints.minWidth, maxWidth: maxWidth);
         final textSize = textPainter.size;
+
         // Get the endIndex of data
         int endIndex;
         final pos = textPainter.getPositionForOffset(Offset(
@@ -534,9 +539,9 @@ class ExpandableTextState extends State<ExpandableText> {
           textSpan = TextSpan(
             text: _readMore ? widget.text.substring(0, endIndex) : widget.text,
             style: TextStyle(
-              color: widgetColor,
-              fontFamily: 'Segoe',
-            ),
+                color: widgetColor,
+                fontFamily: 'Segoe',
+                fontSize: height * 0.02016),
             children: <TextSpan>[link],
           );
         } else {
