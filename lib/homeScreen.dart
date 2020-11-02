@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:bolt/drawer.dart';
 import 'package:bolt/productScreen.dart';
 import 'package:flutter/material.dart';
 
@@ -9,13 +10,22 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
+    var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.of(context).size.width;
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: ImageIcon(AssetImage('assets/icons/menubar.png')),
+        leading: GestureDetector(
+            onTap: () {
+              scaffoldKey.currentState.openDrawer();
+            },
+            child: ImageIcon(AssetImage('assets/icons/menubar.png'))),
         actions: <Widget>[
           Padding(
             padding: const EdgeInsets.only(right: 12),
@@ -27,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
         iconTheme: IconThemeData(color: Colors.black),
       ),
+      drawer: DrawerScreen(),
       body: GestureDetector(
         onTap: () {
           FocusScope.of(context).unfocus();
@@ -52,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: MediaQuery.of(context).size.height * 0.015,
                 ),
                 Container(
-                  height: MediaQuery.of(context).size.height * 0.1,
+                  height: MediaQuery.of(context).size.height * 0.13,
                   child: ListView(
                     scrollDirection: Axis.horizontal,
                     children: <Widget>[
@@ -130,9 +141,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.001,
-                ),
+                // SizedBox(
+                //   height: MediaQuery.of(context).size.height * 0.0000,
+                // ),
                 _buildRow('Best Sell'),
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.01,
@@ -181,6 +192,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildSearch() {
+    var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.of(context).size.width;
     return Padding(
       padding: const EdgeInsets.only(
         left: 10,
@@ -203,8 +216,8 @@ class _HomeScreenState extends State<HomeScreen> {
           decoration: InputDecoration(
             contentPadding: EdgeInsets.symmetric(vertical: 18),
             hintText: 'Search your Product',
-            hintStyle:
-                TextStyle(fontSize: 15, height: 0.3, fontFamily: "Segoe"),
+            hintStyle: TextStyle(
+                fontSize: height * 0.019, height: 0, fontFamily: "Segoe"),
             prefixIcon: Icon(Icons.search),
             focusedBorder: OutlineInputBorder(
               borderSide: BorderSide.none,
@@ -219,6 +232,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildRow(text) {
+    var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.of(context).size.width;
     return Padding(
       padding: const EdgeInsets.only(left: 12, right: 12),
       child: Row(
@@ -228,12 +243,17 @@ class _HomeScreenState extends State<HomeScreen> {
           Text(
             text,
             style: TextStyle(
-                fontSize: 20, fontWeight: FontWeight.w500, fontFamily: 'Segoe'),
+              fontSize: height * 0.026,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Segoe',
+            ),
           ),
           Text(
             'See all',
             style: TextStyle(
-                fontSize: 16, fontWeight: FontWeight.w400, fontFamily: 'Segoe'),
+                fontSize: height * 0.023,
+                fontWeight: FontWeight.w400,
+                fontFamily: 'Segoe'),
           )
         ],
       ),
@@ -241,50 +261,66 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildCategory(text, image, color) {
-    return Center(
-      child: Stack(
-        children: <Widget>[
-          Container(
-            height: MediaQuery.of(context).size.height * 0.1,
-            width: MediaQuery.of(context).size.width * 0.4,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: image,
-                fit: BoxFit.cover,
+    var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.of(context).size.width;
+    return Container(
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+              color: Colors.grey[800],
+              offset: Offset(0, 7),
+              blurRadius: 3,
+              spreadRadius: -10)
+        ],
+      ),
+      child: Center(
+        child: Stack(
+          children: <Widget>[
+            Container(
+              height: MediaQuery.of(context).size.height * 0.12,
+              width: MediaQuery.of(context).size.width * 0.37,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: image,
+                  fit: BoxFit.cover,
+                ),
+                borderRadius: BorderRadius.circular(6),
               ),
-              borderRadius: BorderRadius.circular(10),
             ),
-          ),
-          Container(
-            height: MediaQuery.of(context).size.height * 0.1,
-            width: MediaQuery.of(context).size.width * 0.4,
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.5),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Center(
-              child: Text(
-                text,
-                style: TextStyle(
-                  fontFamily: 'Segoe',
-                  color: Colors.white,
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold,
+            Container(
+              height: MediaQuery.of(context).size.height * 0.12,
+              width: MediaQuery.of(context).size.width * 0.37,
+              decoration: BoxDecoration(
+                boxShadow: [],
+                color: color.withOpacity(0.5),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Center(
+                child: Text(
+                  text,
+                  style: TextStyle(
+                    fontFamily: 'Segoe',
+                    color: Colors.white,
+                    fontSize: height * 0.026,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildFeatured(price, text, image) {
+    var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.of(context).size.width;
     return Stack(
       children: <Widget>[
         Container(
           height: MediaQuery.of(context).size.height * 0.26,
-          width: MediaQuery.of(context).size.width * 0.35,
+          width: MediaQuery.of(context).size.width * 0.37,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(5),
           ),
@@ -297,7 +333,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Text(
                 price,
                 style: TextStyle(
-                    fontSize: 16,
+                    fontSize: height * 0.023,
                     fontFamily: 'Segoe',
                     fontWeight: FontWeight.bold),
               ),
@@ -310,7 +346,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         Container(
           height: MediaQuery.of(context).size.height * 0.18,
-          width: MediaQuery.of(context).size.width * 0.35,
+          width: MediaQuery.of(context).size.width * 0.37,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(5),
             image: DecorationImage(
