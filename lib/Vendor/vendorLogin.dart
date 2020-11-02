@@ -1,5 +1,3 @@
-import 'package:bolt/User/homeScreen.dart';
-import 'package:bolt/User/signupScreen.dart';
 import 'package:bolt/Vendor/vendorProduct.dart';
 import 'package:bolt/Vendor/vendorSignup.dart';
 import 'package:flutter/gestures.dart';
@@ -27,7 +25,6 @@ class _VendorLoginState extends State<VendorLogin> {
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    int count = 0;
 
     int emailValidate;
     bool emailValidatorvar;
@@ -39,7 +36,6 @@ class _VendorLoginState extends State<VendorLogin> {
           FocusScope.of(context).unfocus();
         }
 
-        count++;
         return null;
       },
       child: Scaffold(

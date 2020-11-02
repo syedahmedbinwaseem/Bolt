@@ -14,8 +14,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var height = MediaQuery.of(context).size.height;
-    var width = MediaQuery.of(context).size.width;
     return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(
@@ -193,7 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildSearch() {
     var height = MediaQuery.of(context).size.height;
-    var width = MediaQuery.of(context).size.width;
+
     return Padding(
       padding: const EdgeInsets.only(
         left: 10,
@@ -233,7 +231,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildRow(text) {
     var height = MediaQuery.of(context).size.height;
-    var width = MediaQuery.of(context).size.width;
     return Padding(
       padding: const EdgeInsets.only(left: 12, right: 12),
       child: Row(
@@ -262,7 +259,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildCategory(text, image, color) {
     var height = MediaQuery.of(context).size.height;
-    var width = MediaQuery.of(context).size.width;
     return Container(
       decoration: BoxDecoration(
         boxShadow: [
@@ -315,7 +311,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildFeatured(price, text, image) {
     var height = MediaQuery.of(context).size.height;
-    var width = MediaQuery.of(context).size.width;
     return Stack(
       children: <Widget>[
         Container(

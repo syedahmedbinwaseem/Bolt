@@ -1,5 +1,4 @@
 import 'package:bolt/Utils/drawer.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
@@ -21,15 +20,6 @@ class _ProductScreenState extends State<ProductScreen> {
     // ignore: unused_local_variable
     var color = Color.fromRGBO(102, 126, 234, 1);
 
-    double textSize = ((height * 0.2) - (height * 0.035)) -
-        (height * 0.004) -
-        (height * 0.006);
-    double font = height * 0.02016;
-
-    double finalt = (textSize / font);
-
-    TextStyle style1 =
-        TextStyle(fontFamily: 'Segoe', fontSize: 17, color: Colors.white);
     TextStyle defaultStyle = TextStyle(
         color: Colors.black, fontFamily: 'Segoe', fontSize: height * 0.020);
 

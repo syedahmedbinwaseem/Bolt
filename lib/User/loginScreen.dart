@@ -26,7 +26,6 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    int count = 0;
 
     int emailValidate;
     bool emailValidatorvar;
@@ -38,7 +37,6 @@ class _LoginScreenState extends State<LoginScreen> {
           FocusScope.of(context).unfocus();
         }
 
-        count++;
         return null;
       },
       child: Scaffold(

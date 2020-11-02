@@ -26,7 +26,6 @@ class _VendorSignupState extends State<VendorSignup> {
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    int count = 0;
 
     int emailValidate;
     bool emailValidatorvar;
@@ -38,7 +37,6 @@ class _VendorSignupState extends State<VendorSignup> {
           FocusScope.of(context).unfocus();
         }
 
-        count++;
         return null;
       },
       child: Scaffold(
