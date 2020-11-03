@@ -3,6 +3,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 
+import 'cart.dart';
+
 class ProductScreen extends StatefulWidget {
   @override
   _ProductScreenState createState() => _ProductScreenState();
@@ -417,7 +419,10 @@ class _ProductScreenState extends State<ProductScreen> {
                       children: [
                         Expanded(
                           child: GestureDetector(
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => Cart()));
+                            },
                             child: Container(
                               color: Colors.grey[400],
                               child: Center(

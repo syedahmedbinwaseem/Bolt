@@ -63,6 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Container(
                   height: MediaQuery.of(context).size.height * 0.13,
                   child: ListView(
+                    physics: BouncingScrollPhysics(),
                     scrollDirection: Axis.horizontal,
                     children: <Widget>[
                       SizedBox(
@@ -99,6 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Container(
                   height: MediaQuery.of(context).size.height * 0.265,
                   child: ListView(
+                    physics: BouncingScrollPhysics(),
                     scrollDirection: Axis.horizontal,
                     children: <Widget>[
                       SizedBox(
@@ -149,6 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Container(
                   height: MediaQuery.of(context).size.height * 0.265,
                   child: ListView(
+                    physics: BouncingScrollPhysics(),
                     scrollDirection: Axis.horizontal,
                     children: <Widget>[
                       SizedBox(

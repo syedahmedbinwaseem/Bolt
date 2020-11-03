@@ -44,7 +44,7 @@ class _VendorLoginState extends State<VendorLogin> {
           backgroundColor: Colors.grey[400],
           leading: IconButton(
               icon: Icon(
-                Icons.west,
+                Icons.arrow_back,
                 color: Colors.grey[700],
               ),
               onPressed: () {
