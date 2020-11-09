@@ -2,7 +2,9 @@ import 'dart:ui';
 
 import 'package:bolt/Utils/drawer.dart';
 import 'package:bolt/User/productScreen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -14,177 +16,214 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: scaffoldKey,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: GestureDetector(
-            onTap: () {
-              scaffoldKey.currentState.openDrawer();
-            },
-            child: ImageIcon(AssetImage('assets/icons/menubar.png'))),
-        actions: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: ImageIcon(
-              AssetImage('assets/icons/filter.png'),
-              color: Colors.black,
+    print(FirebaseAuth.instance.currentUser);
+    return WillPopScope(
+      onWillPop: () {
+        return showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text(
+                  'Are you sure you want to exit?',
+                  style: TextStyle(color: Colors.black, fontFamily: 'Segoe'),
+                ),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text(
+                      "Cancel",
+                      style:
+                          TextStyle(color: Colors.black, fontFamily: 'Segoe'),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  FlatButton(
+                    child: Text(
+                      "Exit",
+                      style:
+                          TextStyle(color: Colors.black, fontFamily: 'Segoe'),
+                    ),
+                    onPressed: () {
+                      SystemNavigator.pop();
+                    },
+                  ),
+                ],
+              );
+            });
+      },
+      child: Scaffold(
+        key: scaffoldKey,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          leading: GestureDetector(
+              onTap: () {
+                scaffoldKey.currentState.openDrawer();
+              },
+              child: ImageIcon(AssetImage('assets/icons/menubar.png'))),
+          actions: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: ImageIcon(
+                AssetImage('assets/icons/filter.png'),
+                color: Colors.black,
+              ),
             ),
-          ),
-        ],
-        iconTheme: IconThemeData(color: Colors.black),
-      ),
-      drawer: DrawerScreen(),
-      body: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).unfocus();
-        },
-        child: Container(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          decoration: BoxDecoration(
-            color: Colors.white,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              children: <Widget>[
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.003,
-                ),
-                _buildSearch(),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.015,
-                ),
-                _buildRow('Categories'),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.015,
-                ),
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.13,
-                  child: ListView(
-                    physics: BouncingScrollPhysics(),
-                    scrollDirection: Axis.horizontal,
-                    children: <Widget>[
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.03,
-                      ),
-                      _buildCategory('Woman',
-                          AssetImage('assets/images/woman.jpg'), Colors.blue),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.03,
-                      ),
-                      _buildCategory('Man', AssetImage('assets/images/man.jpg'),
-                          Colors.red),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.03,
-                      ),
-                      _buildCategory(
-                        'Kids',
-                        AssetImage('assets/images/kids.jpg'),
-                        Colors.lightGreen,
-                      ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.03,
-                      ),
-                    ],
+          ],
+          iconTheme: IconThemeData(color: Colors.black),
+        ),
+        drawer: DrawerScreen(),
+        body: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: Container(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+              color: Colors.white,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                children: <Widget>[
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.003,
                   ),
-                ),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.015,
-                ),
-                _buildRow('Featured'),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.01,
-                ),
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.265,
-                  child: ListView(
-                    physics: BouncingScrollPhysics(),
-                    scrollDirection: Axis.horizontal,
-                    children: <Widget>[
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.03,
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ProductScreen()));
-                        },
-                        child: _buildFeatured(
-                          '\$ 55',
-                          'Women T-Shirt',
-                          AssetImage('assets/images/womant.jpg'),
+                  _buildSearch(),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.015,
+                  ),
+                  _buildRow('Categories'),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.015,
+                  ),
+                  Container(
+                    height: MediaQuery.of(context).size.height * 0.13,
+                    child: ListView(
+                      physics: BouncingScrollPhysics(),
+                      scrollDirection: Axis.horizontal,
+                      children: <Widget>[
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.03,
                         ),
-                      ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.03,
-                      ),
-                      _buildFeatured(
-                        '\$ 35',
-                        'Man T-Shirt',
-                        AssetImage('assets/images/mant.jpg'),
-                      ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.03,
-                      ),
-                      _buildFeatured(
-                        '\$ 50',
-                        'Women T-Shirt',
-                        AssetImage('assets/images/womant2.jpg'),
-                      ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.03,
-                      ),
-                    ],
+                        _buildCategory('Woman',
+                            AssetImage('assets/images/woman.jpg'), Colors.blue),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.03,
+                        ),
+                        _buildCategory('Man',
+                            AssetImage('assets/images/man.jpg'), Colors.red),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.03,
+                        ),
+                        _buildCategory(
+                          'Kids',
+                          AssetImage('assets/images/kids.jpg'),
+                          Colors.lightGreen,
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.03,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                // SizedBox(
-                //   height: MediaQuery.of(context).size.height * 0.0000,
-                // ),
-                _buildRow('Best Sell'),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.01,
-                ),
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.265,
-                  child: ListView(
-                    physics: BouncingScrollPhysics(),
-                    scrollDirection: Axis.horizontal,
-                    children: <Widget>[
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.03,
-                      ),
-                      _buildFeatured(
-                        '\$ 45',
-                        'Women T-Shirt',
-                        AssetImage('assets/images/womant3.jpg'),
-                      ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.03,
-                      ),
-                      _buildFeatured(
-                        '\$ 50',
-                        'Man T-Shirt',
-                        AssetImage('assets/images/mant2.jpg'),
-                      ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.03,
-                      ),
-                      _buildFeatured(
-                        '\$ 50',
-                        'Women T-Shirt',
-                        AssetImage('assets/images/womant2.jpg'),
-                      ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.03,
-                      ),
-                    ],
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.015,
                   ),
-                ),
-              ],
+                  _buildRow('Featured'),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.01,
+                  ),
+                  Container(
+                    height: MediaQuery.of(context).size.height * 0.265,
+                    child: ListView(
+                      physics: BouncingScrollPhysics(),
+                      scrollDirection: Axis.horizontal,
+                      children: <Widget>[
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.03,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ProductScreen()));
+                          },
+                          child: _buildFeatured(
+                            '\$ 55',
+                            'Women T-Shirt',
+                            AssetImage('assets/images/womant.jpg'),
+                          ),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.03,
+                        ),
+                        _buildFeatured(
+                          '\$ 35',
+                          'Man T-Shirt',
+                          AssetImage('assets/images/mant.jpg'),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.03,
+                        ),
+                        _buildFeatured(
+                          '\$ 50',
+                          'Women T-Shirt',
+                          AssetImage('assets/images/womant2.jpg'),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.03,
+                        ),
+                      ],
+                    ),
+                  ),
+                  // SizedBox(
+                  //   height: MediaQuery.of(context).size.height * 0.0000,
+                  // ),
+                  _buildRow('Best Sell'),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.01,
+                  ),
+                  Container(
+                    height: MediaQuery.of(context).size.height * 0.265,
+                    child: ListView(
+                      physics: BouncingScrollPhysics(),
+                      scrollDirection: Axis.horizontal,
+                      children: <Widget>[
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.03,
+                        ),
+                        _buildFeatured(
+                          '\$ 45',
+                          'Women T-Shirt',
+                          AssetImage('assets/images/womant3.jpg'),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.03,
+                        ),
+                        _buildFeatured(
+                          '\$ 50',
+                          'Man T-Shirt',
+                          AssetImage('assets/images/mant2.jpg'),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.03,
+                        ),
+                        _buildFeatured(
+                          '\$ 50',
+                          'Women T-Shirt',
+                          AssetImage('assets/images/womant2.jpg'),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.03,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

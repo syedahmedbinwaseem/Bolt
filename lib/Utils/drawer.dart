@@ -1,3 +1,5 @@
+import 'package:bolt/User/loginScreen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class DrawerScreen extends StatefulWidget {
@@ -44,9 +46,21 @@ class _DrawerScreenState extends State<DrawerScreen> {
                 style: TextStyle(fontFamily: 'Segoe', fontSize: 24),
               ),
               SizedBox(height: height * 0.04),
-              Text(
-                'Logout',
-                style: TextStyle(fontFamily: 'Segoe', fontSize: 24),
+              GestureDetector(
+                onTap: () async {
+                  try {
+                    await FirebaseAuth.instance.signOut();
+                    print("logout");
+                  } catch (e) {
+                    print(e);
+                  }
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (context) => LoginScreen()));
+                },
+                child: Text(
+                  'Logout',
+                  style: TextStyle(fontFamily: 'Segoe', fontSize: 24),
+                ),
               )
             ],
           ),
