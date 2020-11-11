@@ -31,7 +31,6 @@ class _SignUpState extends State<SignUp> {
     try {
       UserCredential user = await mauth.createUserWithEmailAndPassword(
           email: emailCon.text, password: passCon.text);
-      print("Successful");
       setState(() {
         signUp = true;
       });
@@ -112,7 +111,6 @@ class _SignUpState extends State<SignUp> {
         }
 
         count++;
-        print(count);
         return null;
       },
       child: Scaffold(
@@ -259,7 +257,6 @@ class _SignUpState extends State<SignUp> {
                                         onTap: () {
                                           FormState fs = fkey.currentState;
                                           fs.validate();
-                                          print(emailValidate);
                                           if (emailValidate == 1) {
                                             Fluttertoast.showToast(
                                               msg: "Invalid Email",

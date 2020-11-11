@@ -28,7 +28,6 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       UserCredential user = await mauth.signInWithEmailAndPassword(
           email: emailCon.text, password: passCon.text);
-      print("Successful");
       setState(() {
         login = true;
       });
@@ -71,8 +70,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print(FirebaseAuth.instance.currentUser);
-
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
 

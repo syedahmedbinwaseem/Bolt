@@ -1,8 +1,6 @@
 import 'dart:ui';
-
 import 'package:bolt/Utils/drawer.dart';
 import 'package:bolt/User/productScreen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -16,7 +14,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print(FirebaseAuth.instance.currentUser);
     return WillPopScope(
       onWillPop: () {
         return showDialog(
