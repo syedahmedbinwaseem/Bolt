@@ -1,3 +1,5 @@
+import 'package:bolt/Vendor/vendorLogin.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class VendorDrawer extends StatefulWidget {
@@ -34,9 +36,20 @@ class _VendorDrawerState extends State<VendorDrawer> {
                 style: TextStyle(fontFamily: 'Segoe', fontSize: 24),
               ),
               SizedBox(height: height * 0.04),
-              Text(
-                'Logout',
-                style: TextStyle(fontFamily: 'Segoe', fontSize: 24),
+              GestureDetector(
+                onTap: () async {
+                  try {
+                    await FirebaseAuth.instance.signOut();
+                  } catch (e) {
+                    print(e);
+                  }
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (context) => VendorLogin()));
+                },
+                child: Text(
+                  'Logout',
+                  style: TextStyle(fontFamily: 'Segoe', fontSize: 24),
+                ),
               )
             ],
           ),

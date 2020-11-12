@@ -1,5 +1,10 @@
+import 'dart:ui';
+
 import 'package:bolt/User/homeScreen.dart';
+import 'package:bolt/User/localUser.dart';
 import 'package:bolt/User/signupScreen.dart';
+import 'package:bolt/welcomeScreen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -26,45 +31,86 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void logIn() async {
     try {
-      UserCredential user = await mauth.signInWithEmailAndPassword(
-          email: emailCon.text, password: passCon.text);
+      await FirebaseFirestore.instance
+          .doc("user/${emailCon.text}")
+          .get()
+          .then((doc) async {
+        if (doc.exists) {
+          try {
+            // ignore: unused_local_variable
+            UserCredential user = await mauth.signInWithEmailAndPassword(
+                email: emailCon.text, password: passCon.text);
+            setState(() {
+              login = true;
+            });
+            if (user != null) {
+              try {
+                DocumentSnapshot snap = await FirebaseFirestore.instance
+                    .collection("user")
+                    .doc(emailCon.text)
+                    .get();
+                LocalUser.userData.username = snap['username'].toString();
+                LocalUser.userData.email = snap['email'].toString();
+              } catch (e) {
+                print(e);
+              }
+            }
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => HomeScreen()),
+                (route) => false);
+          } on FirebaseAuthException catch (e) {
+            if (e.code == 'user-not-found') {
+              setState(() {
+                login = true;
+              });
+              Fluttertoast.showToast(
+                msg: "User not found for this email",
+                toastLength: Toast.LENGTH_LONG,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIosWeb: 3,
+                backgroundColor: Colors.red[400],
+                textColor: Colors.white,
+                fontSize: 15,
+              );
+            } else if (e.code == 'wrong-password') {
+              setState(() {
+                login = true;
+              });
+              Fluttertoast.showToast(
+                msg: "Wrong password",
+                toastLength: Toast.LENGTH_LONG,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIosWeb: 3,
+                backgroundColor: Colors.red[400],
+                textColor: Colors.white,
+                fontSize: 15,
+              );
+            }
+          } catch (e) {
+            print("Error: " + e);
+          }
+        } else {
+          setState(() {
+            login = true;
+          });
+
+          Fluttertoast.showToast(
+            msg: "User not found for this email",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 3,
+            backgroundColor: Colors.red[400],
+            textColor: Colors.white,
+            fontSize: 15,
+          );
+        }
+      });
+    } catch (e) {
       setState(() {
         login = true;
       });
-      Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-          (route) => false);
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        setState(() {
-          login = true;
-        });
-        Fluttertoast.showToast(
-          msg: "User not found for this email",
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 3,
-          backgroundColor: Colors.grey,
-          textColor: Colors.white,
-          fontSize: 15,
-        );
-      } else if (e.code == 'wrong-password') {
-        setState(() {
-          login = true;
-        });
-        Fluttertoast.showToast(
-          msg: "Wrong password",
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 3,
-          backgroundColor: Colors.grey,
-          textColor: Colors.white,
-          fontSize: 15,
-        );
-      }
-    } catch (e) {
-      print("Error: " + e);
+      print(e);
     }
   }
 
@@ -77,11 +123,10 @@ class _LoginScreenState extends State<LoginScreen> {
     bool emailValidatorvar;
     return WillPopScope(
       onWillPop: () {
-        if (FocusScope.of(context).isFirstFocus == false) {
-          Navigator.pop(context);
-        } else {
-          FocusScope.of(context).unfocus();
-        }
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => WelcomeScreen()),
+            (route) => false);
 
         return null;
       },
@@ -97,7 +142,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     color: Colors.grey[700],
                   ),
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => WelcomeScreen()),
+                        (route) => false);
                   }),
               elevation: 0,
             ),
@@ -144,6 +193,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   width: width * 0.91,
                                   height: 50,
                                   child: TextFormField(
+                                    cursorColor: Colors.black,
+                                    style: TextStyle(fontFamily: 'Segoe'),
                                     validator: (input) {
                                       emailValidate = validateEmail(input);
                                       return null;
@@ -169,6 +220,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   width: width * 0.91,
                                   height: 50,
                                   child: TextFormField(
+                                    style: TextStyle(fontFamily: 'Segoe'),
+
                                     // ignore: missing_return
                                     validator: (input) {
                                       emailValidatorvar =

@@ -1,4 +1,6 @@
+import 'package:bolt/User/cart.dart';
 import 'package:bolt/User/loginScreen.dart';
+import 'package:bolt/User/profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -26,14 +28,26 @@ class _DrawerScreenState extends State<DrawerScreen> {
                 style: TextStyle(fontFamily: 'Segoe', fontSize: 24),
               ),
               SizedBox(height: height * 0.04),
-              Text(
-                'Profile',
-                style: TextStyle(fontFamily: 'Segoe', fontSize: 24),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => UserProfile()));
+                },
+                child: Text(
+                  'Profile',
+                  style: TextStyle(fontFamily: 'Segoe', fontSize: 24),
+                ),
               ),
               SizedBox(height: height * 0.04),
-              Text(
-                'My Cart',
-                style: TextStyle(fontFamily: 'Segoe', fontSize: 24),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => Cart()));
+                },
+                child: Text(
+                  'My Cart',
+                  style: TextStyle(fontFamily: 'Segoe', fontSize: 24),
+                ),
               ),
               SizedBox(height: height * 0.04),
               Text(

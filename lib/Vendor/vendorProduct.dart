@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:bolt/Vendor/data.dart';
 import 'package:bolt/Vendor/vendorDrawer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
 class VendorProduct extends StatefulWidget {
@@ -42,368 +43,406 @@ class _VendorProductState extends State<VendorProduct> {
     var height = MediaQuery.of(context).size.height - h - padding.top;
     print(allData.length);
     return SafeArea(
-      child: Scaffold(
-        key: scaffoldKey,
-        backgroundColor: Colors.grey[400],
-        appBar: AppBar(
-          elevation: 0,
+      child: WillPopScope(
+        onWillPop: () {
+          return showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text(
+                    'Are you sure you want to exit?',
+                    style: TextStyle(color: Colors.black, fontFamily: 'Segoe'),
+                  ),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text(
+                        "Cancel",
+                        style:
+                            TextStyle(color: Colors.black, fontFamily: 'Segoe'),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                    FlatButton(
+                      child: Text(
+                        "Exit",
+                        style:
+                            TextStyle(color: Colors.black, fontFamily: 'Segoe'),
+                      ),
+                      onPressed: () {
+                        SystemNavigator.pop();
+                      },
+                    ),
+                  ],
+                );
+              });
+        },
+        child: Scaffold(
+          key: scaffoldKey,
           backgroundColor: Colors.grey[400],
-          leading: GestureDetector(
-              onTap: () {
-                scaffoldKey.currentState.openDrawer();
-              },
-              child: ImageIcon(AssetImage('assets/icons/menubar.png'))),
-        ),
-        drawer: VendorDrawer(),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              Container(
-                padding: EdgeInsets.only(left: width * 0.046),
-                height: height * 0.08,
-                width: width,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Products',
-                    style: TextStyle(
-                        fontFamily: 'Segoe',
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold),
+          appBar: AppBar(
+            elevation: 0,
+            backgroundColor: Colors.grey[400],
+            leading: GestureDetector(
+                onTap: () {
+                  scaffoldKey.currentState.openDrawer();
+                },
+                child: ImageIcon(AssetImage('assets/icons/menubar.png'))),
+          ),
+          drawer: VendorDrawer(),
+          body: SingleChildScrollView(
+            child: Column(
+              children: [
+                Container(
+                  padding: EdgeInsets.only(left: width * 0.046),
+                  height: height * 0.08,
+                  width: width,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Products',
+                      style: TextStyle(
+                          fontFamily: 'Segoe',
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
-              ),
-              Container(
-                height: height * 0.92,
-                width: width,
-                child: ListView.builder(
-                    itemCount: allData.length,
-                    itemBuilder: (context, index) {
-                      final item = allData[index].name;
-                      return Dismissible(
-                        key: Key(item),
-                        background: editDismiss(),
-                        secondaryBackground: deleteDismiss(),
-                        // ignore: missing_return
-                        confirmDismiss: (direction) async {
-                          if (direction == DismissDirection.endToStart) {
-                            final bool res = await showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    content: Text(
-                                      "Are you sure you want to delete ${itemsList[index]}?",
-                                      style: TextStyle(fontFamily: 'Segoe'),
-                                    ),
-                                    actions: <Widget>[
-                                      FlatButton(
-                                        child: Text(
-                                          "Cancel",
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontFamily: 'Segoe '),
-                                        ),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
+                Container(
+                  height: height * 0.92,
+                  width: width,
+                  child: ListView.builder(
+                      itemCount: allData.length,
+                      itemBuilder: (context, index) {
+                        final item = allData[index].name;
+                        return Dismissible(
+                          key: Key(item),
+                          background: editDismiss(),
+                          secondaryBackground: deleteDismiss(),
+                          // ignore: missing_return
+                          confirmDismiss: (direction) async {
+                            if (direction == DismissDirection.endToStart) {
+                              final bool res = await showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      content: Text(
+                                        "Are you sure you want to delete ${itemsList[index]}?",
+                                        style: TextStyle(fontFamily: 'Segoe'),
                                       ),
-                                      FlatButton(
-                                        child: Text(
-                                          "Delete",
-                                          style: TextStyle(
-                                              color: Colors.red,
-                                              fontFamily: 'Segoe',
-                                              fontWeight: FontWeight.bold),
+                                      actions: <Widget>[
+                                        FlatButton(
+                                          child: Text(
+                                            "Cancel",
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontFamily: 'Segoe '),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
                                         ),
-                                        onPressed: () {
-                                          setState(() {
-                                            allData.removeAt(index);
-                                          });
-                                          Navigator.of(context).pop();
-                                        },
+                                        FlatButton(
+                                          child: Text(
+                                            "Delete",
+                                            style: TextStyle(
+                                                color: Colors.red,
+                                                fontFamily: 'Segoe',
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          onPressed: () {
+                                            setState(() {
+                                              allData.removeAt(index);
+                                            });
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  });
+                              return res;
+                            } else {
+                              setState(() {
+                                allData[index].name = 'Pant';
+                              });
+                            }
+                          },
+                          child: InkWell(
+                            onTap: () {},
+                            child: Container(
+                              padding: EdgeInsets.only(left: width * 0.046),
+                              height: 80,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  CircleAvatar(
+                                    backgroundColor: Colors.white,
+                                    radius: 30,
+                                    backgroundImage:
+                                        FileImage(allData[index].image),
+                                  ),
+                                  SizedBox(
+                                    width: 20,
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        height: 15,
                                       ),
+                                      Text(
+                                        '${allData[index].name}',
+                                        style: TextStyle(fontFamily: 'Segoe'),
+                                      ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Text(
+                                        '\$${allData[index].price}',
+                                        style: TextStyle(fontFamily: 'Segoe'),
+                                      )
                                     ],
-                                  );
-                                });
-                            return res;
-                          } else {
-                            setState(() {
-                              allData[index].name = 'Pant';
-                            });
-                          }
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+                ),
+              ],
+            ),
+          ),
+          floatingActionButton: new FloatingActionButton(
+            onPressed: () {
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Dialog(
+                      insetPadding: EdgeInsets.all(0),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      child: GestureDetector(
+                        onTap: () {
+                          FocusScope.of(context).unfocus();
                         },
-                        child: InkWell(
-                          onTap: () {},
+                        child: SingleChildScrollView(
                           child: Container(
-                            padding: EdgeInsets.only(left: width * 0.046),
-                            height: 80,
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            height: height * 0.8,
+                            width: width * 0.9,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                CircleAvatar(
-                                  backgroundColor: Colors.white,
-                                  radius: 30,
-                                  backgroundImage:
-                                      FileImage(allData[index].image),
+                                Text(
+                                  'Add product',
+                                  style: TextStyle(
+                                      fontFamily: 'Segoe',
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20),
+                                ),
+                                SizedBox(height: 10),
+                                Theme(
+                                  data: new ThemeData(
+                                    primaryColor: Colors.grey[700],
+                                  ),
+                                  child: TextField(
+                                    controller: idCon,
+                                    textInputAction: TextInputAction.next,
+                                    cursorColor: Colors.grey[700],
+                                    decoration: InputDecoration(
+                                        hintText: 'Enter ID',
+                                        hintStyle: TextStyle(
+                                            fontFamily: 'Segoe', fontSize: 12)),
+                                  ),
                                 ),
                                 SizedBox(
-                                  width: 20,
+                                  height: 5,
                                 ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(
-                                      height: 15,
+                                Theme(
+                                  data: new ThemeData(
+                                    primaryColor: Colors.grey[700],
+                                  ),
+                                  child: TextField(
+                                    controller: nameCon,
+                                    textInputAction: TextInputAction.next,
+                                    cursorColor: Colors.grey[700],
+                                    decoration: InputDecoration(
+                                        hintText: 'Enter Name',
+                                        hintStyle: TextStyle(
+                                            fontFamily: 'Segoe', fontSize: 12)),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Theme(
+                                  data: new ThemeData(
+                                    primaryColor: Colors.grey[700],
+                                  ),
+                                  child: TextField(
+                                    controller: quanCon,
+                                    textInputAction: TextInputAction.next,
+                                    keyboardType: TextInputType.number,
+                                    cursorColor: Colors.grey[700],
+                                    decoration: InputDecoration(
+                                        hintText: 'Enter quantity',
+                                        hintStyle: TextStyle(
+                                            fontFamily: 'Segoe', fontSize: 12)),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Theme(
+                                  data: new ThemeData(
+                                    primaryColor: Colors.grey[700],
+                                  ),
+                                  child: TextField(
+                                    controller: catCon,
+                                    textInputAction: TextInputAction.next,
+                                    cursorColor: Colors.grey[700],
+                                    decoration: InputDecoration(
+                                        hintText: 'Enter Category',
+                                        hintStyle: TextStyle(
+                                            fontFamily: 'Segoe', fontSize: 12)),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Theme(
+                                  data: new ThemeData(
+                                    primaryColor: Colors.grey[700],
+                                  ),
+                                  child: TextField(
+                                    controller: priCon,
+                                    cursorColor: Colors.grey[700],
+                                    decoration: InputDecoration(
+                                        hintText: 'Enter price',
+                                        hintStyle: TextStyle(
+                                            fontFamily: 'Segoe', fontSize: 12)),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                GestureDetector(
+                                  onTap: () async {
+                                    getImage();
+                                  },
+                                  child: Container(
+                                    height: 40,
+                                    width: width * 0.9,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(6),
+                                        color: Colors.white70,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey,
+                                          ),
+                                        ]),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: Container(
+                                                  padding:
+                                                      EdgeInsets.only(left: 10),
+                                                  child: Text(
+                                                    'Select primary image',
+                                                    style: TextStyle(
+                                                        fontFamily: 'Segoe',
+                                                        fontSize: 13),
+                                                  ))),
+                                        ),
+                                        Container(
+                                            padding: EdgeInsets.only(right: 10),
+                                            child: Icon(Icons.image)),
+                                      ],
                                     ),
-                                    Text(
-                                      '${allData[index].name}',
-                                      style: TextStyle(fontFamily: 'Segoe'),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Align(
+                                    alignment: Alignment.bottomCenter,
+                                    child: Container(
+                                      padding: EdgeInsets.only(right: 10),
+                                      height: 40,
+                                      width: width * 0.9,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () {
+                                              Navigator.pop(context);
+                                              nameCon.clear();
+                                              quanCon.clear();
+                                              priCon.clear();
+                                              catCon.clear();
+                                              idCon.clear();
+                                            },
+                                            child: Text(
+                                              'Cancel',
+                                              style: TextStyle(
+                                                fontFamily: 'Segoe',
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: 50,
+                                          ),
+                                          GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                allData.add(Data(
+                                                    name: nameCon.text,
+                                                    category: catCon.text,
+                                                    id: int.parse(idCon.text),
+                                                    price: priCon.text,
+                                                    image: _image,
+                                                    quantity: int.parse(
+                                                        quanCon.text)));
+                                              });
+                                              Navigator.pop(context);
+                                              nameCon.clear();
+                                              quanCon.clear();
+                                              priCon.clear();
+                                              catCon.clear();
+                                              idCon.clear();
+                                            },
+                                            child: Text(
+                                              'Add',
+                                              style: TextStyle(
+                                                  fontFamily: 'Segoe',
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.green),
+                                            ),
+                                          )
+                                        ],
+                                      ),
                                     ),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    Text(
-                                      '\$${allData[index].price}',
-                                      style: TextStyle(fontFamily: 'Segoe'),
-                                    )
-                                  ],
+                                  ),
                                 ),
                               ],
                             ),
                           ),
                         ),
-                      );
-                    }),
-              ),
-            ],
-          ),
-        ),
-        floatingActionButton: new FloatingActionButton(
-          onPressed: () {
-            showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return Dialog(
-                    insetPadding: EdgeInsets.all(0),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    child: GestureDetector(
-                      onTap: () {
-                        FocusScope.of(context).unfocus();
-                      },
-                      child: SingleChildScrollView(
-                        child: Container(
-                          padding: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          height: height * 0.8,
-                          width: width * 0.9,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Add product',
-                                style: TextStyle(
-                                    fontFamily: 'Segoe',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20),
-                              ),
-                              SizedBox(height: 10),
-                              Theme(
-                                data: new ThemeData(
-                                  primaryColor: Colors.grey[700],
-                                ),
-                                child: TextField(
-                                  controller: idCon,
-                                  textInputAction: TextInputAction.next,
-                                  cursorColor: Colors.grey[700],
-                                  decoration: InputDecoration(
-                                      hintText: 'Enter ID',
-                                      hintStyle: TextStyle(
-                                          fontFamily: 'Segoe', fontSize: 12)),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Theme(
-                                data: new ThemeData(
-                                  primaryColor: Colors.grey[700],
-                                ),
-                                child: TextField(
-                                  controller: nameCon,
-                                  textInputAction: TextInputAction.next,
-                                  cursorColor: Colors.grey[700],
-                                  decoration: InputDecoration(
-                                      hintText: 'Enter Name',
-                                      hintStyle: TextStyle(
-                                          fontFamily: 'Segoe', fontSize: 12)),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Theme(
-                                data: new ThemeData(
-                                  primaryColor: Colors.grey[700],
-                                ),
-                                child: TextField(
-                                  controller: quanCon,
-                                  textInputAction: TextInputAction.next,
-                                  keyboardType: TextInputType.number,
-                                  cursorColor: Colors.grey[700],
-                                  decoration: InputDecoration(
-                                      hintText: 'Enter quantity',
-                                      hintStyle: TextStyle(
-                                          fontFamily: 'Segoe', fontSize: 12)),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Theme(
-                                data: new ThemeData(
-                                  primaryColor: Colors.grey[700],
-                                ),
-                                child: TextField(
-                                  controller: catCon,
-                                  textInputAction: TextInputAction.next,
-                                  cursorColor: Colors.grey[700],
-                                  decoration: InputDecoration(
-                                      hintText: 'Enter Category',
-                                      hintStyle: TextStyle(
-                                          fontFamily: 'Segoe', fontSize: 12)),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Theme(
-                                data: new ThemeData(
-                                  primaryColor: Colors.grey[700],
-                                ),
-                                child: TextField(
-                                  controller: priCon,
-                                  cursorColor: Colors.grey[700],
-                                  decoration: InputDecoration(
-                                      hintText: 'Enter price',
-                                      hintStyle: TextStyle(
-                                          fontFamily: 'Segoe', fontSize: 12)),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              GestureDetector(
-                                onTap: () async {
-                                  getImage();
-                                },
-                                child: Container(
-                                  height: 40,
-                                  width: width * 0.9,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(6),
-                                      color: Colors.white70,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.grey,
-                                        ),
-                                      ]),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: Align(
-                                            alignment: Alignment.centerLeft,
-                                            child: Container(
-                                                padding:
-                                                    EdgeInsets.only(left: 10),
-                                                child: Text(
-                                                  'Select primary image',
-                                                  style: TextStyle(
-                                                      fontFamily: 'Segoe',
-                                                      fontSize: 13),
-                                                ))),
-                                      ),
-                                      Container(
-                                          padding: EdgeInsets.only(right: 10),
-                                          child: Icon(Icons.image)),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: Align(
-                                  alignment: Alignment.bottomCenter,
-                                  child: Container(
-                                    padding: EdgeInsets.only(right: 10),
-                                    height: 40,
-                                    width: width * 0.9,
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        GestureDetector(
-                                          onTap: () {
-                                            Navigator.pop(context);
-                                            nameCon.clear();
-                                            quanCon.clear();
-                                            priCon.clear();
-                                            catCon.clear();
-                                            idCon.clear();
-                                          },
-                                          child: Text(
-                                            'Cancel',
-                                            style: TextStyle(
-                                              fontFamily: 'Segoe',
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: 50,
-                                        ),
-                                        GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              allData.add(Data(
-                                                  name: nameCon.text,
-                                                  category: catCon.text,
-                                                  id: int.parse(idCon.text),
-                                                  price: priCon.text,
-                                                  image: _image,
-                                                  quantity:
-                                                      int.parse(quanCon.text)));
-                                            });
-                                            Navigator.pop(context);
-                                            nameCon.clear();
-                                            quanCon.clear();
-                                            priCon.clear();
-                                            catCon.clear();
-                                            idCon.clear();
-                                          },
-                                          child: Text(
-                                            'Add',
-                                            style: TextStyle(
-                                                fontFamily: 'Segoe',
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.green),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
                       ),
-                    ),
-                  );
-                });
-          },
-          backgroundColor: Color.fromRGBO(102, 126, 234, 1),
-          child: Icon(Icons.add),
-          heroTag: Text('Add Product'),
+                    );
+                  });
+            },
+            backgroundColor: Color.fromRGBO(102, 126, 234, 1),
+            child: Icon(Icons.add),
+            heroTag: Text('Add Product'),
+          ),
         ),
       ),
     );

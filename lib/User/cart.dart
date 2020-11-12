@@ -42,11 +42,11 @@ class _CartState extends State<Cart> {
                   height: screenHeight * 0.1,
                   width: screenWidth,
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 12),
+                    padding: const EdgeInsets.only(left: 16),
                     child: Text(
                       'Cart',
                       style: TextStyle(
-                        fontSize: screenHeight * 0.075,
+                        fontSize: screenHeight * 0.068,
                         fontFamily: 'Segoe',
                         color: Colors.grey[800],
                       ),

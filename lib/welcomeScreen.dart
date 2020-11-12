@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:bolt/User/loginScreen.dart';
 import 'package:bolt/User/signupScreen.dart';
 import 'package:bolt/Vendor/vendorLogin.dart';
-import 'package:bolt/Vendor/vendorSignup.dart';
 import 'package:flutter/material.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -299,26 +298,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                     ),
                                   ),
                                   SizedBox(height: 17),
-                                  GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  VendorSignup()));
-                                    },
-                                    child: Container(
-                                      child: Center(
-                                        child: Text(
-                                          'Signup',
-                                          style: TextStyle(
-                                              fontSize: 15,
-                                              fontFamily: 'Segoe',
-                                              color: Colors.grey[700]),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
                                   SizedBox(height: 20),
                                   Container(
                                     width: 150,

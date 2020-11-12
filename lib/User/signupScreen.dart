@@ -1,5 +1,5 @@
-import 'package:bolt/User/homeScreen.dart';
 import 'package:bolt/User/loginScreen.dart';
+import 'package:bolt/welcomeScreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +35,7 @@ class _SignUpState extends State<SignUp> {
       setState(() {
         signUp = true;
       });
-      if (FirebaseAuth.instance.currentUser != null) {
+      if (user != null) {
         try {
           FirebaseFirestore.instance
               .collection("user")
@@ -43,7 +43,7 @@ class _SignUpState extends State<SignUp> {
               .set({
             'created_at': Timestamp.now(),
             'username': nameCon.text,
-            'email': emailCon.text,
+            'email': emailCon.text
           });
         } catch (e) {
           print('Error is: ' + e);
@@ -63,19 +63,29 @@ class _SignUpState extends State<SignUp> {
                     "Continue",
                     style: TextStyle(color: Colors.black, fontFamily: 'Segoe'),
                   ),
-                  onPressed: () {
+                  onPressed: () async {
+                    try {
+                      await FirebaseAuth.instance.signOut();
+                    } catch (e) {
+                      print(e);
+                    }
                     Navigator.pushAndRemoveUntil(
                         context,
-                        MaterialPageRoute(builder: (context) => HomeScreen()),
+                        MaterialPageRoute(builder: (context) => LoginScreen()),
                         (route) => false);
                   },
                 ),
               ],
             );
-          }).then((value) {
+          }).then((value) async {
+        try {
+          await FirebaseAuth.instance.signOut();
+        } catch (e) {
+          print(e);
+        }
         Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => HomeScreen()),
+            MaterialPageRoute(builder: (context) => LoginScreen()),
             (route) => false);
       });
     } on FirebaseAuthException catch (e) {
@@ -99,19 +109,16 @@ class _SignUpState extends State<SignUp> {
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    int count = 0;
 
     int emailValidate;
     bool emailValidatorvar;
     return WillPopScope(
       onWillPop: () {
-        if (FocusScope.of(context).isFirstFocus == false) {
-          Navigator.pop(context);
-        } else {
-          FocusScope.of(context).unfocus();
-        }
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => WelcomeScreen()),
+            (route) => false);
 
-        count++;
         return null;
       },
       child: Scaffold(
@@ -124,7 +131,10 @@ class _SignUpState extends State<SignUp> {
                 color: Colors.grey[700],
               ),
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => WelcomeScreen()),
+                    (route) => false);
               }),
           elevation: 0,
         ),
@@ -178,6 +188,7 @@ class _SignUpState extends State<SignUp> {
                                       width: width * 0.91,
                                       height: height * 0.082,
                                       child: TextFormField(
+                                        style: TextStyle(fontFamily: 'Segoe'),
                                         textInputAction: TextInputAction.next,
                                         keyboardType:
                                             TextInputType.emailAddress,
@@ -200,6 +211,7 @@ class _SignUpState extends State<SignUp> {
                                       width: width * 0.91,
                                       height: height * 0.082,
                                       child: TextFormField(
+                                        style: TextStyle(fontFamily: 'Segoe'),
                                         validator: (input) {
                                           emailValidate = validateEmail(input);
                                           return null;
@@ -226,6 +238,8 @@ class _SignUpState extends State<SignUp> {
                                       width: width * 0.91,
                                       height: height * 0.082,
                                       child: TextFormField(
+                                        style: TextStyle(fontFamily: 'Segoe'),
+
                                         // ignore: missing_return
                                         validator: (input) {
                                           emailValidatorvar =
