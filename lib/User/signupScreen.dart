@@ -32,6 +32,10 @@ class _SignUpState extends State<SignUp> {
       // ignore: unused_local_variable
       UserCredential user = await mauth.createUserWithEmailAndPassword(
           email: emailCon.text, password: passCon.text);
+      User users = FirebaseAuth.instance.currentUser;
+      if (!users.emailVerified) {
+        await users.sendEmailVerification();
+      }
       setState(() {
         signUp = true;
       });
@@ -43,7 +47,11 @@ class _SignUpState extends State<SignUp> {
               .set({
             'created_at': Timestamp.now(),
             'username': nameCon.text,
-            'email': emailCon.text
+            'email': emailCon.text,
+            'gender': '',
+            'city': '',
+            'phone': '',
+            'address': ''
           });
         } catch (e) {
           print('Error is: ' + e);

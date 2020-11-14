@@ -51,6 +51,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     .get();
                 LocalUser.userData.username = snap['username'].toString();
                 LocalUser.userData.email = snap['email'].toString();
+                LocalUser.userData.gender = snap['gender'].toString();
+                LocalUser.userData.address = snap['address'].toString();
+                LocalUser.userData.phone = snap['phone'].toString();
+                LocalUser.userData.city = snap['city'].toString();
               } catch (e) {
                 print(e);
               }
@@ -119,8 +123,6 @@ class _LoginScreenState extends State<LoginScreen> {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
 
-    int emailValidate;
-    bool emailValidatorvar;
     return WillPopScope(
       onWillPop: () {
         Navigator.pushAndRemoveUntil(
@@ -195,10 +197,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                   child: TextFormField(
                                     cursorColor: Colors.black,
                                     style: TextStyle(fontFamily: 'Segoe'),
-                                    validator: (input) {
-                                      emailValidate = validateEmail(input);
-                                      return null;
-                                    },
                                     textInputAction: TextInputAction.next,
                                     keyboardType: TextInputType.emailAddress,
                                     controller: emailCon,
@@ -221,12 +219,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                   height: 50,
                                   child: TextFormField(
                                     style: TextStyle(fontFamily: 'Segoe'),
-
-                                    // ignore: missing_return
-                                    validator: (input) {
-                                      emailValidatorvar =
-                                          validateStructure(input);
-                                    },
                                     obscureText: showPass,
                                     controller: passCon,
                                     cursorColor: Colors.black,
@@ -252,46 +244,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                   width: width - width * 0.08,
                                   child: GestureDetector(
                                     onTap: () {
-                                      FormState fs = fkey.currentState;
-                                      fs.validate();
-                                      if (emailValidate == 1) {
-                                        Fluttertoast.showToast(
-                                          msg: "Invalid Email",
-                                          toastLength: Toast.LENGTH_LONG,
-                                          gravity: ToastGravity.BOTTOM,
-                                          timeInSecForIosWeb: 3,
-                                          backgroundColor: Colors.grey,
-                                          textColor: Colors.white,
-                                          fontSize: 15,
-                                        );
-                                      } else if (emailValidate == 2) {
-                                        Fluttertoast.showToast(
-                                          msg: "Email is Empty",
-                                          toastLength: Toast.LENGTH_LONG,
-                                          gravity: ToastGravity.BOTTOM,
-                                          timeInSecForIosWeb: 3,
-                                          backgroundColor: Colors.grey,
-                                          textColor: Colors.white,
-                                          fontSize: 15,
-                                        );
-                                      } else {}
-
-                                      if (emailValidatorvar == true) {
-                                        setState(() {
-                                          login = false;
-                                        });
-                                        logIn();
-                                      } else {
-                                        Fluttertoast.showToast(
-                                          msg: "Invalid Password",
-                                          toastLength: Toast.LENGTH_LONG,
-                                          gravity: ToastGravity.BOTTOM,
-                                          timeInSecForIosWeb: 3,
-                                          backgroundColor: Colors.grey,
-                                          textColor: Colors.white,
-                                          fontSize: 15,
-                                        );
-                                      }
+                                      setState(() {
+                                        login = false;
+                                      });
+                                      logIn();
                                     },
                                     child: Center(
                                       child: Container(
@@ -386,25 +342,4 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-}
-
-int validateEmail(String value) {
-  if (value.isEmpty) return 2;
-
-  Pattern pattern =
-      r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
-
-  RegExp regex = new RegExp(pattern);
-
-  if (!regex.hasMatch(value.trim())) {
-    return 1;
-  }
-  return 0;
-}
-
-bool validateStructure(String value) {
-  String pattern =
-      r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$';
-  RegExp regExp = new RegExp(pattern);
-  return regExp.hasMatch(value);
 }

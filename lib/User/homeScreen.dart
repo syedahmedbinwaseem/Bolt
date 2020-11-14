@@ -1,7 +1,8 @@
 import 'dart:ui';
-import 'package:bolt/User/localUser.dart';
+import 'package:bolt/User/signupScreen.dart';
 import 'package:bolt/Utils/drawer.dart';
 import 'package:bolt/User/productScreen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -13,8 +14,14 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
 
+  Future<bool> isLoggedIn() async {
+    User user = FirebaseAuth.instance.currentUser;
+    print(user.emailVerified);
+  }
+
   @override
   Widget build(BuildContext context) {
+    isLoggedIn();
     return WillPopScope(
       onWillPop: () {
         return showDialog(
