@@ -1,4 +1,7 @@
 import 'package:bolt/User/cart.dart';
+import 'package:bolt/User/homeScreen.dart';
+import 'package:bolt/User/localUser.dart';
+import 'package:bolt/User/localUser.dart';
 import 'package:bolt/User/loginScreen.dart';
 import 'package:bolt/User/profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -23,9 +26,15 @@ class _DrawerScreenState extends State<DrawerScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                'Home',
-                style: TextStyle(fontFamily: 'Segoe', fontSize: 24),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => HomeScreen()));
+                },
+                child: Text(
+                  'Home',
+                  style: TextStyle(fontFamily: 'Segoe', fontSize: 24),
+                ),
               ),
               SizedBox(height: height * 0.04),
               GestureDetector(
@@ -64,6 +73,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
                 onTap: () async {
                   try {
                     await FirebaseAuth.instance.signOut();
+
                     print("logout");
                   } catch (e) {
                     print(e);
