@@ -172,10 +172,7 @@ class _VendorLoginState extends State<VendorLogin> {
                                   width: width * 0.91,
                                   height: 50,
                                   child: TextFormField(
-                                    validator: (input) {
-                                      emailValidate = validateEmail(input);
-                                      return null;
-                                    },
+                                    style: TextStyle(fontFamily: 'Segoe'),
                                     textInputAction: TextInputAction.next,
                                     keyboardType: TextInputType.emailAddress,
                                     controller: emailCon,
@@ -197,11 +194,7 @@ class _VendorLoginState extends State<VendorLogin> {
                                   width: width * 0.91,
                                   height: 50,
                                   child: TextFormField(
-                                    // ignore: missing_return
-                                    validator: (input) {
-                                      emailValidatorvar =
-                                          validateStructure(input);
-                                    },
+                                    style: TextStyle(fontFamily: 'Segoe'),
                                     obscureText: showPass,
                                     controller: passCon,
                                     cursorColor: Colors.black,
@@ -227,46 +220,10 @@ class _VendorLoginState extends State<VendorLogin> {
                                   width: width - width * 0.08,
                                   child: GestureDetector(
                                     onTap: () {
-                                      FormState fs = fkey.currentState;
-                                      fs.validate();
-                                      if (emailValidate == 1) {
-                                        Fluttertoast.showToast(
-                                          msg: "Invalid Email",
-                                          toastLength: Toast.LENGTH_LONG,
-                                          gravity: ToastGravity.BOTTOM,
-                                          timeInSecForIosWeb: 3,
-                                          backgroundColor: Colors.grey,
-                                          textColor: Colors.white,
-                                          fontSize: 15,
-                                        );
-                                      } else if (emailValidate == 2) {
-                                        Fluttertoast.showToast(
-                                          msg: "Email is Empty",
-                                          toastLength: Toast.LENGTH_LONG,
-                                          gravity: ToastGravity.BOTTOM,
-                                          timeInSecForIosWeb: 3,
-                                          backgroundColor: Colors.grey,
-                                          textColor: Colors.white,
-                                          fontSize: 15,
-                                        );
-                                      } else {}
-
-                                      if (emailValidatorvar == true) {
-                                        setState(() {
-                                          login = false;
-                                        });
-                                        logIn();
-                                      } else {
-                                        Fluttertoast.showToast(
-                                          msg: "Invalid Password",
-                                          toastLength: Toast.LENGTH_LONG,
-                                          gravity: ToastGravity.BOTTOM,
-                                          timeInSecForIosWeb: 3,
-                                          backgroundColor: Colors.grey,
-                                          textColor: Colors.white,
-                                          fontSize: 15,
-                                        );
-                                      }
+                                      setState(() {
+                                        login = false;
+                                      });
+                                      logIn();
                                     },
                                     child: Center(
                                       child: Container(
