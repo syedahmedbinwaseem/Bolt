@@ -36,6 +36,7 @@ class _VendorLoginState extends State<VendorLogin> {
             // ignore: unused_local_variable
             UserCredential user = await mauth.signInWithEmailAndPassword(
                 email: emailCon.text, password: passCon.text);
+            print('Login success');
             setState(() {
               login = true;
             });

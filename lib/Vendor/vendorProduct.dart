@@ -2,13 +2,16 @@ import 'dart:io';
 
 import 'package:bolt/Vendor/data.dart';
 import 'package:bolt/Vendor/vendorDrawer.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class VendorProduct extends StatefulWidget {
   @override
@@ -18,6 +21,8 @@ class VendorProduct extends StatefulWidget {
 class _VendorProductState extends State<VendorProduct>
     with TickerProviderStateMixin {
   GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+  firebase_storage.FirebaseStorage storage =
+      firebase_storage.FirebaseStorage.instance;
   final itemsList = List<String>.generate(20, (n) => "List item $n");
   List<Data> allData = List<Data>();
   File _image;
@@ -31,6 +36,9 @@ class _VendorProductState extends State<VendorProduct>
   int womenCount;
   int kidCount;
   TabController tabController;
+  QuerySnapshot menSnap;
+  QuerySnapshot womenSnap;
+  QuerySnapshot kidsSnap;
   int tabindex;
   var category = ["Men", "Women", "Kids"];
   var currentItems = null;
@@ -38,6 +46,7 @@ class _VendorProductState extends State<VendorProduct>
   bool reload = false;
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
+  String imagePath;
 
   Future getImage() async {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
@@ -51,7 +60,7 @@ class _VendorProductState extends State<VendorProduct>
     });
   }
 
-  void abc() async {
+  void getProducts() async {
     try {
       QuerySnapshot snap = await FirebaseFirestore.instance
           .collection('product')
@@ -79,6 +88,9 @@ class _VendorProductState extends State<VendorProduct>
         menCount = snap.docs.length;
         womenCount = snap1.docs.length;
         kidCount = snap2.docs.length;
+        menSnap = snap;
+        womenSnap = snap1;
+        kidsSnap = snap2;
       });
 
       _refreshController.refreshCompleted();
@@ -90,8 +102,8 @@ class _VendorProductState extends State<VendorProduct>
 
   @override
   void initState() {
-    abc();
     super.initState();
+    getProducts();
     tabController = TabController(length: 3, vsync: this);
     tabController.addListener(() {
       if (tabController.indexIsChanging) {
@@ -102,14 +114,27 @@ class _VendorProductState extends State<VendorProduct>
     });
   }
 
+  Future uploadFile(String id, String folder) async {
+    try {
+      Reference storageReference = FirebaseStorage.instance
+          .ref()
+          .child('$folder/${id + Timestamp.now().toString()}');
+      UploadTask uploadTask = storageReference.putFile(_image);
+      await uploadTask.whenComplete(() async {
+        await storageReference.getDownloadURL().then((value) {
+          setState(() {
+            imagePath = value;
+          });
+        });
+      });
+      print('File Uploaded');
+    } catch (e) {
+      print('not');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // abc().then((value) {
-    //   setState(() {
-    //     menCount = value;
-    //   });
-    // });
-    print(menCount);
     var width = MediaQuery.of(context).size.width;
     var h = AppBar().preferredSize.height;
     var padding = MediaQuery.of(context).padding;
@@ -207,97 +232,475 @@ class _VendorProductState extends State<VendorProduct>
                 child: SmartRefresher(
                   controller: _refreshController,
                   physics: BouncingScrollPhysics(),
-                  header: WaterDropHeader(
-                    waterDropColor: Color.fromRGBO(102, 126, 234, 1),
-                    complete: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.done,
-                            color: Color.fromRGBO(102, 126, 234, 1),
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Text(
-                            "Refresh Completed",
-                            style: TextStyle(
-                              fontFamily: 'Segoe',
-                              color: Color.fromRGBO(102, 126, 234, 1),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                  header: WaterDropMaterialHeader(
+                    backgroundColor: Color.fromRGBO(102, 126, 234, 1),
+                    color: Colors.white,
                   ),
                   onRefresh: () {
-                    abc();
+                    getProducts();
                   },
-                  child: ListView.builder(
-                      itemCount: menCount,
-                      itemBuilder: (context, index) => Padding(
-                            padding: const EdgeInsets.only(
-                                top: 5, bottom: 5, left: 5, right: 5),
-                            child: GestureDetector(
-                              onLongPress: () {
-                                print('long press');
-                              },
-                              child: Container(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.15,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.white,
+                  child: menCount == null
+                      ? Container()
+                      : ListView.builder(
+                          itemCount: menCount,
+                          itemBuilder: (context, index) => Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 5, bottom: 5, left: 5, right: 5),
+                                child: GestureDetector(
+                                  onLongPress: () {
+                                    print('long press');
+                                  },
+                                  child: Container(
+                                    height: MediaQuery.of(context).size.height *
+                                        0.15,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: Colors.white,
+                                        boxShadow: [
+                                          BoxShadow(
+                                              color: Colors.grey[800],
+                                              spreadRadius: -2.5,
+                                              blurRadius: 1,
+                                              offset: Offset(2, 3))
+                                        ]),
+                                    child: Row(
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Container(
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.13,
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.13,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              child: CachedNetworkImage(
+                                                imageUrl: menSnap.docs[index]
+                                                        ['image_path']
+                                                    .toString(),
+                                                fit: BoxFit.cover,
+                                                progressIndicatorBuilder:
+                                                    (context, url,
+                                                            downloadProgress) =>
+                                                        Center(
+                                                  child: SizedBox(
+                                                    height: 35,
+                                                    width: 35,
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                            backgroundColor:
+                                                                Colors.white,
+                                                            valueColor:
+                                                                AlwaysStoppedAnimation<
+                                                                    Color>(
+                                                              Color.fromRGBO(
+                                                                  102,
+                                                                  126,
+                                                                  234,
+                                                                  1),
+                                                            ),
+                                                            strokeWidth: 3,
+                                                            value:
+                                                                downloadProgress
+                                                                    .progress),
+                                                  ),
+                                                ),
+                                                errorWidget:
+                                                    (context, url, error) =>
+                                                        Icon(Icons.error),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: 20,
+                                        ),
+                                        Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                                menSnap.docs[index]['name'] ==
+                                                        null
+                                                    ? ''
+                                                    : menSnap.docs[index]
+                                                        ['name'],
+                                                style: TextStyle(
+                                                    fontFamily: 'Segoe',
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 20)),
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                            Text(
+                                                menSnap.docs[index]['price'] ==
+                                                        null
+                                                    ? ''
+                                                    : 'Rs. ' +
+                                                        menSnap.docs[index]
+                                                            ['price'] +
+                                                        "/-",
+                                                style: TextStyle(
+                                                    fontFamily: 'Segoe',
+                                                    fontSize: 15)),
+                                          ],
+                                        ),
+                                        Expanded(
+                                          child: Column(
+                                            children: [
+                                              Expanded(
+                                                flex: 1,
+                                                child: Align(
+                                                  alignment: Alignment.topRight,
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.only(
+                                                              topRight: Radius
+                                                                  .circular(10),
+                                                              bottomLeft: Radius
+                                                                  .circular(
+                                                                      10)),
+                                                      color: Colors.grey[300],
+                                                    ),
+                                                    // height: 35,
+                                                    width: 110,
+                                                    child: Center(
+                                                      child: Text(
+                                                          menSnap.docs[index]
+                                                                      .id ==
+                                                                  null
+                                                              ? ''
+                                                              : 'ID: ' +
+                                                                  menSnap
+                                                                      .docs[
+                                                                          index]
+                                                                      .id,
+                                                          style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontFamily: 'Segoe',
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          )),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(height: 15),
+                                              Expanded(
+                                                flex: 1,
+                                                child: Align(
+                                                  alignment:
+                                                      Alignment.bottomRight,
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.only(
+                                                              topLeft: Radius
+                                                                  .circular(10),
+                                                              bottomRight:
+                                                                  Radius
+                                                                      .circular(
+                                                                          10)),
+                                                      color: Colors.grey[300],
+                                                    ),
+                                                    width: 110,
+                                                    child: Center(
+                                                      child: Text(
+                                                          menSnap.docs[index][
+                                                                      'quantity'] ==
+                                                                  null
+                                                              ? ''
+                                                              : menSnap.docs[
+                                                                      index]
+                                                                  ['quantity'],
+                                                          style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontFamily: 'Segoe',
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          )),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          )),
+                              )),
                 ),
               ),
               Container(
                 height: MediaQuery.of(context).size.height,
                 width: MediaQuery.of(context).size.width,
-                child: ListView.builder(
-                    itemCount: womenCount,
-                    itemBuilder: (context, index) => Padding(
-                          padding: const EdgeInsets.only(
-                              top: 5, bottom: 5, left: 5, right: 5),
-                          child: GestureDetector(
-                            onLongPress: () {
-                              print('long press');
-                            },
-                            child: Container(
-                              height: MediaQuery.of(context).size.height * 0.15,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        )),
+                child: SmartRefresher(
+                  controller: _refreshController,
+                  physics: BouncingScrollPhysics(),
+                  header: WaterDropMaterialHeader(
+                    backgroundColor: Color.fromRGBO(102, 126, 234, 1),
+                    color: Colors.white,
+                  ),
+                  onRefresh: () {
+                    getProducts();
+                  },
+                  child: womenCount == null
+                      ? Container()
+                      : ListView.builder(
+                          itemCount: womenCount,
+                          itemBuilder: (context, index) => Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 5, bottom: 5, left: 5, right: 5),
+                                child: GestureDetector(
+                                  onLongPress: () {
+                                    print('long press');
+                                  },
+                                  child: Container(
+                                    height: MediaQuery.of(context).size.height *
+                                        0.15,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: Colors.white,
+                                        boxShadow: [
+                                          BoxShadow(
+                                              color: Colors.grey[800],
+                                              spreadRadius: -2.5,
+                                              blurRadius: 1,
+                                              offset: Offset(2, 3))
+                                        ]),
+                                    child: Row(
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Container(
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.13,
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.13,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              child: CachedNetworkImage(
+                                                imageUrl: womenSnap.docs[index]
+                                                        ['image_path']
+                                                    .toString(),
+                                                fit: BoxFit.cover,
+                                                progressIndicatorBuilder:
+                                                    (context, url,
+                                                            downloadProgress) =>
+                                                        Center(
+                                                  child: SizedBox(
+                                                    height: 35,
+                                                    width: 35,
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                            backgroundColor:
+                                                                Colors.white,
+                                                            valueColor:
+                                                                AlwaysStoppedAnimation<
+                                                                    Color>(
+                                                              Color.fromRGBO(
+                                                                  102,
+                                                                  126,
+                                                                  234,
+                                                                  1),
+                                                            ),
+                                                            strokeWidth: 3,
+                                                            value:
+                                                                downloadProgress
+                                                                    .progress),
+                                                  ),
+                                                ),
+                                                errorWidget:
+                                                    (context, url, error) =>
+                                                        Icon(Icons.error),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: 20,
+                                        ),
+                                        Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                                womenSnap.docs[index]['name'] ==
+                                                        null
+                                                    ? ''
+                                                    : menSnap.docs[index]
+                                                        ['name'],
+                                                style: TextStyle(
+                                                    fontFamily: 'Segoe',
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 20)),
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                            Text(
+                                                womenSnap.docs[index]
+                                                            ['price'] ==
+                                                        null
+                                                    ? ''
+                                                    : 'Rs. ' +
+                                                        menSnap.docs[index]
+                                                            ['price'] +
+                                                        "/-",
+                                                style: TextStyle(
+                                                    fontFamily: 'Segoe',
+                                                    fontSize: 15)),
+                                          ],
+                                        ),
+                                        Expanded(
+                                          child: Column(
+                                            children: [
+                                              Expanded(
+                                                flex: 1,
+                                                child: Align(
+                                                  alignment: Alignment.topRight,
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.only(
+                                                              topRight: Radius
+                                                                  .circular(10),
+                                                              bottomLeft: Radius
+                                                                  .circular(
+                                                                      10)),
+                                                      color: Colors.grey[300],
+                                                    ),
+                                                    width: 110,
+                                                    child: Center(
+                                                      child: Text(
+                                                          womenSnap.docs[index]
+                                                                      .id ==
+                                                                  null
+                                                              ? ''
+                                                              : 'ID: ' +
+                                                                  menSnap
+                                                                      .docs[
+                                                                          index]
+                                                                      .id,
+                                                          style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontFamily: 'Segoe',
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          )),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(height: 15),
+                                              Expanded(
+                                                flex: 1,
+                                                child: Align(
+                                                  alignment:
+                                                      Alignment.bottomRight,
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.only(
+                                                              topLeft: Radius
+                                                                  .circular(10),
+                                                              bottomRight:
+                                                                  Radius
+                                                                      .circular(
+                                                                          10)),
+                                                      color: Colors.grey[300],
+                                                    ),
+                                                    width: 110,
+                                                    child: Center(
+                                                      child: Text(
+                                                          womenSnap.docs[index][
+                                                                      'quantity'] ==
+                                                                  null
+                                                              ? ''
+                                                              : menSnap.docs[
+                                                                      index]
+                                                                  ['quantity'],
+                                                          style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontFamily: 'Segoe',
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          )),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              )),
+                ),
               ),
               Container(
                 height: MediaQuery.of(context).size.height,
                 width: MediaQuery.of(context).size.width,
-                child: ListView.builder(
-                    itemCount: kidCount,
-                    itemBuilder: (context, index) => Padding(
-                          padding: const EdgeInsets.only(
-                              top: 5, bottom: 5, left: 5, right: 5),
-                          child: GestureDetector(
-                            onLongPress: () {
-                              print('long press');
-                            },
-                            child: Container(
-                              height: MediaQuery.of(context).size.height * 0.15,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        )),
+                child: SmartRefresher(
+                  controller: _refreshController,
+                  physics: BouncingScrollPhysics(),
+                  header: WaterDropMaterialHeader(
+                    backgroundColor: Color.fromRGBO(102, 126, 234, 1),
+                    color: Colors.white,
+                  ),
+                  onRefresh: () {
+                    getProducts;
+                  },
+                  child: kidCount == null
+                      ? Container()
+                      : ListView.builder(
+                          itemCount: kidCount,
+                          itemBuilder: (context, index) => Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 5, bottom: 5, left: 5, right: 5),
+                                child: GestureDetector(
+                                  onLongPress: () {
+                                    print('long press');
+                                  },
+                                  child: Container(
+                                    height: MediaQuery.of(context).size.height *
+                                        0.15,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              )),
+                ),
               )
             ],
           ),
@@ -678,50 +1081,71 @@ class _VendorProductState extends State<VendorProduct>
                                                         if (checkAlreadyExist ==
                                                             0) {
                                                           try {
-                                                            FirebaseFirestore
-                                                                .instance
-                                                                .collection(
-                                                                    'product')
-                                                                .doc(
-                                                                    'admin1@gmail.com')
-                                                                .collection(
-                                                                    'products')
-                                                                .doc('category')
-                                                                .collection(
-                                                                    currentItems
+                                                            await uploadFile(
+                                                                    idCon.text,
+                                                                    currentItems)
+                                                                .then((value) {
+                                                              try {
+                                                                FirebaseFirestore
+                                                                    .instance
+                                                                    .collection(
+                                                                        'product')
+                                                                    .doc(
+                                                                        'admin1@gmail.com')
+                                                                    .collection(
+                                                                        'products')
+                                                                    .doc(
+                                                                        'category')
+                                                                    .collection(currentItems
                                                                         .toString()
                                                                         .toLowerCase())
-                                                                .doc(idCon.text)
-                                                                .set({
-                                                              'name':
-                                                                  nameCon.text,
-                                                              'quantity':
-                                                                  quanCon.text,
-                                                              'price':
-                                                                  priCon.text
-                                                            });
-                                                            setState(() {
-                                                              saved = true;
-                                                            });
-                                                            Fluttertoast
-                                                                .showToast(
-                                                              msg:
-                                                                  "Product added successfully",
-                                                              toastLength: Toast
-                                                                  .LENGTH_LONG,
-                                                              gravity:
-                                                                  ToastGravity
-                                                                      .BOTTOM,
-                                                              timeInSecForIosWeb:
-                                                                  3,
-                                                              backgroundColor:
-                                                                  Colors.green,
-                                                              textColor:
-                                                                  Colors.white,
-                                                              fontSize: 15,
-                                                            );
+                                                                    .doc(idCon
+                                                                        .text)
+                                                                    .set({
+                                                                  'name':
+                                                                      nameCon
+                                                                          .text,
+                                                                  'quantity':
+                                                                      quanCon
+                                                                          .text,
+                                                                  'price':
+                                                                      priCon
+                                                                          .text,
+                                                                  'image_path':
+                                                                      imagePath
+                                                                });
+                                                                setState(() {
+                                                                  saved = true;
+                                                                });
+                                                                getProducts();
+                                                                Fluttertoast
+                                                                    .showToast(
+                                                                  msg:
+                                                                      "Product added successfully",
+                                                                  toastLength: Toast
+                                                                      .LENGTH_LONG,
+                                                                  gravity:
+                                                                      ToastGravity
+                                                                          .BOTTOM,
+                                                                  timeInSecForIosWeb:
+                                                                      3,
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .green,
+                                                                  textColor:
+                                                                      Colors
+                                                                          .white,
+                                                                  fontSize: 15,
+                                                                );
+                                                                setState(() {
+                                                                  _image = null;
+                                                                });
 
-                                                            exit = true;
+                                                                exit = true;
+                                                              } catch (e) {
+                                                                print(e);
+                                                              }
+                                                            });
                                                           } catch (e) {
                                                             print("Ex: " + e);
                                                             exit = false;
