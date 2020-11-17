@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:bolt/User/signupScreen.dart';
 import 'package:bolt/Vendor/vendorProduct.dart';
 import 'package:bolt/welcomeScreen.dart';
@@ -220,11 +222,35 @@ class _VendorLoginState extends State<VendorLogin> {
                                 Container(
                                   width: width - width * 0.08,
                                   child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        login = false;
-                                      });
-                                      logIn();
+                                    onTap: () async {
+                                      try {
+                                        final result =
+                                            await InternetAddress.lookup(
+                                                'google.com');
+                                        if (result.isNotEmpty &&
+                                            result[0].rawAddress.isNotEmpty) {
+                                          print('connected');
+                                          setState(() {
+                                            login = false;
+                                          });
+                                          logIn();
+                                        }
+                                      } on SocketException catch (_) {
+                                        print('not connected');
+                                        setState(() {
+                                          login = false;
+                                        });
+                                        Fluttertoast.showToast(
+                                          msg:
+                                              "You're not connected to the internet",
+                                          toastLength: Toast.LENGTH_LONG,
+                                          gravity: ToastGravity.BOTTOM,
+                                          timeInSecForIosWeb: 3,
+                                          backgroundColor: Colors.red[400],
+                                          textColor: Colors.white,
+                                          fontSize: 15,
+                                        );
+                                      }
                                     },
                                     child: Center(
                                       child: Container(
@@ -278,7 +304,16 @@ class _VendorLoginState extends State<VendorLogin> {
           login == null
               ? Container()
               : login == false
-                  ? Center(child: CircularProgressIndicator())
+                  ? Center(
+                      child: Center(
+                      child: CircularProgressIndicator(
+                        backgroundColor: Colors.transparent,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Color.fromRGBO(102, 126, 234, 1),
+                        ),
+                        strokeWidth: 3,
+                      ),
+                    ))
                   : Container()
         ],
       ),

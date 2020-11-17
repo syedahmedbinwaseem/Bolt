@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:bolt/User/loginScreen.dart';
 import 'package:bolt/welcomeScreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -277,7 +279,7 @@ class _SignUpState extends State<SignUp> {
                                     Container(
                                       width: width - width * 0.08,
                                       child: GestureDetector(
-                                        onTap: () {
+                                        onTap: () async {
                                           FormState fs = fkey.currentState;
                                           fs.validate();
                                           if (emailValidate == 1) {
@@ -303,17 +305,37 @@ class _SignUpState extends State<SignUp> {
                                           } else {}
 
                                           if (emailValidatorvar == true) {
-                                            setState(() {
-                                              signUp = false;
-                                            });
-                                            signup();
-
-                                            // Navigator.push(
-                                            //   context,
-                                            //   MaterialPageRoute(
-                                            //       builder: (context) =>
-                                            //           HomeScreen()),
-                                            // );
+                                            try {
+                                              final result =
+                                                  await InternetAddress.lookup(
+                                                      'google.com');
+                                              if (result.isNotEmpty &&
+                                                  result[0]
+                                                      .rawAddress
+                                                      .isNotEmpty) {
+                                                print('connected');
+                                                setState(() {
+                                                  signUp = false;
+                                                });
+                                                signup();
+                                              }
+                                            } on SocketException catch (_) {
+                                              print('not connected');
+                                              setState(() {
+                                                signUp = false;
+                                              });
+                                              Fluttertoast.showToast(
+                                                msg:
+                                                    "You're not connected to the internet",
+                                                toastLength: Toast.LENGTH_LONG,
+                                                gravity: ToastGravity.BOTTOM,
+                                                timeInSecForIosWeb: 3,
+                                                backgroundColor:
+                                                    Colors.red[400],
+                                                textColor: Colors.white,
+                                                fontSize: 15,
+                                              );
+                                            }
                                           } else {
                                             Fluttertoast.showToast(
                                               msg: "Invalid Password",
@@ -417,7 +439,15 @@ class _SignUpState extends State<SignUp> {
                   ? Container()
                   : signUp == false
                       ? Center(
-                          child: CircularProgressIndicator(),
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              backgroundColor: Colors.transparent,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Color.fromRGBO(102, 126, 234, 1),
+                              ),
+                              strokeWidth: 3,
+                            ),
+                          ),
                         )
                       : Container()
             ],

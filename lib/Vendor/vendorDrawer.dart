@@ -1,4 +1,5 @@
 import 'package:bolt/Vendor/vendorLogin.dart';
+import 'package:bolt/Vendor/vendorProduct.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -21,9 +22,15 @@ class _VendorDrawerState extends State<VendorDrawer> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                'Home',
-                style: TextStyle(fontFamily: 'Segoe', fontSize: 24),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => VendorProduct()));
+                },
+                child: Text(
+                  'Home',
+                  style: TextStyle(fontFamily: 'Segoe', fontSize: 24),
+                ),
               ),
               SizedBox(height: height * 0.04),
               Text(
