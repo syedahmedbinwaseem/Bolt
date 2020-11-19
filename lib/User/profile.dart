@@ -49,6 +49,7 @@ class _UserProfileState extends State<UserProfile> {
   Widget build(BuildContext context) {
     var screenWidth = MediaQuery.of(context).size.width;
     var screenHeight = MediaQuery.of(context).size.height;
+
     return SafeArea(
       child: Scaffold(
         drawer: DrawerScreen(),
