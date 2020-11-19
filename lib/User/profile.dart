@@ -688,7 +688,7 @@ class _UserProfileState extends State<UserProfile> {
                                           FilteringTextInputFormatter
                                               .digitsOnly,
                                           _mobileFormatter,
-                                          LengthLimitingTextInputFormatter(12)
+                                          LengthLimitingTextInputFormatter(12),
                                         ],
                                         keyboardType:
                                             TextInputType.numberWithOptions(),
