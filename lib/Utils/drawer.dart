@@ -39,6 +39,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
               SizedBox(height: height * 0.04),
               GestureDetector(
                 onTap: () {
+                  Navigator.pop(context);
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => UserProfile()));
                 },

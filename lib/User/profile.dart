@@ -515,7 +515,8 @@ class _UserProfileState extends State<UserProfile> {
                                     Padding(
                                       padding:
                                           const EdgeInsets.only(left: 15.0),
-                                      child: LocalUser.userData.gender == ''
+                                      child: LocalUser.userData.gender == '' ||
+                                              LocalUser.userData == null
                                           ? Text(
                                               'No gender available',
                                               style: TextStyle(

@@ -35,9 +35,7 @@ class _SignUpState extends State<SignUp> {
       UserCredential user = await mauth.createUserWithEmailAndPassword(
           email: emailCon.text, password: passCon.text);
       User users = FirebaseAuth.instance.currentUser;
-      if (!users.emailVerified) {
-        await users.sendEmailVerification();
-      }
+
       setState(() {
         signUp = true;
       });

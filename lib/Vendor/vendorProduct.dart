@@ -394,13 +394,14 @@ class _VendorProductState extends State<VendorProduct>
                                                                           borderRadius:
                                                                               BorderRadius.circular(10),
                                                                         ),
-                                                                        height: height *
-                                                                            0.67,
+                                                                        // height: height *
+                                                                        //     0.67,
                                                                         width: width *
                                                                             0.9,
                                                                         child: Column(
-                                                                            crossAxisAlignment:
-                                                                                CrossAxisAlignment.start,
+                                                                            mainAxisSize:
+                                                                                MainAxisSize.min,
+                                                                            crossAxisAlignment: CrossAxisAlignment.start,
                                                                             children: [
                                                                               Row(
                                                                                 children: [
@@ -527,182 +528,178 @@ class _VendorProductState extends State<VendorProduct>
                                                                               SizedBox(
                                                                                 height: 10,
                                                                               ),
-                                                                              Expanded(
-                                                                                  child: Align(
-                                                                                alignment: Alignment.bottomCenter,
-                                                                                child: Container(
-                                                                                  padding: EdgeInsets.only(right: 10),
-                                                                                  height: 40,
-                                                                                  width: width * 0.9,
-                                                                                  child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                                                                                    GestureDetector(
-                                                                                      onTap: () {
-                                                                                        nameECon.clear();
-                                                                                        quanECon.clear();
-                                                                                        priECon.clear();
-                                                                                        edititems = null;
-                                                                                        setState(() {
-                                                                                          edit = false;
-                                                                                          _image = null;
-                                                                                        });
-                                                                                        Navigator.pop(context);
-                                                                                      },
-                                                                                      child: Text('Cancel', style: TextStyle(fontFamily: "Segoe", fontWeight: FontWeight.bold)),
-                                                                                    ),
-                                                                                    SizedBox(width: 20),
-                                                                                    GestureDetector(
-                                                                                      onTap: () async {
-                                                                                        if (nameECon.text == '') {
-                                                                                          Fluttertoast.showToast(
-                                                                                            msg: "Name cannot be empty",
-                                                                                            toastLength: Toast.LENGTH_LONG,
-                                                                                            gravity: ToastGravity.BOTTOM,
-                                                                                            timeInSecForIosWeb: 3,
-                                                                                            backgroundColor: Colors.red[400],
-                                                                                            textColor: Colors.white,
-                                                                                            fontSize: 15,
-                                                                                          );
-                                                                                        } else if (quanECon.text == '') {
-                                                                                          Fluttertoast.showToast(
-                                                                                            msg: "Quantity cannot be empty",
-                                                                                            toastLength: Toast.LENGTH_LONG,
-                                                                                            gravity: ToastGravity.BOTTOM,
-                                                                                            timeInSecForIosWeb: 3,
-                                                                                            backgroundColor: Colors.red[400],
-                                                                                            textColor: Colors.white,
-                                                                                            fontSize: 15,
-                                                                                          );
-                                                                                        } else if (priECon.text == '') {
-                                                                                          Fluttertoast.showToast(
-                                                                                            msg: "Price cannot be empty",
-                                                                                            toastLength: Toast.LENGTH_LONG,
-                                                                                            gravity: ToastGravity.BOTTOM,
-                                                                                            timeInSecForIosWeb: 3,
-                                                                                            backgroundColor: Colors.red[400],
-                                                                                            textColor: Colors.white,
-                                                                                            fontSize: 15,
-                                                                                          );
-                                                                                        } else {
-                                                                                          try {
-                                                                                            final result = await InternetAddress.lookup('google.com');
-                                                                                            if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-                                                                                              print('connected');
-                                                                                              setState(() {
-                                                                                                edit = true;
-                                                                                              });
-                                                                                              if (_image == null) {
-                                                                                                try {
-                                                                                                  await uploadFile(menSnap.docs[index].id, 'Men').then((value) async {
-                                                                                                    try {
-                                                                                                      FirebaseFirestore.instance.collection('product').doc('admin1@gmail.com').collection('products').doc('category').collection('men').doc(menSnap.docs[index].id).update({
-                                                                                                        'name': nameECon.text,
-                                                                                                        'quantity': quanECon.text,
-                                                                                                        'price': priECon.text,
-                                                                                                        'image_path': _image == null ? menSnap.docs[index]['image_path'] : imagePath,
-                                                                                                        'bucket': _image == null ? menSnap.docs[index]['bucket'] : metaData.bucket,
-                                                                                                        'full_path': _image == null ? menSnap.docs[index]['full_path'] : metaData.fullPath
-                                                                                                      });
-                                                                                                      print('Updated');
-                                                                                                      setState(() {
-                                                                                                        _image = null;
-                                                                                                      });
-                                                                                                      Fluttertoast.showToast(
-                                                                                                        msg: "Product Updated",
-                                                                                                        toastLength: Toast.LENGTH_LONG,
-                                                                                                        gravity: ToastGravity.BOTTOM,
-                                                                                                        timeInSecForIosWeb: 3,
-                                                                                                        backgroundColor: Colors.green,
-                                                                                                        textColor: Colors.white,
-                                                                                                        fontSize: 15,
-                                                                                                      );
-                                                                                                      getProducts();
-                                                                                                      Navigator.pop(context);
-                                                                                                    } catch (e) {
-                                                                                                      print(e);
-                                                                                                    }
-                                                                                                  });
-                                                                                                } catch (e) {
-                                                                                                  print(e);
-                                                                                                  setState(() {
-                                                                                                    edit = false;
-                                                                                                    _image = null;
-                                                                                                  });
-                                                                                                }
-                                                                                              } else {
-                                                                                                try {
-                                                                                                  await deleteFile(menSnap.docs[index]['bucket'], menSnap.docs[index]['full_path']).then((value) async {
-                                                                                                    try {
-                                                                                                      await uploadFile(menSnap.docs[index].id, 'Men').then((value) async {
-                                                                                                        try {
-                                                                                                          FirebaseFirestore.instance.collection('product').doc('admin1@gmail.com').collection('products').doc('category').collection('men').doc(menSnap.docs[index].id).update({
-                                                                                                            'name': nameECon.text,
-                                                                                                            'quantity': quanECon.text,
-                                                                                                            'price': priECon.text,
-                                                                                                            'image_path': _image == null ? menSnap.docs[index]['image_path'] : imagePath,
-                                                                                                            'bucket': _image == null ? menSnap.docs[index]['bucket'] : metaData.bucket,
-                                                                                                            'full_path': _image == null ? menSnap.docs[index]['full_path'] : metaData.fullPath
-                                                                                                          });
-                                                                                                          print('Updated');
-                                                                                                          setState(() {
-                                                                                                            _image = null;
-                                                                                                          });
-                                                                                                          Fluttertoast.showToast(
-                                                                                                            msg: "Product Updated",
-                                                                                                            toastLength: Toast.LENGTH_LONG,
-                                                                                                            gravity: ToastGravity.BOTTOM,
-                                                                                                            timeInSecForIosWeb: 3,
-                                                                                                            backgroundColor: Colors.green,
-                                                                                                            textColor: Colors.white,
-                                                                                                            fontSize: 15,
-                                                                                                          );
-                                                                                                          getProducts();
-                                                                                                          Navigator.pop(context);
-                                                                                                        } catch (e) {
-                                                                                                          print(e);
-                                                                                                        }
-                                                                                                      });
-                                                                                                    } catch (e) {
-                                                                                                      print(e);
-                                                                                                      setState(() {
-                                                                                                        edit = false;
-                                                                                                        _image = null;
-                                                                                                      });
-                                                                                                    }
-                                                                                                  });
-                                                                                                } catch (e) {
-                                                                                                  print(e);
-                                                                                                  setState(() {
-                                                                                                    edit = false;
-                                                                                                    _image = null;
-                                                                                                  });
-                                                                                                }
+                                                                              Container(
+                                                                                padding: EdgeInsets.only(right: 10),
+                                                                                height: 40,
+                                                                                width: width * 0.9,
+                                                                                child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                                                                                  GestureDetector(
+                                                                                    onTap: () {
+                                                                                      nameECon.clear();
+                                                                                      quanECon.clear();
+                                                                                      priECon.clear();
+                                                                                      edititems = null;
+                                                                                      setState(() {
+                                                                                        edit = false;
+                                                                                        _image = null;
+                                                                                      });
+                                                                                      Navigator.pop(context);
+                                                                                    },
+                                                                                    child: Text('Cancel', style: TextStyle(fontFamily: "Segoe", fontWeight: FontWeight.bold)),
+                                                                                  ),
+                                                                                  SizedBox(width: 20),
+                                                                                  GestureDetector(
+                                                                                    onTap: () async {
+                                                                                      if (nameECon.text == '') {
+                                                                                        Fluttertoast.showToast(
+                                                                                          msg: "Name cannot be empty",
+                                                                                          toastLength: Toast.LENGTH_LONG,
+                                                                                          gravity: ToastGravity.BOTTOM,
+                                                                                          timeInSecForIosWeb: 3,
+                                                                                          backgroundColor: Colors.red[400],
+                                                                                          textColor: Colors.white,
+                                                                                          fontSize: 15,
+                                                                                        );
+                                                                                      } else if (quanECon.text == '') {
+                                                                                        Fluttertoast.showToast(
+                                                                                          msg: "Quantity cannot be empty",
+                                                                                          toastLength: Toast.LENGTH_LONG,
+                                                                                          gravity: ToastGravity.BOTTOM,
+                                                                                          timeInSecForIosWeb: 3,
+                                                                                          backgroundColor: Colors.red[400],
+                                                                                          textColor: Colors.white,
+                                                                                          fontSize: 15,
+                                                                                        );
+                                                                                      } else if (priECon.text == '') {
+                                                                                        Fluttertoast.showToast(
+                                                                                          msg: "Price cannot be empty",
+                                                                                          toastLength: Toast.LENGTH_LONG,
+                                                                                          gravity: ToastGravity.BOTTOM,
+                                                                                          timeInSecForIosWeb: 3,
+                                                                                          backgroundColor: Colors.red[400],
+                                                                                          textColor: Colors.white,
+                                                                                          fontSize: 15,
+                                                                                        );
+                                                                                      } else {
+                                                                                        try {
+                                                                                          final result = await InternetAddress.lookup('google.com');
+                                                                                          if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+                                                                                            print('connected');
+                                                                                            setState(() {
+                                                                                              edit = true;
+                                                                                            });
+                                                                                            if (_image == null) {
+                                                                                              try {
+                                                                                                await uploadFile(menSnap.docs[index].id, 'Men').then((value) async {
+                                                                                                  try {
+                                                                                                    FirebaseFirestore.instance.collection('product').doc('admin1@gmail.com').collection('products').doc('category').collection('men').doc(menSnap.docs[index].id).update({
+                                                                                                      'name': nameECon.text,
+                                                                                                      'quantity': quanECon.text,
+                                                                                                      'price': priECon.text,
+                                                                                                      'image_path': _image == null ? menSnap.docs[index]['image_path'] : imagePath,
+                                                                                                      'bucket': _image == null ? menSnap.docs[index]['bucket'] : metaData.bucket,
+                                                                                                      'full_path': _image == null ? menSnap.docs[index]['full_path'] : metaData.fullPath
+                                                                                                    });
+                                                                                                    print('Updated');
+                                                                                                    setState(() {
+                                                                                                      _image = null;
+                                                                                                    });
+                                                                                                    Fluttertoast.showToast(
+                                                                                                      msg: "Product Updated",
+                                                                                                      toastLength: Toast.LENGTH_LONG,
+                                                                                                      gravity: ToastGravity.BOTTOM,
+                                                                                                      timeInSecForIosWeb: 3,
+                                                                                                      backgroundColor: Colors.green,
+                                                                                                      textColor: Colors.white,
+                                                                                                      fontSize: 15,
+                                                                                                    );
+                                                                                                    getProducts();
+                                                                                                    Navigator.pop(context);
+                                                                                                  } catch (e) {
+                                                                                                    print(e);
+                                                                                                  }
+                                                                                                });
+                                                                                              } catch (e) {
+                                                                                                print(e);
+                                                                                                setState(() {
+                                                                                                  edit = false;
+                                                                                                  _image = null;
+                                                                                                });
+                                                                                              }
+                                                                                            } else {
+                                                                                              try {
+                                                                                                await deleteFile(menSnap.docs[index]['bucket'], menSnap.docs[index]['full_path']).then((value) async {
+                                                                                                  try {
+                                                                                                    await uploadFile(menSnap.docs[index].id, 'Men').then((value) async {
+                                                                                                      try {
+                                                                                                        FirebaseFirestore.instance.collection('product').doc('admin1@gmail.com').collection('products').doc('category').collection('men').doc(menSnap.docs[index].id).update({
+                                                                                                          'name': nameECon.text,
+                                                                                                          'quantity': quanECon.text,
+                                                                                                          'price': priECon.text,
+                                                                                                          'image_path': _image == null ? menSnap.docs[index]['image_path'] : imagePath,
+                                                                                                          'bucket': _image == null ? menSnap.docs[index]['bucket'] : metaData.bucket,
+                                                                                                          'full_path': _image == null ? menSnap.docs[index]['full_path'] : metaData.fullPath
+                                                                                                        });
+                                                                                                        print('Updated');
+                                                                                                        setState(() {
+                                                                                                          _image = null;
+                                                                                                        });
+                                                                                                        Fluttertoast.showToast(
+                                                                                                          msg: "Product Updated",
+                                                                                                          toastLength: Toast.LENGTH_LONG,
+                                                                                                          gravity: ToastGravity.BOTTOM,
+                                                                                                          timeInSecForIosWeb: 3,
+                                                                                                          backgroundColor: Colors.green,
+                                                                                                          textColor: Colors.white,
+                                                                                                          fontSize: 15,
+                                                                                                        );
+                                                                                                        getProducts();
+                                                                                                        Navigator.pop(context);
+                                                                                                      } catch (e) {
+                                                                                                        print(e);
+                                                                                                      }
+                                                                                                    });
+                                                                                                  } catch (e) {
+                                                                                                    print(e);
+                                                                                                    setState(() {
+                                                                                                      edit = false;
+                                                                                                      _image = null;
+                                                                                                    });
+                                                                                                  }
+                                                                                                });
+                                                                                              } catch (e) {
+                                                                                                print(e);
+                                                                                                setState(() {
+                                                                                                  edit = false;
+                                                                                                  _image = null;
+                                                                                                });
                                                                                               }
                                                                                             }
-                                                                                          } on SocketException catch (_) {
-                                                                                            Navigator.pop(context);
-
-                                                                                            print('not connected');
-                                                                                            setState(() {
-                                                                                              edit = false;
-                                                                                              _image = null;
-                                                                                            });
-                                                                                            Fluttertoast.showToast(
-                                                                                              msg: "You're not connected to the internet",
-                                                                                              toastLength: Toast.LENGTH_LONG,
-                                                                                              gravity: ToastGravity.BOTTOM,
-                                                                                              timeInSecForIosWeb: 3,
-                                                                                              backgroundColor: Colors.red[400],
-                                                                                              textColor: Colors.white,
-                                                                                              fontSize: 15,
-                                                                                            );
                                                                                           }
+                                                                                        } on SocketException catch (_) {
+                                                                                          Navigator.pop(context);
+
+                                                                                          print('not connected');
+                                                                                          setState(() {
+                                                                                            edit = false;
+                                                                                            _image = null;
+                                                                                          });
+                                                                                          Fluttertoast.showToast(
+                                                                                            msg: "You're not connected to the internet",
+                                                                                            toastLength: Toast.LENGTH_LONG,
+                                                                                            gravity: ToastGravity.BOTTOM,
+                                                                                            timeInSecForIosWeb: 3,
+                                                                                            backgroundColor: Colors.red[400],
+                                                                                            textColor: Colors.white,
+                                                                                            fontSize: 15,
+                                                                                          );
                                                                                         }
-                                                                                      },
-                                                                                      child: Text('Edit', style: TextStyle(fontFamily: "Segoe", fontWeight: FontWeight.bold, color: Color.fromRGBO(102, 126, 234, 1))),
-                                                                                    ),
-                                                                                  ]),
-                                                                                ),
-                                                                              ))
+                                                                                      }
+                                                                                    },
+                                                                                    child: Text('Edit', style: TextStyle(fontFamily: "Segoe", fontWeight: FontWeight.bold, color: Color.fromRGBO(102, 126, 234, 1))),
+                                                                                  ),
+                                                                                ]),
+                                                                              )
                                                                             ]),
                                                                       ),
                                                                     ),
@@ -1252,15 +1249,17 @@ class _VendorProductState extends State<VendorProduct>
                                                                         borderRadius:
                                                                             BorderRadius.circular(10),
                                                                       ),
-                                                                      height:
-                                                                          height *
-                                                                              0.67,
+                                                                      // height:
+                                                                      //     height *
+                                                                      //         0.67,
                                                                       width:
                                                                           width *
                                                                               0.9,
                                                                       child: Column(
-                                                                          crossAxisAlignment:
-                                                                              CrossAxisAlignment.start,
+                                                                          crossAxisAlignment: CrossAxisAlignment
+                                                                              .start,
+                                                                          mainAxisSize:
+                                                                              MainAxisSize.min,
                                                                           children: [
                                                                             Row(
                                                                               children: [
@@ -1387,183 +1386,179 @@ class _VendorProductState extends State<VendorProduct>
                                                                             SizedBox(
                                                                               height: 10,
                                                                             ),
-                                                                            Expanded(
-                                                                                child: Align(
-                                                                              alignment: Alignment.bottomCenter,
-                                                                              child: Container(
-                                                                                padding: EdgeInsets.only(right: 10),
-                                                                                height: 40,
-                                                                                width: width * 0.9,
-                                                                                child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                                                                                  GestureDetector(
-                                                                                    onTap: () {
-                                                                                      nameECon.clear();
-                                                                                      quanECon.clear();
-                                                                                      priECon.clear();
-                                                                                      edititems = null;
-                                                                                      setState(() {
-                                                                                        edit = false;
-                                                                                        _image = null;
-                                                                                      });
-                                                                                      Navigator.pop(context);
-                                                                                    },
-                                                                                    child: Text('Cancel', style: TextStyle(fontFamily: "Segoe", fontWeight: FontWeight.bold)),
-                                                                                  ),
-                                                                                  SizedBox(width: 20),
-                                                                                  GestureDetector(
-                                                                                    onTap: () async {
-                                                                                      if (nameECon.text == '') {
-                                                                                        Fluttertoast.showToast(
-                                                                                          msg: "Name cannot be empty",
-                                                                                          toastLength: Toast.LENGTH_LONG,
-                                                                                          gravity: ToastGravity.BOTTOM,
-                                                                                          timeInSecForIosWeb: 3,
-                                                                                          backgroundColor: Colors.red[400],
-                                                                                          textColor: Colors.white,
-                                                                                          fontSize: 15,
-                                                                                        );
-                                                                                      } else if (quanECon.text == '') {
-                                                                                        Fluttertoast.showToast(
-                                                                                          msg: "Quantity cannot be empty",
-                                                                                          toastLength: Toast.LENGTH_LONG,
-                                                                                          gravity: ToastGravity.BOTTOM,
-                                                                                          timeInSecForIosWeb: 3,
-                                                                                          backgroundColor: Colors.red[400],
-                                                                                          textColor: Colors.white,
-                                                                                          fontSize: 15,
-                                                                                        );
-                                                                                      } else if (priECon.text == '') {
-                                                                                        Fluttertoast.showToast(
-                                                                                          msg: "Price cannot be empty",
-                                                                                          toastLength: Toast.LENGTH_LONG,
-                                                                                          gravity: ToastGravity.BOTTOM,
-                                                                                          timeInSecForIosWeb: 3,
-                                                                                          backgroundColor: Colors.red[400],
-                                                                                          textColor: Colors.white,
-                                                                                          fontSize: 15,
-                                                                                        );
-                                                                                      } else {
-                                                                                        try {
-                                                                                          final result = await InternetAddress.lookup('google.com');
-                                                                                          if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-                                                                                            print('connected');
-                                                                                            setState(() {
-                                                                                              edit = true;
-                                                                                            });
+                                                                            Container(
+                                                                              padding: EdgeInsets.only(right: 10),
+                                                                              height: 40,
+                                                                              width: width * 0.9,
+                                                                              child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                                                                                GestureDetector(
+                                                                                  onTap: () {
+                                                                                    nameECon.clear();
+                                                                                    quanECon.clear();
+                                                                                    priECon.clear();
+                                                                                    edititems = null;
+                                                                                    setState(() {
+                                                                                      edit = false;
+                                                                                      _image = null;
+                                                                                    });
+                                                                                    Navigator.pop(context);
+                                                                                  },
+                                                                                  child: Text('Cancel', style: TextStyle(fontFamily: "Segoe", fontWeight: FontWeight.bold)),
+                                                                                ),
+                                                                                SizedBox(width: 20),
+                                                                                GestureDetector(
+                                                                                  onTap: () async {
+                                                                                    if (nameECon.text == '') {
+                                                                                      Fluttertoast.showToast(
+                                                                                        msg: "Name cannot be empty",
+                                                                                        toastLength: Toast.LENGTH_LONG,
+                                                                                        gravity: ToastGravity.BOTTOM,
+                                                                                        timeInSecForIosWeb: 3,
+                                                                                        backgroundColor: Colors.red[400],
+                                                                                        textColor: Colors.white,
+                                                                                        fontSize: 15,
+                                                                                      );
+                                                                                    } else if (quanECon.text == '') {
+                                                                                      Fluttertoast.showToast(
+                                                                                        msg: "Quantity cannot be empty",
+                                                                                        toastLength: Toast.LENGTH_LONG,
+                                                                                        gravity: ToastGravity.BOTTOM,
+                                                                                        timeInSecForIosWeb: 3,
+                                                                                        backgroundColor: Colors.red[400],
+                                                                                        textColor: Colors.white,
+                                                                                        fontSize: 15,
+                                                                                      );
+                                                                                    } else if (priECon.text == '') {
+                                                                                      Fluttertoast.showToast(
+                                                                                        msg: "Price cannot be empty",
+                                                                                        toastLength: Toast.LENGTH_LONG,
+                                                                                        gravity: ToastGravity.BOTTOM,
+                                                                                        timeInSecForIosWeb: 3,
+                                                                                        backgroundColor: Colors.red[400],
+                                                                                        textColor: Colors.white,
+                                                                                        fontSize: 15,
+                                                                                      );
+                                                                                    } else {
+                                                                                      try {
+                                                                                        final result = await InternetAddress.lookup('google.com');
+                                                                                        if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+                                                                                          print('connected');
+                                                                                          setState(() {
+                                                                                            edit = true;
+                                                                                          });
 
-                                                                                            if (_image == null) {
-                                                                                              try {
-                                                                                                await uploadFile(womenSnap.docs[index].id, 'Women').then((value) async {
-                                                                                                  try {
-                                                                                                    FirebaseFirestore.instance.collection('product').doc('admin1@gmail.com').collection('products').doc('category').collection('women').doc(womenSnap.docs[index].id).update({
-                                                                                                      'name': nameECon.text,
-                                                                                                      'quantity': quanECon.text,
-                                                                                                      'price': priECon.text,
-                                                                                                      'image_path': _image == null ? womenSnap.docs[index]['image_path'] : imagePath,
-                                                                                                      'bucket': _image == null ? womenSnap.docs[index]['bucket'] : metaData.bucket,
-                                                                                                      'full_path': _image == null ? womenSnap.docs[index]['full_path'] : metaData.fullPath
-                                                                                                    });
-                                                                                                    print('Updated');
-                                                                                                    setState(() {
-                                                                                                      _image = null;
-                                                                                                    });
-                                                                                                    Fluttertoast.showToast(
-                                                                                                      msg: "Product Updated",
-                                                                                                      toastLength: Toast.LENGTH_LONG,
-                                                                                                      gravity: ToastGravity.BOTTOM,
-                                                                                                      timeInSecForIosWeb: 3,
-                                                                                                      backgroundColor: Colors.green,
-                                                                                                      textColor: Colors.white,
-                                                                                                      fontSize: 15,
-                                                                                                    );
-                                                                                                    getProducts();
-                                                                                                    Navigator.pop(context);
-                                                                                                  } catch (e) {
-                                                                                                    print(e);
-                                                                                                  }
-                                                                                                });
-                                                                                              } catch (e) {
-                                                                                                print(e);
-                                                                                                setState(() {
-                                                                                                  edit = false;
-                                                                                                  _image = null;
-                                                                                                });
-                                                                                              }
-                                                                                            } else {
-                                                                                              try {
-                                                                                                await deleteFile(womenSnap.docs[index]['bucket'], womenSnap.docs[index]['full_path']).then((value) async {
-                                                                                                  try {
-                                                                                                    await uploadFile(womenSnap.docs[index].id, 'Women').then((value) async {
-                                                                                                      try {
-                                                                                                        FirebaseFirestore.instance.collection('product').doc('admin1@gmail.com').collection('products').doc('category').collection('women').doc(womenSnap.docs[index].id).update({
-                                                                                                          'name': nameECon.text,
-                                                                                                          'quantity': quanECon.text,
-                                                                                                          'price': priECon.text,
-                                                                                                          'image_path': _image == null ? womenSnap.docs[index]['image_path'] : imagePath,
-                                                                                                          'bucket': _image == null ? womenSnap.docs[index]['bucket'] : metaData.bucket,
-                                                                                                          'full_path': _image == null ? womenSnap.docs[index]['full_path'] : metaData.fullPath
-                                                                                                        });
-                                                                                                        print('Updated');
-                                                                                                        setState(() {
-                                                                                                          _image = null;
-                                                                                                        });
-                                                                                                        Fluttertoast.showToast(
-                                                                                                          msg: "Product Updated",
-                                                                                                          toastLength: Toast.LENGTH_LONG,
-                                                                                                          gravity: ToastGravity.BOTTOM,
-                                                                                                          timeInSecForIosWeb: 3,
-                                                                                                          backgroundColor: Colors.green,
-                                                                                                          textColor: Colors.white,
-                                                                                                          fontSize: 15,
-                                                                                                        );
-                                                                                                        getProducts();
-                                                                                                        Navigator.pop(context);
-                                                                                                      } catch (e) {
-                                                                                                        print(e);
-                                                                                                      }
-                                                                                                    });
-                                                                                                  } catch (e) {
-                                                                                                    print(e);
-                                                                                                    setState(() {
-                                                                                                      edit = false;
-                                                                                                      _image = null;
-                                                                                                    });
-                                                                                                  }
-                                                                                                });
-                                                                                              } catch (e) {
-                                                                                                print(e);
-                                                                                                setState(() {
-                                                                                                  edit = false;
-                                                                                                  _image = null;
-                                                                                                });
-                                                                                              }
+                                                                                          if (_image == null) {
+                                                                                            try {
+                                                                                              await uploadFile(womenSnap.docs[index].id, 'Women').then((value) async {
+                                                                                                try {
+                                                                                                  FirebaseFirestore.instance.collection('product').doc('admin1@gmail.com').collection('products').doc('category').collection('women').doc(womenSnap.docs[index].id).update({
+                                                                                                    'name': nameECon.text,
+                                                                                                    'quantity': quanECon.text,
+                                                                                                    'price': priECon.text,
+                                                                                                    'image_path': _image == null ? womenSnap.docs[index]['image_path'] : imagePath,
+                                                                                                    'bucket': _image == null ? womenSnap.docs[index]['bucket'] : metaData.bucket,
+                                                                                                    'full_path': _image == null ? womenSnap.docs[index]['full_path'] : metaData.fullPath
+                                                                                                  });
+                                                                                                  print('Updated');
+                                                                                                  setState(() {
+                                                                                                    _image = null;
+                                                                                                  });
+                                                                                                  Fluttertoast.showToast(
+                                                                                                    msg: "Product Updated",
+                                                                                                    toastLength: Toast.LENGTH_LONG,
+                                                                                                    gravity: ToastGravity.BOTTOM,
+                                                                                                    timeInSecForIosWeb: 3,
+                                                                                                    backgroundColor: Colors.green,
+                                                                                                    textColor: Colors.white,
+                                                                                                    fontSize: 15,
+                                                                                                  );
+                                                                                                  getProducts();
+                                                                                                  Navigator.pop(context);
+                                                                                                } catch (e) {
+                                                                                                  print(e);
+                                                                                                }
+                                                                                              });
+                                                                                            } catch (e) {
+                                                                                              print(e);
+                                                                                              setState(() {
+                                                                                                edit = false;
+                                                                                                _image = null;
+                                                                                              });
+                                                                                            }
+                                                                                          } else {
+                                                                                            try {
+                                                                                              await deleteFile(womenSnap.docs[index]['bucket'], womenSnap.docs[index]['full_path']).then((value) async {
+                                                                                                try {
+                                                                                                  await uploadFile(womenSnap.docs[index].id, 'Women').then((value) async {
+                                                                                                    try {
+                                                                                                      FirebaseFirestore.instance.collection('product').doc('admin1@gmail.com').collection('products').doc('category').collection('women').doc(womenSnap.docs[index].id).update({
+                                                                                                        'name': nameECon.text,
+                                                                                                        'quantity': quanECon.text,
+                                                                                                        'price': priECon.text,
+                                                                                                        'image_path': _image == null ? womenSnap.docs[index]['image_path'] : imagePath,
+                                                                                                        'bucket': _image == null ? womenSnap.docs[index]['bucket'] : metaData.bucket,
+                                                                                                        'full_path': _image == null ? womenSnap.docs[index]['full_path'] : metaData.fullPath
+                                                                                                      });
+                                                                                                      print('Updated');
+                                                                                                      setState(() {
+                                                                                                        _image = null;
+                                                                                                      });
+                                                                                                      Fluttertoast.showToast(
+                                                                                                        msg: "Product Updated",
+                                                                                                        toastLength: Toast.LENGTH_LONG,
+                                                                                                        gravity: ToastGravity.BOTTOM,
+                                                                                                        timeInSecForIosWeb: 3,
+                                                                                                        backgroundColor: Colors.green,
+                                                                                                        textColor: Colors.white,
+                                                                                                        fontSize: 15,
+                                                                                                      );
+                                                                                                      getProducts();
+                                                                                                      Navigator.pop(context);
+                                                                                                    } catch (e) {
+                                                                                                      print(e);
+                                                                                                    }
+                                                                                                  });
+                                                                                                } catch (e) {
+                                                                                                  print(e);
+                                                                                                  setState(() {
+                                                                                                    edit = false;
+                                                                                                    _image = null;
+                                                                                                  });
+                                                                                                }
+                                                                                              });
+                                                                                            } catch (e) {
+                                                                                              print(e);
+                                                                                              setState(() {
+                                                                                                edit = false;
+                                                                                                _image = null;
+                                                                                              });
                                                                                             }
                                                                                           }
-                                                                                        } on SocketException catch (_) {
-                                                                                          Navigator.pop(context);
-
-                                                                                          print('not connected');
-                                                                                          setState(() {
-                                                                                            edit = false;
-                                                                                            _image = null;
-                                                                                          });
-                                                                                          Fluttertoast.showToast(
-                                                                                            msg: "You're not connected to the internet",
-                                                                                            toastLength: Toast.LENGTH_LONG,
-                                                                                            gravity: ToastGravity.BOTTOM,
-                                                                                            timeInSecForIosWeb: 3,
-                                                                                            backgroundColor: Colors.red[400],
-                                                                                            textColor: Colors.white,
-                                                                                            fontSize: 15,
-                                                                                          );
                                                                                         }
+                                                                                      } on SocketException catch (_) {
+                                                                                        Navigator.pop(context);
+
+                                                                                        print('not connected');
+                                                                                        setState(() {
+                                                                                          edit = false;
+                                                                                          _image = null;
+                                                                                        });
+                                                                                        Fluttertoast.showToast(
+                                                                                          msg: "You're not connected to the internet",
+                                                                                          toastLength: Toast.LENGTH_LONG,
+                                                                                          gravity: ToastGravity.BOTTOM,
+                                                                                          timeInSecForIosWeb: 3,
+                                                                                          backgroundColor: Colors.red[400],
+                                                                                          textColor: Colors.white,
+                                                                                          fontSize: 15,
+                                                                                        );
                                                                                       }
-                                                                                    },
-                                                                                    child: Text('Edit', style: TextStyle(fontFamily: "Segoe", fontWeight: FontWeight.bold, color: Color.fromRGBO(102, 126, 234, 1))),
-                                                                                  ),
-                                                                                ]),
-                                                                              ),
-                                                                            ))
+                                                                                    }
+                                                                                  },
+                                                                                  child: Text('Edit', style: TextStyle(fontFamily: "Segoe", fontWeight: FontWeight.bold, color: Color.fromRGBO(102, 126, 234, 1))),
+                                                                                ),
+                                                                              ]),
+                                                                            )
                                                                           ]),
                                                                     ),
                                                                   ),
@@ -2118,15 +2113,17 @@ class _VendorProductState extends State<VendorProduct>
                                                                         borderRadius:
                                                                             BorderRadius.circular(10),
                                                                       ),
-                                                                      height:
-                                                                          height *
-                                                                              0.67,
+                                                                      // height:
+                                                                      //     height *
+                                                                      //         0.67,
                                                                       width:
                                                                           width *
                                                                               0.9,
                                                                       child: Column(
-                                                                          crossAxisAlignment:
-                                                                              CrossAxisAlignment.start,
+                                                                          crossAxisAlignment: CrossAxisAlignment
+                                                                              .start,
+                                                                          mainAxisSize:
+                                                                              MainAxisSize.min,
                                                                           children: [
                                                                             Row(
                                                                               children: [
@@ -2253,183 +2250,179 @@ class _VendorProductState extends State<VendorProduct>
                                                                             SizedBox(
                                                                               height: 10,
                                                                             ),
-                                                                            Expanded(
-                                                                                child: Align(
-                                                                              alignment: Alignment.bottomCenter,
-                                                                              child: Container(
-                                                                                padding: EdgeInsets.only(right: 10),
-                                                                                height: 40,
-                                                                                width: width * 0.9,
-                                                                                child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                                                                                  GestureDetector(
-                                                                                    onTap: () {
-                                                                                      nameECon.clear();
-                                                                                      quanECon.clear();
-                                                                                      priECon.clear();
-                                                                                      edititems = null;
-                                                                                      setState(() {
-                                                                                        edit = false;
-                                                                                        _image = null;
-                                                                                      });
-                                                                                      Navigator.pop(context);
-                                                                                    },
-                                                                                    child: Text('Cancel', style: TextStyle(fontFamily: "Segoe", fontWeight: FontWeight.bold)),
-                                                                                  ),
-                                                                                  SizedBox(width: 20),
-                                                                                  GestureDetector(
-                                                                                    onTap: () async {
-                                                                                      if (nameECon.text == '') {
-                                                                                        Fluttertoast.showToast(
-                                                                                          msg: "Name cannot be empty",
-                                                                                          toastLength: Toast.LENGTH_LONG,
-                                                                                          gravity: ToastGravity.BOTTOM,
-                                                                                          timeInSecForIosWeb: 3,
-                                                                                          backgroundColor: Colors.red[400],
-                                                                                          textColor: Colors.white,
-                                                                                          fontSize: 15,
-                                                                                        );
-                                                                                      } else if (quanECon.text == '') {
-                                                                                        Fluttertoast.showToast(
-                                                                                          msg: "Quantity cannot be empty",
-                                                                                          toastLength: Toast.LENGTH_LONG,
-                                                                                          gravity: ToastGravity.BOTTOM,
-                                                                                          timeInSecForIosWeb: 3,
-                                                                                          backgroundColor: Colors.red[400],
-                                                                                          textColor: Colors.white,
-                                                                                          fontSize: 15,
-                                                                                        );
-                                                                                      } else if (priECon.text == '') {
-                                                                                        Fluttertoast.showToast(
-                                                                                          msg: "Price cannot be empty",
-                                                                                          toastLength: Toast.LENGTH_LONG,
-                                                                                          gravity: ToastGravity.BOTTOM,
-                                                                                          timeInSecForIosWeb: 3,
-                                                                                          backgroundColor: Colors.red[400],
-                                                                                          textColor: Colors.white,
-                                                                                          fontSize: 15,
-                                                                                        );
-                                                                                      } else {
-                                                                                        try {
-                                                                                          final result = await InternetAddress.lookup('google.com');
-                                                                                          if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-                                                                                            print('connected');
-                                                                                            setState(() {
-                                                                                              edit = true;
-                                                                                            });
+                                                                            Container(
+                                                                              padding: EdgeInsets.only(right: 10),
+                                                                              height: 40,
+                                                                              width: width * 0.9,
+                                                                              child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                                                                                GestureDetector(
+                                                                                  onTap: () {
+                                                                                    nameECon.clear();
+                                                                                    quanECon.clear();
+                                                                                    priECon.clear();
+                                                                                    edititems = null;
+                                                                                    setState(() {
+                                                                                      edit = false;
+                                                                                      _image = null;
+                                                                                    });
+                                                                                    Navigator.pop(context);
+                                                                                  },
+                                                                                  child: Text('Cancel', style: TextStyle(fontFamily: "Segoe", fontWeight: FontWeight.bold)),
+                                                                                ),
+                                                                                SizedBox(width: 20),
+                                                                                GestureDetector(
+                                                                                  onTap: () async {
+                                                                                    if (nameECon.text == '') {
+                                                                                      Fluttertoast.showToast(
+                                                                                        msg: "Name cannot be empty",
+                                                                                        toastLength: Toast.LENGTH_LONG,
+                                                                                        gravity: ToastGravity.BOTTOM,
+                                                                                        timeInSecForIosWeb: 3,
+                                                                                        backgroundColor: Colors.red[400],
+                                                                                        textColor: Colors.white,
+                                                                                        fontSize: 15,
+                                                                                      );
+                                                                                    } else if (quanECon.text == '') {
+                                                                                      Fluttertoast.showToast(
+                                                                                        msg: "Quantity cannot be empty",
+                                                                                        toastLength: Toast.LENGTH_LONG,
+                                                                                        gravity: ToastGravity.BOTTOM,
+                                                                                        timeInSecForIosWeb: 3,
+                                                                                        backgroundColor: Colors.red[400],
+                                                                                        textColor: Colors.white,
+                                                                                        fontSize: 15,
+                                                                                      );
+                                                                                    } else if (priECon.text == '') {
+                                                                                      Fluttertoast.showToast(
+                                                                                        msg: "Price cannot be empty",
+                                                                                        toastLength: Toast.LENGTH_LONG,
+                                                                                        gravity: ToastGravity.BOTTOM,
+                                                                                        timeInSecForIosWeb: 3,
+                                                                                        backgroundColor: Colors.red[400],
+                                                                                        textColor: Colors.white,
+                                                                                        fontSize: 15,
+                                                                                      );
+                                                                                    } else {
+                                                                                      try {
+                                                                                        final result = await InternetAddress.lookup('google.com');
+                                                                                        if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+                                                                                          print('connected');
+                                                                                          setState(() {
+                                                                                            edit = true;
+                                                                                          });
 
-                                                                                            if (_image == null) {
-                                                                                              try {
-                                                                                                await uploadFile(kidsSnap.docs[index].id, 'Kids').then((value) async {
-                                                                                                  try {
-                                                                                                    FirebaseFirestore.instance.collection('product').doc('admin1@gmail.com').collection('products').doc('category').collection('kids').doc(kidsSnap.docs[index].id).update({
-                                                                                                      'name': nameECon.text,
-                                                                                                      'quantity': quanECon.text,
-                                                                                                      'price': priECon.text,
-                                                                                                      'image_path': _image == null ? kidsSnap.docs[index]['image_path'] : imagePath,
-                                                                                                      'bucket': _image == null ? kidsSnap.docs[index]['bucket'] : metaData.bucket,
-                                                                                                      'full_path': _image == null ? kidsSnap.docs[index]['full_path'] : metaData.fullPath
-                                                                                                    });
-                                                                                                    print('Updated');
-                                                                                                    setState(() {
-                                                                                                      _image = null;
-                                                                                                    });
-                                                                                                    Fluttertoast.showToast(
-                                                                                                      msg: "Product Updated",
-                                                                                                      toastLength: Toast.LENGTH_LONG,
-                                                                                                      gravity: ToastGravity.BOTTOM,
-                                                                                                      timeInSecForIosWeb: 3,
-                                                                                                      backgroundColor: Colors.green,
-                                                                                                      textColor: Colors.white,
-                                                                                                      fontSize: 15,
-                                                                                                    );
-                                                                                                    getProducts();
-                                                                                                    Navigator.pop(context);
-                                                                                                  } catch (e) {
-                                                                                                    print(e);
-                                                                                                  }
-                                                                                                });
-                                                                                              } catch (e) {
-                                                                                                print(e);
-                                                                                                setState(() {
-                                                                                                  edit = false;
-                                                                                                  _image = null;
-                                                                                                });
-                                                                                              }
-                                                                                            } else {
-                                                                                              try {
-                                                                                                await deleteFile(kidsSnap.docs[index]['bucket'], kidsSnap.docs[index]['full_path']).then((value) async {
-                                                                                                  try {
-                                                                                                    await uploadFile(kidsSnap.docs[index].id, 'Women').then((value) async {
-                                                                                                      try {
-                                                                                                        FirebaseFirestore.instance.collection('product').doc('admin1@gmail.com').collection('products').doc('category').collection('kids').doc(kidsSnap.docs[index].id).update({
-                                                                                                          'name': nameECon.text,
-                                                                                                          'quantity': quanECon.text,
-                                                                                                          'price': priECon.text,
-                                                                                                          'image_path': _image == null ? kidsSnap.docs[index]['image_path'] : imagePath,
-                                                                                                          'bucket': _image == null ? kidsSnap.docs[index]['bucket'] : metaData.bucket,
-                                                                                                          'full_path': _image == null ? kidsSnap.docs[index]['full_path'] : metaData.fullPath
-                                                                                                        });
-                                                                                                        print('Updated');
-                                                                                                        setState(() {
-                                                                                                          _image = null;
-                                                                                                        });
-                                                                                                        Fluttertoast.showToast(
-                                                                                                          msg: "Product Updated",
-                                                                                                          toastLength: Toast.LENGTH_LONG,
-                                                                                                          gravity: ToastGravity.BOTTOM,
-                                                                                                          timeInSecForIosWeb: 3,
-                                                                                                          backgroundColor: Colors.green,
-                                                                                                          textColor: Colors.white,
-                                                                                                          fontSize: 15,
-                                                                                                        );
-                                                                                                        getProducts();
-                                                                                                        Navigator.pop(context);
-                                                                                                      } catch (e) {
-                                                                                                        print(e);
-                                                                                                      }
-                                                                                                    });
-                                                                                                  } catch (e) {
-                                                                                                    print(e);
-                                                                                                    setState(() {
-                                                                                                      edit = false;
-                                                                                                      _image = null;
-                                                                                                    });
-                                                                                                  }
-                                                                                                });
-                                                                                              } catch (e) {
-                                                                                                print(e);
-                                                                                                setState(() {
-                                                                                                  edit = false;
-                                                                                                  _image = null;
-                                                                                                });
-                                                                                              }
+                                                                                          if (_image == null) {
+                                                                                            try {
+                                                                                              await uploadFile(kidsSnap.docs[index].id, 'Kids').then((value) async {
+                                                                                                try {
+                                                                                                  FirebaseFirestore.instance.collection('product').doc('admin1@gmail.com').collection('products').doc('category').collection('kids').doc(kidsSnap.docs[index].id).update({
+                                                                                                    'name': nameECon.text,
+                                                                                                    'quantity': quanECon.text,
+                                                                                                    'price': priECon.text,
+                                                                                                    'image_path': _image == null ? kidsSnap.docs[index]['image_path'] : imagePath,
+                                                                                                    'bucket': _image == null ? kidsSnap.docs[index]['bucket'] : metaData.bucket,
+                                                                                                    'full_path': _image == null ? kidsSnap.docs[index]['full_path'] : metaData.fullPath
+                                                                                                  });
+                                                                                                  print('Updated');
+                                                                                                  setState(() {
+                                                                                                    _image = null;
+                                                                                                  });
+                                                                                                  Fluttertoast.showToast(
+                                                                                                    msg: "Product Updated",
+                                                                                                    toastLength: Toast.LENGTH_LONG,
+                                                                                                    gravity: ToastGravity.BOTTOM,
+                                                                                                    timeInSecForIosWeb: 3,
+                                                                                                    backgroundColor: Colors.green,
+                                                                                                    textColor: Colors.white,
+                                                                                                    fontSize: 15,
+                                                                                                  );
+                                                                                                  getProducts();
+                                                                                                  Navigator.pop(context);
+                                                                                                } catch (e) {
+                                                                                                  print(e);
+                                                                                                }
+                                                                                              });
+                                                                                            } catch (e) {
+                                                                                              print(e);
+                                                                                              setState(() {
+                                                                                                edit = false;
+                                                                                                _image = null;
+                                                                                              });
+                                                                                            }
+                                                                                          } else {
+                                                                                            try {
+                                                                                              await deleteFile(kidsSnap.docs[index]['bucket'], kidsSnap.docs[index]['full_path']).then((value) async {
+                                                                                                try {
+                                                                                                  await uploadFile(kidsSnap.docs[index].id, 'Women').then((value) async {
+                                                                                                    try {
+                                                                                                      FirebaseFirestore.instance.collection('product').doc('admin1@gmail.com').collection('products').doc('category').collection('kids').doc(kidsSnap.docs[index].id).update({
+                                                                                                        'name': nameECon.text,
+                                                                                                        'quantity': quanECon.text,
+                                                                                                        'price': priECon.text,
+                                                                                                        'image_path': _image == null ? kidsSnap.docs[index]['image_path'] : imagePath,
+                                                                                                        'bucket': _image == null ? kidsSnap.docs[index]['bucket'] : metaData.bucket,
+                                                                                                        'full_path': _image == null ? kidsSnap.docs[index]['full_path'] : metaData.fullPath
+                                                                                                      });
+                                                                                                      print('Updated');
+                                                                                                      setState(() {
+                                                                                                        _image = null;
+                                                                                                      });
+                                                                                                      Fluttertoast.showToast(
+                                                                                                        msg: "Product Updated",
+                                                                                                        toastLength: Toast.LENGTH_LONG,
+                                                                                                        gravity: ToastGravity.BOTTOM,
+                                                                                                        timeInSecForIosWeb: 3,
+                                                                                                        backgroundColor: Colors.green,
+                                                                                                        textColor: Colors.white,
+                                                                                                        fontSize: 15,
+                                                                                                      );
+                                                                                                      getProducts();
+                                                                                                      Navigator.pop(context);
+                                                                                                    } catch (e) {
+                                                                                                      print(e);
+                                                                                                    }
+                                                                                                  });
+                                                                                                } catch (e) {
+                                                                                                  print(e);
+                                                                                                  setState(() {
+                                                                                                    edit = false;
+                                                                                                    _image = null;
+                                                                                                  });
+                                                                                                }
+                                                                                              });
+                                                                                            } catch (e) {
+                                                                                              print(e);
+                                                                                              setState(() {
+                                                                                                edit = false;
+                                                                                                _image = null;
+                                                                                              });
                                                                                             }
                                                                                           }
-                                                                                        } on SocketException catch (_) {
-                                                                                          Navigator.pop(context);
-
-                                                                                          print('not connected');
-                                                                                          setState(() {
-                                                                                            edit = false;
-                                                                                            _image = null;
-                                                                                          });
-                                                                                          Fluttertoast.showToast(
-                                                                                            msg: "You're not connected to the internet",
-                                                                                            toastLength: Toast.LENGTH_LONG,
-                                                                                            gravity: ToastGravity.BOTTOM,
-                                                                                            timeInSecForIosWeb: 3,
-                                                                                            backgroundColor: Colors.red[400],
-                                                                                            textColor: Colors.white,
-                                                                                            fontSize: 15,
-                                                                                          );
                                                                                         }
+                                                                                      } on SocketException catch (_) {
+                                                                                        Navigator.pop(context);
+
+                                                                                        print('not connected');
+                                                                                        setState(() {
+                                                                                          edit = false;
+                                                                                          _image = null;
+                                                                                        });
+                                                                                        Fluttertoast.showToast(
+                                                                                          msg: "You're not connected to the internet",
+                                                                                          toastLength: Toast.LENGTH_LONG,
+                                                                                          gravity: ToastGravity.BOTTOM,
+                                                                                          timeInSecForIosWeb: 3,
+                                                                                          backgroundColor: Colors.red[400],
+                                                                                          textColor: Colors.white,
+                                                                                          fontSize: 15,
+                                                                                        );
                                                                                       }
-                                                                                    },
-                                                                                    child: Text('Edit', style: TextStyle(fontFamily: "Segoe", fontWeight: FontWeight.bold, color: Color.fromRGBO(102, 126, 234, 1))),
-                                                                                  ),
-                                                                                ]),
-                                                                              ),
-                                                                            ))
+                                                                                    }
+                                                                                  },
+                                                                                  child: Text('Edit', style: TextStyle(fontFamily: "Segoe", fontWeight: FontWeight.bold, color: Color.fromRGBO(102, 126, 234, 1))),
+                                                                                ),
+                                                                              ]),
+                                                                            )
                                                                           ]),
                                                                     ),
                                                                   ),
@@ -2902,10 +2895,11 @@ class _VendorProductState extends State<VendorProduct>
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                height: height * 0.8,
+                                // height: height * 0.8,
                                 width: width * 0.9,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Text(
                                       'Add product',
@@ -3086,153 +3080,137 @@ class _VendorProductState extends State<VendorProduct>
                                     SizedBox(
                                       height: 10,
                                     ),
-                                    Expanded(
-                                      child: Align(
-                                        alignment: Alignment.bottomCenter,
-                                        child: Container(
-                                          padding: EdgeInsets.only(right: 10),
-                                          height: 40,
-                                          width: width * 0.9,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
-                                            children: [
-                                              GestureDetector(
-                                                onTap: () {
-                                                  Navigator.pop(context);
-                                                  nameCon.clear();
-                                                  quanCon.clear();
-                                                  priCon.clear();
-                                                  catCon.clear();
-                                                  idCon.clear();
-                                                  setState(() {
-                                                    currentItems = null;
-                                                  });
-                                                },
-                                                child: Text(
-                                                  'Cancel',
-                                                  style: TextStyle(
-                                                    fontFamily: 'Segoe',
-                                                  ),
-                                                ),
+                                    Container(
+                                      padding: EdgeInsets.only(right: 10),
+                                      height: 40,
+                                      width: width * 0.9,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () {
+                                              Navigator.pop(context);
+                                              nameCon.clear();
+                                              quanCon.clear();
+                                              priCon.clear();
+                                              catCon.clear();
+                                              idCon.clear();
+                                              setState(() {
+                                                currentItems = null;
+                                              });
+                                            },
+                                            child: Text(
+                                              'Cancel',
+                                              style: TextStyle(
+                                                fontFamily: 'Segoe',
                                               ),
-                                              SizedBox(
-                                                width: 50,
-                                              ),
-                                              GestureDetector(
-                                                onTap: () async {
-                                                  setState(() {
-                                                    saved = false;
-                                                  });
-                                                  if (idCon.text == '') {
-                                                    Fluttertoast.showToast(
-                                                      msg: "ID cannot be empty",
-                                                      toastLength:
-                                                          Toast.LENGTH_LONG,
-                                                      gravity:
-                                                          ToastGravity.BOTTOM,
-                                                      timeInSecForIosWeb: 3,
-                                                      backgroundColor:
-                                                          Colors.red[400],
-                                                      textColor: Colors.white,
-                                                      fontSize: 15,
-                                                    );
-                                                    setState(() {
-                                                      saved = true;
-                                                    });
-                                                  } else if (nameCon.text ==
-                                                      '') {
-                                                    Fluttertoast.showToast(
-                                                      msg:
-                                                          "Name cannot be empty",
-                                                      toastLength:
-                                                          Toast.LENGTH_LONG,
-                                                      gravity:
-                                                          ToastGravity.BOTTOM,
-                                                      timeInSecForIosWeb: 3,
-                                                      backgroundColor:
-                                                          Colors.red[400],
-                                                      textColor: Colors.white,
-                                                      fontSize: 15,
-                                                    );
-                                                    setState(() {
-                                                      saved = true;
-                                                    });
-                                                  } else if (quanCon.text ==
-                                                      '') {
-                                                    Fluttertoast.showToast(
-                                                      msg:
-                                                          "Quantity cannot be empty",
-                                                      toastLength:
-                                                          Toast.LENGTH_LONG,
-                                                      gravity:
-                                                          ToastGravity.BOTTOM,
-                                                      timeInSecForIosWeb: 3,
-                                                      backgroundColor:
-                                                          Colors.red[400],
-                                                      textColor: Colors.white,
-                                                      fontSize: 15,
-                                                    );
-                                                    setState(() {
-                                                      saved = true;
-                                                    });
-                                                  } else if (currentItems ==
-                                                      null) {
-                                                    Fluttertoast.showToast(
-                                                      msg:
-                                                          "Please select a category",
-                                                      toastLength:
-                                                          Toast.LENGTH_LONG,
-                                                      gravity:
-                                                          ToastGravity.BOTTOM,
-                                                      timeInSecForIosWeb: 3,
-                                                      backgroundColor:
-                                                          Colors.red[400],
-                                                      textColor: Colors.white,
-                                                      fontSize: 15,
-                                                    );
-                                                    setState(() {
-                                                      saved = true;
-                                                    });
-                                                  } else if (priCon.text ==
-                                                      '') {
-                                                    Fluttertoast.showToast(
-                                                      msg:
-                                                          "Price cannot be empty",
-                                                      toastLength:
-                                                          Toast.LENGTH_LONG,
-                                                      gravity:
-                                                          ToastGravity.BOTTOM,
-                                                      timeInSecForIosWeb: 3,
-                                                      backgroundColor:
-                                                          Colors.red[400],
-                                                      textColor: Colors.white,
-                                                      fontSize: 15,
-                                                    );
-                                                    setState(() {
-                                                      saved = true;
-                                                    });
-                                                  } else {
-                                                    print(
-                                                        "Text:" + nameCon.text);
-                                                    bool exit;
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: 50,
+                                          ),
+                                          GestureDetector(
+                                            onTap: () async {
+                                              setState(() {
+                                                saved = false;
+                                              });
+                                              if (idCon.text == '') {
+                                                Fluttertoast.showToast(
+                                                  msg: "ID cannot be empty",
+                                                  toastLength:
+                                                      Toast.LENGTH_LONG,
+                                                  gravity: ToastGravity.BOTTOM,
+                                                  timeInSecForIosWeb: 3,
+                                                  backgroundColor:
+                                                      Colors.red[400],
+                                                  textColor: Colors.white,
+                                                  fontSize: 15,
+                                                );
+                                                setState(() {
+                                                  saved = true;
+                                                });
+                                              } else if (nameCon.text == '') {
+                                                Fluttertoast.showToast(
+                                                  msg: "Name cannot be empty",
+                                                  toastLength:
+                                                      Toast.LENGTH_LONG,
+                                                  gravity: ToastGravity.BOTTOM,
+                                                  timeInSecForIosWeb: 3,
+                                                  backgroundColor:
+                                                      Colors.red[400],
+                                                  textColor: Colors.white,
+                                                  fontSize: 15,
+                                                );
+                                                setState(() {
+                                                  saved = true;
+                                                });
+                                              } else if (quanCon.text == '') {
+                                                Fluttertoast.showToast(
+                                                  msg:
+                                                      "Quantity cannot be empty",
+                                                  toastLength:
+                                                      Toast.LENGTH_LONG,
+                                                  gravity: ToastGravity.BOTTOM,
+                                                  timeInSecForIosWeb: 3,
+                                                  backgroundColor:
+                                                      Colors.red[400],
+                                                  textColor: Colors.white,
+                                                  fontSize: 15,
+                                                );
+                                                setState(() {
+                                                  saved = true;
+                                                });
+                                              } else if (currentItems == null) {
+                                                Fluttertoast.showToast(
+                                                  msg:
+                                                      "Please select a category",
+                                                  toastLength:
+                                                      Toast.LENGTH_LONG,
+                                                  gravity: ToastGravity.BOTTOM,
+                                                  timeInSecForIosWeb: 3,
+                                                  backgroundColor:
+                                                      Colors.red[400],
+                                                  textColor: Colors.white,
+                                                  fontSize: 15,
+                                                );
+                                                setState(() {
+                                                  saved = true;
+                                                });
+                                              } else if (priCon.text == '') {
+                                                Fluttertoast.showToast(
+                                                  msg: "Price cannot be empty",
+                                                  toastLength:
+                                                      Toast.LENGTH_LONG,
+                                                  gravity: ToastGravity.BOTTOM,
+                                                  timeInSecForIosWeb: 3,
+                                                  backgroundColor:
+                                                      Colors.red[400],
+                                                  textColor: Colors.white,
+                                                  fontSize: 15,
+                                                );
+                                                setState(() {
+                                                  saved = true;
+                                                });
+                                              } else {
+                                                print("Text:" + nameCon.text);
+                                                bool exit;
 
-                                                    try {
-                                                      final result =
-                                                          await InternetAddress
-                                                              .lookup(
-                                                                  'google.com');
-                                                      if (result.isNotEmpty &&
-                                                          result[0]
-                                                              .rawAddress
-                                                              .isNotEmpty) {
-                                                        print('connected');
-                                                        User user = FirebaseAuth
-                                                            .instance
-                                                            .currentUser;
-                                                        if (user != null) {
-                                                          try {
-                                                            QuerySnapshot snap = await FirebaseFirestore
+                                                try {
+                                                  final result =
+                                                      await InternetAddress
+                                                          .lookup('google.com');
+                                                  if (result.isNotEmpty &&
+                                                      result[0]
+                                                          .rawAddress
+                                                          .isNotEmpty) {
+                                                    print('connected');
+                                                    User user = FirebaseAuth
+                                                        .instance.currentUser;
+                                                    if (user != null) {
+                                                      try {
+                                                        QuerySnapshot snap =
+                                                            await FirebaseFirestore
                                                                 .instance
                                                                 .collection(
                                                                     'product')
@@ -3245,185 +3223,169 @@ class _VendorProductState extends State<VendorProduct>
                                                                         .toString()
                                                                         .toLowerCase())
                                                                 .get();
-                                                            print(snap
-                                                                .docs.length);
-                                                            int checkAlreadyExist =
-                                                                0;
-                                                            snap.docs
-                                                                .forEach((doc) {
-                                                              if (doc.id ==
-                                                                  idCon.text) {
-                                                                checkAlreadyExist++;
-                                                              } else {}
-                                                            });
-                                                            if (checkAlreadyExist ==
-                                                                0) {
+                                                        print(snap.docs.length);
+                                                        int checkAlreadyExist =
+                                                            0;
+                                                        snap.docs
+                                                            .forEach((doc) {
+                                                          if (doc.id ==
+                                                              idCon.text) {
+                                                            checkAlreadyExist++;
+                                                          } else {}
+                                                        });
+                                                        if (checkAlreadyExist ==
+                                                            0) {
+                                                          try {
+                                                            await uploadFile(
+                                                                    idCon.text,
+                                                                    currentItems)
+                                                                .then((value) {
                                                               try {
-                                                                await uploadFile(
-                                                                        idCon
-                                                                            .text,
-                                                                        currentItems)
-                                                                    .then(
-                                                                        (value) {
-                                                                  try {
-                                                                    FirebaseFirestore
-                                                                        .instance
-                                                                        .collection(
-                                                                            'product')
-                                                                        .doc(
-                                                                            'admin1@gmail.com')
-                                                                        .collection(
-                                                                            'products')
-                                                                        .doc(
-                                                                            'category')
-                                                                        .collection(currentItems
-                                                                            .toString()
-                                                                            .toLowerCase())
-                                                                        .doc(idCon
-                                                                            .text)
-                                                                        .set({
-                                                                      'name': nameCon
+                                                                FirebaseFirestore
+                                                                    .instance
+                                                                    .collection(
+                                                                        'product')
+                                                                    .doc(
+                                                                        'admin1@gmail.com')
+                                                                    .collection(
+                                                                        'products')
+                                                                    .doc(
+                                                                        'category')
+                                                                    .collection(currentItems
+                                                                        .toString()
+                                                                        .toLowerCase())
+                                                                    .doc(idCon
+                                                                        .text)
+                                                                    .set({
+                                                                  'name':
+                                                                      nameCon
                                                                           .text,
-                                                                      'quantity':
-                                                                          quanCon
-                                                                              .text,
-                                                                      'price':
-                                                                          priCon
-                                                                              .text,
-                                                                      'image_path':
-                                                                          imagePath,
-                                                                      'bucket':
-                                                                          metaData
-                                                                              .bucket,
-                                                                      'full_path':
-                                                                          metaData
-                                                                              .fullPath
-                                                                    });
-                                                                    setState(
-                                                                        () {
-                                                                      saved =
-                                                                          true;
-                                                                    });
-                                                                    getProducts();
-                                                                    Fluttertoast
-                                                                        .showToast(
-                                                                      msg:
-                                                                          "Product added successfully",
-                                                                      toastLength:
-                                                                          Toast
-                                                                              .LENGTH_LONG,
-                                                                      gravity:
-                                                                          ToastGravity
-                                                                              .BOTTOM,
-                                                                      timeInSecForIosWeb:
-                                                                          3,
-                                                                      backgroundColor:
-                                                                          Colors
-                                                                              .green,
-                                                                      textColor:
-                                                                          Colors
-                                                                              .white,
-                                                                      fontSize:
-                                                                          15,
-                                                                    );
-                                                                    setState(
-                                                                        () {
-                                                                      _image =
-                                                                          null;
-                                                                    });
-
-                                                                    exit = true;
-                                                                  } catch (e) {
-                                                                    print(e);
-                                                                  }
+                                                                  'quantity':
+                                                                      quanCon
+                                                                          .text,
+                                                                  'price':
+                                                                      priCon
+                                                                          .text,
+                                                                  'image_path':
+                                                                      imagePath,
+                                                                  'bucket':
+                                                                      metaData
+                                                                          .bucket,
+                                                                  'full_path':
+                                                                      metaData
+                                                                          .fullPath
                                                                 });
-                                                              } catch (e) {
-                                                                print(
-                                                                    "Ex: " + e);
-                                                                exit = false;
-                                                              }
-                                                            } else {
-                                                              Fluttertoast
-                                                                  .showToast(
-                                                                msg:
-                                                                    "Product with this ID already exist",
-                                                                toastLength: Toast
-                                                                    .LENGTH_LONG,
-                                                                gravity:
-                                                                    ToastGravity
-                                                                        .BOTTOM,
-                                                                timeInSecForIosWeb:
-                                                                    3,
-                                                                backgroundColor:
-                                                                    Colors.red[
-                                                                        400],
-                                                                textColor:
-                                                                    Colors
-                                                                        .white,
-                                                                fontSize: 15,
-                                                              );
-                                                              setState(() {
-                                                                saved = true;
-                                                              });
-                                                              exit = false;
-                                                            }
-                                                          } catch (e) {
-                                                            print(
-                                                                "Exception: " +
-                                                                    e);
-                                                            exit = false;
-                                                            setState(() {
-                                                              saved = true;
-                                                            });
-                                                          }
-                                                        }
-                                                        if (exit == false) {
-                                                          return null;
-                                                        } else {
-                                                          Navigator.pop(
-                                                              context);
-                                                        }
-                                                        nameCon.clear();
-                                                        quanCon.clear();
-                                                        priCon.clear();
-                                                        catCon.clear();
-                                                        idCon.clear();
-                                                      }
-                                                    } on SocketException catch (_) {
-                                                      Navigator.pop(context);
+                                                                setState(() {
+                                                                  saved = true;
+                                                                });
+                                                                getProducts();
+                                                                Fluttertoast
+                                                                    .showToast(
+                                                                  msg:
+                                                                      "Product added successfully",
+                                                                  toastLength: Toast
+                                                                      .LENGTH_LONG,
+                                                                  gravity:
+                                                                      ToastGravity
+                                                                          .BOTTOM,
+                                                                  timeInSecForIosWeb:
+                                                                      3,
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .green,
+                                                                  textColor:
+                                                                      Colors
+                                                                          .white,
+                                                                  fontSize: 15,
+                                                                );
+                                                                setState(() {
+                                                                  _image = null;
+                                                                });
 
-                                                      print('not connected');
-                                                      setState(() {
-                                                        saved = true;
-                                                      });
-                                                      Fluttertoast.showToast(
-                                                        msg:
-                                                            "You're not connected to the internet",
-                                                        toastLength:
-                                                            Toast.LENGTH_LONG,
-                                                        gravity:
-                                                            ToastGravity.BOTTOM,
-                                                        timeInSecForIosWeb: 3,
-                                                        backgroundColor:
-                                                            Colors.red[400],
-                                                        textColor: Colors.white,
-                                                        fontSize: 15,
-                                                      );
+                                                                exit = true;
+                                                              } catch (e) {
+                                                                print(e);
+                                                              }
+                                                            });
+                                                          } catch (e) {
+                                                            print("Ex: " + e);
+                                                            exit = false;
+                                                          }
+                                                        } else {
+                                                          Fluttertoast
+                                                              .showToast(
+                                                            msg:
+                                                                "Product with this ID already exist",
+                                                            toastLength: Toast
+                                                                .LENGTH_LONG,
+                                                            gravity:
+                                                                ToastGravity
+                                                                    .BOTTOM,
+                                                            timeInSecForIosWeb:
+                                                                3,
+                                                            backgroundColor:
+                                                                Colors.red[400],
+                                                            textColor:
+                                                                Colors.white,
+                                                            fontSize: 15,
+                                                          );
+                                                          setState(() {
+                                                            saved = true;
+                                                          });
+                                                          exit = false;
+                                                        }
+                                                      } catch (e) {
+                                                        print(
+                                                            "Exception: " + e);
+                                                        exit = false;
+                                                        setState(() {
+                                                          saved = true;
+                                                        });
+                                                      }
                                                     }
+                                                    if (exit == false) {
+                                                      return null;
+                                                    } else {
+                                                      Navigator.pop(context);
+                                                    }
+                                                    nameCon.clear();
+                                                    quanCon.clear();
+                                                    priCon.clear();
+                                                    catCon.clear();
+                                                    idCon.clear();
                                                   }
-                                                },
-                                                child: Text(
-                                                  'Add',
-                                                  style: TextStyle(
-                                                      fontFamily: 'Segoe',
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.green),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        ),
+                                                } on SocketException catch (_) {
+                                                  Navigator.pop(context);
+
+                                                  print('not connected');
+                                                  setState(() {
+                                                    saved = true;
+                                                  });
+                                                  Fluttertoast.showToast(
+                                                    msg:
+                                                        "You're not connected to the internet",
+                                                    toastLength:
+                                                        Toast.LENGTH_LONG,
+                                                    gravity:
+                                                        ToastGravity.BOTTOM,
+                                                    timeInSecForIosWeb: 3,
+                                                    backgroundColor:
+                                                        Colors.red[400],
+                                                    textColor: Colors.white,
+                                                    fontSize: 15,
+                                                  );
+                                                }
+                                              }
+                                            },
+                                            child: Text(
+                                              'Add',
+                                              style: TextStyle(
+                                                  fontFamily: 'Segoe',
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.green),
+                                            ),
+                                          )
+                                        ],
                                       ),
                                     ),
                                   ],
