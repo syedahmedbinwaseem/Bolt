@@ -121,6 +121,15 @@ class _VendorProductState extends State<VendorProduct>
       _refreshController.loadComplete();
     } catch (e) {
       print(e);
+      Fluttertoast.showToast(
+        msg: e,
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Colors.red[400],
+        textColor: Colors.white,
+        fontSize: 15,
+      );
     }
   }
 
@@ -161,6 +170,15 @@ class _VendorProductState extends State<VendorProduct>
         print('File Uploaded');
       } catch (e) {
         print('not uploaded');
+        Fluttertoast.showToast(
+          msg: e,
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 3,
+          backgroundColor: Colors.red[400],
+          textColor: Colors.white,
+          fontSize: 15,
+        );
       }
     }
   }
@@ -176,6 +194,15 @@ class _VendorProductState extends State<VendorProduct>
           .then((value) => print('Deleted '));
     } catch (e) {
       print(e);
+      Fluttertoast.showToast(
+        msg: e,
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Colors.red[400],
+        textColor: Colors.white,
+        fontSize: 15,
+      );
     }
   }
 
@@ -218,6 +245,15 @@ class _VendorProductState extends State<VendorProduct>
                           await FirebaseAuth.instance.signOut();
                           SystemNavigator.pop();
                         } catch (e) {
+                          Fluttertoast.showToast(
+                            msg: e,
+                            toastLength: Toast.LENGTH_LONG,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 3,
+                            backgroundColor: Colors.red[400],
+                            textColor: Colors.white,
+                            fontSize: 15,
+                          );
                           print(e);
                         }
                       },
@@ -560,7 +596,6 @@ class _VendorProductState extends State<VendorProduct>
                                                                                   style: TextStyle(fontFamily: 'Segoe'),
                                                                                   controller: desECon,
                                                                                   textInputAction: TextInputAction.next,
-                                                                                  keyboardType: TextInputType.number,
                                                                                   cursorColor: Colors.grey[700],
                                                                                   decoration: InputDecoration(enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)), hintText: 'Enter Description', hintStyle: TextStyle(fontFamily: 'Segoe', fontSize: 12)),
                                                                                 ),
@@ -879,10 +914,28 @@ class _VendorProductState extends State<VendorProduct>
                                                                                                     Navigator.pop(context);
                                                                                                   } catch (e) {
                                                                                                     print(e);
+                                                                                                    Fluttertoast.showToast(
+                                                                                                      msg: e,
+                                                                                                      toastLength: Toast.LENGTH_LONG,
+                                                                                                      gravity: ToastGravity.BOTTOM,
+                                                                                                      timeInSecForIosWeb: 3,
+                                                                                                      backgroundColor: Colors.red[400],
+                                                                                                      textColor: Colors.white,
+                                                                                                      fontSize: 15,
+                                                                                                    );
                                                                                                   }
                                                                                                 });
                                                                                               } catch (e) {
                                                                                                 print(e);
+                                                                                                Fluttertoast.showToast(
+                                                                                                  msg: e,
+                                                                                                  toastLength: Toast.LENGTH_LONG,
+                                                                                                  gravity: ToastGravity.BOTTOM,
+                                                                                                  timeInSecForIosWeb: 3,
+                                                                                                  backgroundColor: Colors.red[400],
+                                                                                                  textColor: Colors.white,
+                                                                                                  fontSize: 15,
+                                                                                                );
                                                                                                 setState(() {
                                                                                                   edit = false;
                                                                                                   _image = null;
@@ -934,10 +987,28 @@ class _VendorProductState extends State<VendorProduct>
                                                                                                         getProducts();
                                                                                                         Navigator.pop(context);
                                                                                                       } catch (e) {
+                                                                                                        Fluttertoast.showToast(
+                                                                                                          msg: e,
+                                                                                                          toastLength: Toast.LENGTH_LONG,
+                                                                                                          gravity: ToastGravity.BOTTOM,
+                                                                                                          timeInSecForIosWeb: 3,
+                                                                                                          backgroundColor: Colors.red[400],
+                                                                                                          textColor: Colors.white,
+                                                                                                          fontSize: 15,
+                                                                                                        );
                                                                                                         print(e);
                                                                                                       }
                                                                                                     });
                                                                                                   } catch (e) {
+                                                                                                    Fluttertoast.showToast(
+                                                                                                      msg: e,
+                                                                                                      toastLength: Toast.LENGTH_LONG,
+                                                                                                      gravity: ToastGravity.BOTTOM,
+                                                                                                      timeInSecForIosWeb: 3,
+                                                                                                      backgroundColor: Colors.red[400],
+                                                                                                      textColor: Colors.white,
+                                                                                                      fontSize: 15,
+                                                                                                    );
                                                                                                     print(e);
                                                                                                     setState(() {
                                                                                                       edit = false;
@@ -947,6 +1018,15 @@ class _VendorProductState extends State<VendorProduct>
                                                                                                 });
                                                                                               } catch (e) {
                                                                                                 print(e);
+                                                                                                Fluttertoast.showToast(
+                                                                                                  msg: e,
+                                                                                                  toastLength: Toast.LENGTH_LONG,
+                                                                                                  gravity: ToastGravity.BOTTOM,
+                                                                                                  timeInSecForIosWeb: 3,
+                                                                                                  backgroundColor: Colors.red[400],
+                                                                                                  textColor: Colors.white,
+                                                                                                  fontSize: 15,
+                                                                                                );
                                                                                                 setState(() {
                                                                                                   edit = false;
                                                                                                   _image = null;
@@ -1147,6 +1227,15 @@ class _VendorProductState extends State<VendorProduct>
                                                                               Navigator.pop(context);
                                                                             } catch (e) {
                                                                               print(e);
+                                                                              Fluttertoast.showToast(
+                                                                                msg: e,
+                                                                                toastLength: Toast.LENGTH_LONG,
+                                                                                gravity: ToastGravity.BOTTOM,
+                                                                                timeInSecForIosWeb: 3,
+                                                                                backgroundColor: Colors.red[400],
+                                                                                textColor: Colors.white,
+                                                                                fontSize: 15,
+                                                                              );
                                                                               setState(() {
                                                                                 delete = false;
                                                                               });
@@ -1155,6 +1244,23 @@ class _VendorProductState extends State<VendorProduct>
                                                                         } catch (e) {
                                                                           print(
                                                                               e);
+                                                                          Fluttertoast
+                                                                              .showToast(
+                                                                            msg:
+                                                                                e,
+                                                                            toastLength:
+                                                                                Toast.LENGTH_LONG,
+                                                                            gravity:
+                                                                                ToastGravity.BOTTOM,
+                                                                            timeInSecForIosWeb:
+                                                                                3,
+                                                                            backgroundColor:
+                                                                                Colors.red[400],
+                                                                            textColor:
+                                                                                Colors.white,
+                                                                            fontSize:
+                                                                                15,
+                                                                          );
                                                                           setState(
                                                                               () {
                                                                             delete =
@@ -1898,7 +2004,6 @@ class _VendorProductState extends State<VendorProduct>
                                                                                 style: TextStyle(fontFamily: 'Segoe'),
                                                                                 controller: desECon,
                                                                                 textInputAction: TextInputAction.next,
-                                                                                keyboardType: TextInputType.number,
                                                                                 cursorColor: Colors.grey[700],
                                                                                 decoration: InputDecoration(enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)), hintText: 'Enter Description', hintStyle: TextStyle(fontFamily: 'Segoe', fontSize: 12)),
                                                                               ),
@@ -2208,10 +2313,28 @@ class _VendorProductState extends State<VendorProduct>
                                                                                                   Navigator.pop(context);
                                                                                                 } catch (e) {
                                                                                                   print(e);
+                                                                                                  Fluttertoast.showToast(
+                                                                                                    msg: e,
+                                                                                                    toastLength: Toast.LENGTH_LONG,
+                                                                                                    gravity: ToastGravity.BOTTOM,
+                                                                                                    timeInSecForIosWeb: 3,
+                                                                                                    backgroundColor: Colors.red[400],
+                                                                                                    textColor: Colors.white,
+                                                                                                    fontSize: 15,
+                                                                                                  );
                                                                                                 }
                                                                                               });
                                                                                             } catch (e) {
                                                                                               print(e);
+                                                                                              Fluttertoast.showToast(
+                                                                                                msg: e,
+                                                                                                toastLength: Toast.LENGTH_LONG,
+                                                                                                gravity: ToastGravity.BOTTOM,
+                                                                                                timeInSecForIosWeb: 3,
+                                                                                                backgroundColor: Colors.red[400],
+                                                                                                textColor: Colors.white,
+                                                                                                fontSize: 15,
+                                                                                              );
                                                                                               setState(() {
                                                                                                 edit = false;
                                                                                                 _image = null;
@@ -2264,10 +2387,28 @@ class _VendorProductState extends State<VendorProduct>
                                                                                                       Navigator.pop(context);
                                                                                                     } catch (e) {
                                                                                                       print(e);
+                                                                                                      Fluttertoast.showToast(
+                                                                                                        msg: e,
+                                                                                                        toastLength: Toast.LENGTH_LONG,
+                                                                                                        gravity: ToastGravity.BOTTOM,
+                                                                                                        timeInSecForIosWeb: 3,
+                                                                                                        backgroundColor: Colors.red[400],
+                                                                                                        textColor: Colors.white,
+                                                                                                        fontSize: 15,
+                                                                                                      );
                                                                                                     }
                                                                                                   });
                                                                                                 } catch (e) {
                                                                                                   print(e);
+                                                                                                  Fluttertoast.showToast(
+                                                                                                    msg: e,
+                                                                                                    toastLength: Toast.LENGTH_LONG,
+                                                                                                    gravity: ToastGravity.BOTTOM,
+                                                                                                    timeInSecForIosWeb: 3,
+                                                                                                    backgroundColor: Colors.red[400],
+                                                                                                    textColor: Colors.white,
+                                                                                                    fontSize: 15,
+                                                                                                  );
                                                                                                   setState(() {
                                                                                                     edit = false;
                                                                                                     _image = null;
@@ -2276,6 +2417,15 @@ class _VendorProductState extends State<VendorProduct>
                                                                                               });
                                                                                             } catch (e) {
                                                                                               print(e);
+                                                                                              Fluttertoast.showToast(
+                                                                                                msg: e,
+                                                                                                toastLength: Toast.LENGTH_LONG,
+                                                                                                gravity: ToastGravity.BOTTOM,
+                                                                                                timeInSecForIosWeb: 3,
+                                                                                                backgroundColor: Colors.red[400],
+                                                                                                textColor: Colors.white,
+                                                                                                fontSize: 15,
+                                                                                              );
                                                                                               setState(() {
                                                                                                 edit = false;
                                                                                                 _image = null;
@@ -2477,6 +2627,15 @@ class _VendorProductState extends State<VendorProduct>
                                                                             Navigator.pop(context);
                                                                           } catch (e) {
                                                                             print(e);
+                                                                            Fluttertoast.showToast(
+                                                                              msg: e,
+                                                                              toastLength: Toast.LENGTH_LONG,
+                                                                              gravity: ToastGravity.BOTTOM,
+                                                                              timeInSecForIosWeb: 3,
+                                                                              backgroundColor: Colors.red[400],
+                                                                              textColor: Colors.white,
+                                                                              fontSize: 15,
+                                                                            );
                                                                             setState(() {
                                                                               delete = false;
                                                                             });
@@ -2485,6 +2644,23 @@ class _VendorProductState extends State<VendorProduct>
                                                                       } catch (e) {
                                                                         print(
                                                                             e);
+                                                                        Fluttertoast
+                                                                            .showToast(
+                                                                          msg:
+                                                                              e,
+                                                                          toastLength:
+                                                                              Toast.LENGTH_LONG,
+                                                                          gravity:
+                                                                              ToastGravity.BOTTOM,
+                                                                          timeInSecForIosWeb:
+                                                                              3,
+                                                                          backgroundColor:
+                                                                              Colors.red[400],
+                                                                          textColor:
+                                                                              Colors.white,
+                                                                          fontSize:
+                                                                              15,
+                                                                        );
                                                                         setState(
                                                                             () {
                                                                           delete =
@@ -3087,7 +3263,7 @@ class _VendorProductState extends State<VendorProduct>
                                                         .docs[index]['size']
                                                         .length ==
                                                     1) {
-                                                  if (menSnap.docs[index]
+                                                  if (kidsSnap.docs[index]
                                                           ['size'] ==
                                                       'S') {
                                                     setState(() {
@@ -3232,7 +3408,6 @@ class _VendorProductState extends State<VendorProduct>
                                                                                 style: TextStyle(fontFamily: 'Segoe'),
                                                                                 controller: desECon,
                                                                                 textInputAction: TextInputAction.next,
-                                                                                keyboardType: TextInputType.number,
                                                                                 cursorColor: Colors.grey[700],
                                                                                 decoration: InputDecoration(enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)), hintText: 'Enter Description', hintStyle: TextStyle(fontFamily: 'Segoe', fontSize: 12)),
                                                                               ),
@@ -3542,10 +3717,28 @@ class _VendorProductState extends State<VendorProduct>
                                                                                                   Navigator.pop(context);
                                                                                                 } catch (e) {
                                                                                                   print(e);
+                                                                                                  Fluttertoast.showToast(
+                                                                                                    msg: e,
+                                                                                                    toastLength: Toast.LENGTH_LONG,
+                                                                                                    gravity: ToastGravity.BOTTOM,
+                                                                                                    timeInSecForIosWeb: 3,
+                                                                                                    backgroundColor: Colors.red[400],
+                                                                                                    textColor: Colors.white,
+                                                                                                    fontSize: 15,
+                                                                                                  );
                                                                                                 }
                                                                                               });
                                                                                             } catch (e) {
                                                                                               print(e);
+                                                                                              Fluttertoast.showToast(
+                                                                                                msg: e,
+                                                                                                toastLength: Toast.LENGTH_LONG,
+                                                                                                gravity: ToastGravity.BOTTOM,
+                                                                                                timeInSecForIosWeb: 3,
+                                                                                                backgroundColor: Colors.red[400],
+                                                                                                textColor: Colors.white,
+                                                                                                fontSize: 15,
+                                                                                              );
                                                                                               setState(() {
                                                                                                 edit = false;
                                                                                                 _image = null;
@@ -3555,7 +3748,7 @@ class _VendorProductState extends State<VendorProduct>
                                                                                             try {
                                                                                               await deleteFile(kidsSnap.docs[index]['bucket'], kidsSnap.docs[index]['full_path']).then((value) async {
                                                                                                 try {
-                                                                                                  await uploadFile(kidsSnap.docs[index].id, 'Women').then((value) async {
+                                                                                                  await uploadFile(kidsSnap.docs[index].id, 'Kids').then((value) async {
                                                                                                     try {
                                                                                                       FirebaseFirestore.instance.collection('product').doc('admin1@gmail.com').collection('products').doc('category').collection('kids').doc(kidsSnap.docs[index].id).update({
                                                                                                         'name': nameECon.text,
@@ -3598,10 +3791,28 @@ class _VendorProductState extends State<VendorProduct>
                                                                                                       Navigator.pop(context);
                                                                                                     } catch (e) {
                                                                                                       print(e);
+                                                                                                      Fluttertoast.showToast(
+                                                                                                        msg: e,
+                                                                                                        toastLength: Toast.LENGTH_LONG,
+                                                                                                        gravity: ToastGravity.BOTTOM,
+                                                                                                        timeInSecForIosWeb: 3,
+                                                                                                        backgroundColor: Colors.red[400],
+                                                                                                        textColor: Colors.white,
+                                                                                                        fontSize: 15,
+                                                                                                      );
                                                                                                     }
                                                                                                   });
                                                                                                 } catch (e) {
                                                                                                   print(e);
+                                                                                                  Fluttertoast.showToast(
+                                                                                                    msg: e,
+                                                                                                    toastLength: Toast.LENGTH_LONG,
+                                                                                                    gravity: ToastGravity.BOTTOM,
+                                                                                                    timeInSecForIosWeb: 3,
+                                                                                                    backgroundColor: Colors.red[400],
+                                                                                                    textColor: Colors.white,
+                                                                                                    fontSize: 15,
+                                                                                                  );
                                                                                                   setState(() {
                                                                                                     edit = false;
                                                                                                     _image = null;
@@ -3610,6 +3821,15 @@ class _VendorProductState extends State<VendorProduct>
                                                                                               });
                                                                                             } catch (e) {
                                                                                               print(e);
+                                                                                              Fluttertoast.showToast(
+                                                                                                msg: e,
+                                                                                                toastLength: Toast.LENGTH_LONG,
+                                                                                                gravity: ToastGravity.BOTTOM,
+                                                                                                timeInSecForIosWeb: 3,
+                                                                                                backgroundColor: Colors.red[400],
+                                                                                                textColor: Colors.white,
+                                                                                                fontSize: 15,
+                                                                                              );
                                                                                               setState(() {
                                                                                                 edit = false;
                                                                                                 _image = null;
@@ -3811,6 +4031,15 @@ class _VendorProductState extends State<VendorProduct>
                                                                             Navigator.pop(context);
                                                                           } catch (e) {
                                                                             print(e);
+                                                                            Fluttertoast.showToast(
+                                                                              msg: e,
+                                                                              toastLength: Toast.LENGTH_LONG,
+                                                                              gravity: ToastGravity.BOTTOM,
+                                                                              timeInSecForIosWeb: 3,
+                                                                              backgroundColor: Colors.red[400],
+                                                                              textColor: Colors.white,
+                                                                              fontSize: 15,
+                                                                            );
                                                                             setState(() {
                                                                               delete = false;
                                                                             });
@@ -3819,6 +4048,23 @@ class _VendorProductState extends State<VendorProduct>
                                                                       } catch (e) {
                                                                         print(
                                                                             e);
+                                                                        Fluttertoast
+                                                                            .showToast(
+                                                                          msg:
+                                                                              e,
+                                                                          toastLength:
+                                                                              Toast.LENGTH_LONG,
+                                                                          gravity:
+                                                                              ToastGravity.BOTTOM,
+                                                                          timeInSecForIosWeb:
+                                                                              3,
+                                                                          backgroundColor:
+                                                                              Colors.red[400],
+                                                                          textColor:
+                                                                              Colors.white,
+                                                                          fontSize:
+                                                                              15,
+                                                                        );
                                                                         setState(
                                                                             () {
                                                                           delete =
@@ -5079,10 +5325,45 @@ class _VendorProductState extends State<VendorProduct>
                                                                 exit = true;
                                                               } catch (e) {
                                                                 print(e);
+                                                                Fluttertoast
+                                                                    .showToast(
+                                                                  msg: e,
+                                                                  toastLength: Toast
+                                                                      .LENGTH_LONG,
+                                                                  gravity:
+                                                                      ToastGravity
+                                                                          .BOTTOM,
+                                                                  timeInSecForIosWeb:
+                                                                      3,
+                                                                  backgroundColor:
+                                                                      Colors.red[
+                                                                          400],
+                                                                  textColor:
+                                                                      Colors
+                                                                          .white,
+                                                                  fontSize: 15,
+                                                                );
                                                               }
                                                             });
                                                           } catch (e) {
                                                             print("Ex: " + e);
+                                                            Fluttertoast
+                                                                .showToast(
+                                                              msg: e,
+                                                              toastLength: Toast
+                                                                  .LENGTH_LONG,
+                                                              gravity:
+                                                                  ToastGravity
+                                                                      .BOTTOM,
+                                                              timeInSecForIosWeb:
+                                                                  3,
+                                                              backgroundColor:
+                                                                  Colors
+                                                                      .red[400],
+                                                              textColor:
+                                                                  Colors.white,
+                                                              fontSize: 15,
+                                                            );
                                                             exit = false;
                                                           }
                                                         } else {
@@ -5111,6 +5392,19 @@ class _VendorProductState extends State<VendorProduct>
                                                       } catch (e) {
                                                         print(
                                                             "Exception: " + e);
+                                                        Fluttertoast.showToast(
+                                                          msg: e,
+                                                          toastLength:
+                                                              Toast.LENGTH_LONG,
+                                                          gravity: ToastGravity
+                                                              .BOTTOM,
+                                                          timeInSecForIosWeb: 3,
+                                                          backgroundColor:
+                                                              Colors.red[400],
+                                                          textColor:
+                                                              Colors.white,
+                                                          fontSize: 15,
+                                                        );
                                                         exit = false;
                                                         setState(() {
                                                           saved = true;
