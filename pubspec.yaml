@@ -39,6 +39,7 @@ dependencies:
   cached_network_image: ^2.3.3
   flutter_animated_dialog: ^1.1.0
   connectivity: ^2.0.2
+  smart_select: ^4.3.2
 
 dev_dependencies:
   flutter_test:
