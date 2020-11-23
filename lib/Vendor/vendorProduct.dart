@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -14,6 +15,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:smart_select/smart_select.dart';
 
 class VendorProduct extends StatefulWidget {
   @override
@@ -34,12 +36,19 @@ class _VendorProductState extends State<VendorProduct>
   final catCon = TextEditingController();
   final priCon = TextEditingController();
   final idCon = TextEditingController();
+  final desCon = TextEditingController();
 
   final nameECon = TextEditingController();
   final quanECon = TextEditingController();
   final catECon = TextEditingController();
   final priECon = TextEditingController();
   final idECon = TextEditingController();
+  final desECon = TextEditingController();
+
+  bool stap = false;
+  bool mtap = false;
+  bool ltap = false;
+
   int menCount;
   int womenCount;
   int kidCount;
@@ -53,7 +62,10 @@ class _VendorProductState extends State<VendorProduct>
 
   int tabindex;
   var category = ["Men", "Women", "Kids"];
+  List<String> size = ["Small", "Medium", "Large"];
   var currentItems = null;
+  var sizeItems = null;
+  var sizeEItems = null;
   var edititems = null;
   bool saved;
   bool reload = false;
@@ -110,6 +122,15 @@ class _VendorProductState extends State<VendorProduct>
       _refreshController.loadComplete();
     } catch (e) {
       print(e);
+      Fluttertoast.showToast(
+        msg: e,
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Colors.red[400],
+        textColor: Colors.white,
+        fontSize: 15,
+      );
     }
   }
 
@@ -150,6 +171,15 @@ class _VendorProductState extends State<VendorProduct>
         print('File Uploaded');
       } catch (e) {
         print('not uploaded');
+        Fluttertoast.showToast(
+          msg: e,
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 3,
+          backgroundColor: Colors.red[400],
+          textColor: Colors.white,
+          fontSize: 15,
+        );
       }
     }
   }
@@ -165,17 +195,15 @@ class _VendorProductState extends State<VendorProduct>
           .then((value) => print('Deleted '));
     } catch (e) {
       print(e);
-    }
-  }
-
-  Future<int> aa() async {
-    try {
-      final result = await InternetAddress.lookup('google.com');
-      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        return 1;
-      }
-    } on SocketException catch (_) {
-      return 0;
+      Fluttertoast.showToast(
+        msg: e,
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Colors.red[400],
+        textColor: Colors.white,
+        fontSize: 15,
+      );
     }
   }
 
@@ -218,6 +246,15 @@ class _VendorProductState extends State<VendorProduct>
                           await FirebaseAuth.instance.signOut();
                           SystemNavigator.pop();
                         } catch (e) {
+                          Fluttertoast.showToast(
+                            msg: e,
+                            toastLength: Toast.LENGTH_LONG,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 3,
+                            backgroundColor: Colors.red[400],
+                            textColor: Colors.white,
+                            fontSize: 15,
+                          );
                           print(e);
                         }
                       },
@@ -316,6 +353,40 @@ class _VendorProductState extends State<VendorProduct>
                                 padding: const EdgeInsets.only(
                                     top: 5, bottom: 5, left: 5, right: 5),
                                 child: GestureDetector(
+                                  onTap: () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            title: Text(
+                                                menSnap.docs[index]['name'],
+                                                style: TextStyle(
+                                                    fontFamily: 'Segoe',
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                            content: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Text('Description:',
+                                                    style: TextStyle(
+                                                        fontFamily: 'Segoe',
+                                                        fontWeight:
+                                                            FontWeight.w700)),
+                                                SizedBox(height: 10),
+                                                Text(
+                                                  menSnap.docs[index]
+                                                      ['description'],
+                                                  style: TextStyle(
+                                                    fontFamily: 'Segoe',
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        });
+                                  },
                                   onLongPress: () {
                                     showDialog(
                                         context: context,
@@ -338,6 +409,75 @@ class _VendorProductState extends State<VendorProduct>
                                               GestureDetector(
                                                 onTap: () {
                                                   setState(() {
+                                                    stap = false;
+                                                    ltap = false;
+                                                    mtap = false;
+                                                  });
+                                                  if (menSnap.docs[index]
+                                                              ['size']
+                                                          .split('')
+                                                          .length ==
+                                                      3) {
+                                                    setState(() {
+                                                      stap = true;
+                                                      ltap = true;
+                                                      mtap = true;
+                                                    });
+                                                  } else if (menSnap
+                                                          .docs[index]['size']
+                                                          .length ==
+                                                      2) {
+                                                    if (menSnap.docs[index]
+                                                            ['size'] ==
+                                                        'SM') {
+                                                      setState(() {
+                                                        stap = true;
+                                                        mtap = true;
+                                                      });
+                                                    } else if (menSnap
+                                                                .docs[index]
+                                                            ['size'] ==
+                                                        'SL') {
+                                                      setState(() {
+                                                        stap = true;
+                                                        ltap = true;
+                                                      });
+                                                    } else if (menSnap
+                                                                .docs[index]
+                                                            ['size'] ==
+                                                        'ML') {
+                                                      setState(() {
+                                                        mtap = true;
+                                                        ltap = true;
+                                                      });
+                                                    }
+                                                  } else if (menSnap
+                                                          .docs[index]['size']
+                                                          .length ==
+                                                      1) {
+                                                    if (menSnap.docs[index]
+                                                            ['size'] ==
+                                                        'S') {
+                                                      setState(() {
+                                                        stap = true;
+                                                      });
+                                                    } else if (menSnap
+                                                                .docs[index]
+                                                            ['size'] ==
+                                                        'M') {
+                                                      setState(() {
+                                                        mtap = true;
+                                                      });
+                                                    } else if (menSnap
+                                                                .docs[index]
+                                                            ['size'] ==
+                                                        'L') {
+                                                      setState(() {
+                                                        ltap = true;
+                                                      });
+                                                    }
+                                                  }
+                                                  setState(() {
                                                     edititems = tabController
                                                                 .index ==
                                                             0
@@ -357,6 +497,9 @@ class _VendorProductState extends State<VendorProduct>
                                                     quanECon.text =
                                                         menSnap.docs[index]
                                                             ['quantity'];
+                                                    desECon.text =
+                                                        menSnap.docs[index]
+                                                            ['description'];
                                                   });
                                                   Navigator.pop(context);
                                                   showDialog(
@@ -394,13 +537,14 @@ class _VendorProductState extends State<VendorProduct>
                                                                           borderRadius:
                                                                               BorderRadius.circular(10),
                                                                         ),
-                                                                        height: height *
-                                                                            0.67,
+                                                                        // height: height *
+                                                                        //     0.67,
                                                                         width: width *
                                                                             0.9,
                                                                         child: Column(
-                                                                            crossAxisAlignment:
-                                                                                CrossAxisAlignment.start,
+                                                                            mainAxisSize:
+                                                                                MainAxisSize.min,
+                                                                            crossAxisAlignment: CrossAxisAlignment.start,
                                                                             children: [
                                                                               Row(
                                                                                 children: [
@@ -432,9 +576,6 @@ class _VendorProductState extends State<VendorProduct>
                                                                                   decoration: InputDecoration(enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)), hintText: 'Enter Name', hintStyle: TextStyle(fontFamily: 'Segoe', fontSize: 12)),
                                                                                 ),
                                                                               ),
-                                                                              SizedBox(
-                                                                                height: 5,
-                                                                              ),
                                                                               Theme(
                                                                                 data: new ThemeData(
                                                                                   primaryColor: Colors.grey[700],
@@ -448,9 +589,6 @@ class _VendorProductState extends State<VendorProduct>
                                                                                   decoration: InputDecoration(enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)), hintText: 'Enter Quantity', hintStyle: TextStyle(fontFamily: 'Segoe', fontSize: 12)),
                                                                                 ),
                                                                               ),
-                                                                              SizedBox(
-                                                                                height: 5,
-                                                                              ),
                                                                               Theme(
                                                                                 data: new ThemeData(
                                                                                   primaryColor: Colors.grey[700],
@@ -462,6 +600,141 @@ class _VendorProductState extends State<VendorProduct>
                                                                                   keyboardType: TextInputType.number,
                                                                                   cursorColor: Colors.grey[700],
                                                                                   decoration: InputDecoration(enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)), hintText: 'Enter Price', hintStyle: TextStyle(fontFamily: 'Segoe', fontSize: 12)),
+                                                                                ),
+                                                                              ),
+                                                                              Theme(
+                                                                                data: new ThemeData(
+                                                                                  primaryColor: Colors.grey[700],
+                                                                                ),
+                                                                                child: TextField(
+                                                                                  style: TextStyle(fontFamily: 'Segoe'),
+                                                                                  controller: desECon,
+                                                                                  textInputAction: TextInputAction.next,
+                                                                                  cursorColor: Colors.grey[700],
+                                                                                  decoration: InputDecoration(enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)), hintText: 'Enter Description', hintStyle: TextStyle(fontFamily: 'Segoe', fontSize: 12)),
+                                                                                ),
+                                                                              ),
+                                                                              SizedBox(
+                                                                                height: 10,
+                                                                              ),
+                                                                              Container(
+                                                                                height: 40,
+                                                                                width: width * 0.9,
+                                                                                child: Row(
+                                                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                                  children: [
+                                                                                    Text(
+                                                                                      'Edit size',
+                                                                                      style: TextStyle(
+                                                                                        fontFamily: 'Segoe',
+                                                                                        fontSize: 13,
+                                                                                        color: Colors.black.withOpacity(0.6),
+                                                                                      ),
+                                                                                    ),
+                                                                                    Expanded(
+                                                                                      flex: 2,
+                                                                                      child: Align(
+                                                                                        alignment: Alignment.centerRight,
+                                                                                        child: Container(
+                                                                                          child: Row(
+                                                                                            mainAxisSize: MainAxisSize.min,
+                                                                                            children: [
+                                                                                              GestureDetector(
+                                                                                                onTap: () {
+                                                                                                  stap == false
+                                                                                                      ? setState(() {
+                                                                                                          stap = true;
+                                                                                                        })
+                                                                                                      : setState(() {
+                                                                                                          stap = false;
+                                                                                                        });
+                                                                                                },
+                                                                                                child: Container(
+                                                                                                  height: 35,
+                                                                                                  width: 35,
+                                                                                                  decoration: BoxDecoration(
+                                                                                                    borderRadius: BorderRadius.circular(5),
+                                                                                                    boxShadow: [
+                                                                                                      BoxShadow(color: stap == true ? Color.fromRGBO(102, 126, 234, 1) : Colors.transparent, offset: stap == true ? Offset(0, 6) : Offset(0, 0), blurRadius: stap == true ? 3 : 0, spreadRadius: stap == true ? -4 : 0)
+                                                                                                    ],
+                                                                                                    color: stap == true ? Color.fromRGBO(102, 126, 234, 1) : Colors.grey[300],
+                                                                                                  ),
+                                                                                                  child: Center(
+                                                                                                    child: Text(
+                                                                                                      'S',
+                                                                                                      style: TextStyle(fontFamily: 'Segoe', fontWeight: FontWeight.bold),
+                                                                                                    ),
+                                                                                                  ),
+                                                                                                ),
+                                                                                              ),
+                                                                                              SizedBox(
+                                                                                                width: 9,
+                                                                                              ),
+                                                                                              GestureDetector(
+                                                                                                onTap: () {
+                                                                                                  mtap == false
+                                                                                                      ? setState(() {
+                                                                                                          mtap = true;
+                                                                                                        })
+                                                                                                      : setState(() {
+                                                                                                          mtap = false;
+                                                                                                        });
+                                                                                                },
+                                                                                                child: Container(
+                                                                                                  height: 35,
+                                                                                                  width: 35,
+                                                                                                  decoration: BoxDecoration(
+                                                                                                    borderRadius: BorderRadius.circular(5),
+                                                                                                    boxShadow: [
+                                                                                                      BoxShadow(color: mtap == true ? Color.fromRGBO(102, 126, 234, 1) : Colors.transparent, offset: mtap == true ? Offset(0, 6) : Offset(0, 0), blurRadius: mtap == true ? 3 : 0, spreadRadius: mtap == true ? -4 : 0)
+                                                                                                    ],
+                                                                                                    color: mtap == true ? Color.fromRGBO(102, 126, 234, 1) : Colors.grey[300],
+                                                                                                  ),
+                                                                                                  child: Center(
+                                                                                                    child: Text(
+                                                                                                      'M',
+                                                                                                      style: TextStyle(fontFamily: 'Segoe', fontWeight: FontWeight.bold),
+                                                                                                    ),
+                                                                                                  ),
+                                                                                                ),
+                                                                                              ),
+                                                                                              SizedBox(
+                                                                                                width: 9,
+                                                                                              ),
+                                                                                              GestureDetector(
+                                                                                                onTap: () {
+                                                                                                  ltap == false
+                                                                                                      ? setState(() {
+                                                                                                          ltap = true;
+                                                                                                        })
+                                                                                                      : setState(() {
+                                                                                                          ltap = false;
+                                                                                                        });
+                                                                                                },
+                                                                                                child: Container(
+                                                                                                  height: 35,
+                                                                                                  width: 35,
+                                                                                                  decoration: BoxDecoration(
+                                                                                                    borderRadius: BorderRadius.circular(5),
+                                                                                                    boxShadow: [
+                                                                                                      BoxShadow(color: ltap == true ? Color.fromRGBO(102, 126, 234, 1) : Colors.transparent, offset: ltap == true ? Offset(0, 6) : Offset(0, 0), blurRadius: ltap == true ? 3 : 0, spreadRadius: ltap == true ? -4 : 0)
+                                                                                                    ],
+                                                                                                    color: ltap == true ? Color.fromRGBO(102, 126, 234, 1) : Colors.grey[300],
+                                                                                                  ),
+                                                                                                  child: Center(
+                                                                                                    child: Text(
+                                                                                                      'L',
+                                                                                                      style: TextStyle(fontFamily: 'Segoe', fontWeight: FontWeight.bold),
+                                                                                                    ),
+                                                                                                  ),
+                                                                                                ),
+                                                                                              ),
+                                                                                            ],
+                                                                                          ),
+                                                                                        ),
+                                                                                      ),
+                                                                                    ),
+                                                                                  ],
                                                                                 ),
                                                                               ),
                                                                               SizedBox(
@@ -527,182 +800,278 @@ class _VendorProductState extends State<VendorProduct>
                                                                               SizedBox(
                                                                                 height: 10,
                                                                               ),
-                                                                              Expanded(
-                                                                                  child: Align(
-                                                                                alignment: Alignment.bottomCenter,
-                                                                                child: Container(
-                                                                                  padding: EdgeInsets.only(right: 10),
-                                                                                  height: 40,
-                                                                                  width: width * 0.9,
-                                                                                  child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                                                                                    GestureDetector(
-                                                                                      onTap: () {
-                                                                                        nameECon.clear();
-                                                                                        quanECon.clear();
-                                                                                        priECon.clear();
-                                                                                        edititems = null;
-                                                                                        setState(() {
-                                                                                          edit = false;
-                                                                                          _image = null;
-                                                                                        });
-                                                                                        Navigator.pop(context);
-                                                                                      },
-                                                                                      child: Text('Cancel', style: TextStyle(fontFamily: "Segoe", fontWeight: FontWeight.bold)),
-                                                                                    ),
-                                                                                    SizedBox(width: 20),
-                                                                                    GestureDetector(
-                                                                                      onTap: () async {
-                                                                                        if (nameECon.text == '') {
-                                                                                          Fluttertoast.showToast(
-                                                                                            msg: "Name cannot be empty",
-                                                                                            toastLength: Toast.LENGTH_LONG,
-                                                                                            gravity: ToastGravity.BOTTOM,
-                                                                                            timeInSecForIosWeb: 3,
-                                                                                            backgroundColor: Colors.red[400],
-                                                                                            textColor: Colors.white,
-                                                                                            fontSize: 15,
-                                                                                          );
-                                                                                        } else if (quanECon.text == '') {
-                                                                                          Fluttertoast.showToast(
-                                                                                            msg: "Quantity cannot be empty",
-                                                                                            toastLength: Toast.LENGTH_LONG,
-                                                                                            gravity: ToastGravity.BOTTOM,
-                                                                                            timeInSecForIosWeb: 3,
-                                                                                            backgroundColor: Colors.red[400],
-                                                                                            textColor: Colors.white,
-                                                                                            fontSize: 15,
-                                                                                          );
-                                                                                        } else if (priECon.text == '') {
-                                                                                          Fluttertoast.showToast(
-                                                                                            msg: "Price cannot be empty",
-                                                                                            toastLength: Toast.LENGTH_LONG,
-                                                                                            gravity: ToastGravity.BOTTOM,
-                                                                                            timeInSecForIosWeb: 3,
-                                                                                            backgroundColor: Colors.red[400],
-                                                                                            textColor: Colors.white,
-                                                                                            fontSize: 15,
-                                                                                          );
-                                                                                        } else {
-                                                                                          try {
-                                                                                            final result = await InternetAddress.lookup('google.com');
-                                                                                            if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-                                                                                              print('connected');
-                                                                                              setState(() {
-                                                                                                edit = true;
-                                                                                              });
-                                                                                              if (_image == null) {
-                                                                                                try {
-                                                                                                  await uploadFile(menSnap.docs[index].id, 'Men').then((value) async {
-                                                                                                    try {
-                                                                                                      FirebaseFirestore.instance.collection('product').doc('admin1@gmail.com').collection('products').doc('category').collection('men').doc(menSnap.docs[index].id).update({
-                                                                                                        'name': nameECon.text,
-                                                                                                        'quantity': quanECon.text,
-                                                                                                        'price': priECon.text,
-                                                                                                        'image_path': _image == null ? menSnap.docs[index]['image_path'] : imagePath,
-                                                                                                        'bucket': _image == null ? menSnap.docs[index]['bucket'] : metaData.bucket,
-                                                                                                        'full_path': _image == null ? menSnap.docs[index]['full_path'] : metaData.fullPath
-                                                                                                      });
-                                                                                                      print('Updated');
-                                                                                                      setState(() {
-                                                                                                        _image = null;
-                                                                                                      });
-                                                                                                      Fluttertoast.showToast(
-                                                                                                        msg: "Product Updated",
-                                                                                                        toastLength: Toast.LENGTH_LONG,
-                                                                                                        gravity: ToastGravity.BOTTOM,
-                                                                                                        timeInSecForIosWeb: 3,
-                                                                                                        backgroundColor: Colors.green,
-                                                                                                        textColor: Colors.white,
-                                                                                                        fontSize: 15,
-                                                                                                      );
-                                                                                                      getProducts();
-                                                                                                      Navigator.pop(context);
-                                                                                                    } catch (e) {
-                                                                                                      print(e);
-                                                                                                    }
-                                                                                                  });
-                                                                                                } catch (e) {
-                                                                                                  print(e);
-                                                                                                  setState(() {
-                                                                                                    edit = false;
-                                                                                                    _image = null;
-                                                                                                  });
-                                                                                                }
-                                                                                              } else {
-                                                                                                try {
-                                                                                                  await deleteFile(menSnap.docs[index]['bucket'], menSnap.docs[index]['full_path']).then((value) async {
-                                                                                                    try {
-                                                                                                      await uploadFile(menSnap.docs[index].id, 'Men').then((value) async {
-                                                                                                        try {
-                                                                                                          FirebaseFirestore.instance.collection('product').doc('admin1@gmail.com').collection('products').doc('category').collection('men').doc(menSnap.docs[index].id).update({
-                                                                                                            'name': nameECon.text,
-                                                                                                            'quantity': quanECon.text,
-                                                                                                            'price': priECon.text,
-                                                                                                            'image_path': _image == null ? menSnap.docs[index]['image_path'] : imagePath,
-                                                                                                            'bucket': _image == null ? menSnap.docs[index]['bucket'] : metaData.bucket,
-                                                                                                            'full_path': _image == null ? menSnap.docs[index]['full_path'] : metaData.fullPath
-                                                                                                          });
-                                                                                                          print('Updated');
-                                                                                                          setState(() {
-                                                                                                            _image = null;
-                                                                                                          });
-                                                                                                          Fluttertoast.showToast(
-                                                                                                            msg: "Product Updated",
-                                                                                                            toastLength: Toast.LENGTH_LONG,
-                                                                                                            gravity: ToastGravity.BOTTOM,
-                                                                                                            timeInSecForIosWeb: 3,
-                                                                                                            backgroundColor: Colors.green,
-                                                                                                            textColor: Colors.white,
-                                                                                                            fontSize: 15,
-                                                                                                          );
-                                                                                                          getProducts();
-                                                                                                          Navigator.pop(context);
-                                                                                                        } catch (e) {
-                                                                                                          print(e);
-                                                                                                        }
-                                                                                                      });
-                                                                                                    } catch (e) {
-                                                                                                      print(e);
-                                                                                                      setState(() {
-                                                                                                        edit = false;
-                                                                                                        _image = null;
-                                                                                                      });
-                                                                                                    }
-                                                                                                  });
-                                                                                                } catch (e) {
-                                                                                                  print(e);
-                                                                                                  setState(() {
-                                                                                                    edit = false;
-                                                                                                    _image = null;
-                                                                                                  });
-                                                                                                }
+                                                                              Container(
+                                                                                padding: EdgeInsets.only(right: 10),
+                                                                                height: 40,
+                                                                                width: width * 0.9,
+                                                                                child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                                                                                  GestureDetector(
+                                                                                    onTap: () {
+                                                                                      nameECon.clear();
+                                                                                      quanECon.clear();
+                                                                                      priECon.clear();
+                                                                                      edititems = null;
+                                                                                      setState(() {
+                                                                                        edit = false;
+                                                                                        _image = null;
+                                                                                        stap = false;
+                                                                                        ltap = false;
+                                                                                        mtap = false;
+                                                                                      });
+                                                                                      Navigator.pop(context);
+                                                                                    },
+                                                                                    child: Text('Cancel', style: TextStyle(fontFamily: "Segoe", fontWeight: FontWeight.bold)),
+                                                                                  ),
+                                                                                  SizedBox(width: 20),
+                                                                                  GestureDetector(
+                                                                                    onTap: () async {
+                                                                                      if (nameECon.text == '') {
+                                                                                        Fluttertoast.showToast(
+                                                                                          msg: "Name cannot be empty",
+                                                                                          toastLength: Toast.LENGTH_LONG,
+                                                                                          gravity: ToastGravity.BOTTOM,
+                                                                                          timeInSecForIosWeb: 3,
+                                                                                          backgroundColor: Colors.red[400],
+                                                                                          textColor: Colors.white,
+                                                                                          fontSize: 15,
+                                                                                        );
+                                                                                      } else if (quanECon.text == '') {
+                                                                                        Fluttertoast.showToast(
+                                                                                          msg: "Quantity cannot be empty",
+                                                                                          toastLength: Toast.LENGTH_LONG,
+                                                                                          gravity: ToastGravity.BOTTOM,
+                                                                                          timeInSecForIosWeb: 3,
+                                                                                          backgroundColor: Colors.red[400],
+                                                                                          textColor: Colors.white,
+                                                                                          fontSize: 15,
+                                                                                        );
+                                                                                      } else if (priECon.text == '') {
+                                                                                        Fluttertoast.showToast(
+                                                                                          msg: "Price cannot be empty",
+                                                                                          toastLength: Toast.LENGTH_LONG,
+                                                                                          gravity: ToastGravity.BOTTOM,
+                                                                                          timeInSecForIosWeb: 3,
+                                                                                          backgroundColor: Colors.red[400],
+                                                                                          textColor: Colors.white,
+                                                                                          fontSize: 15,
+                                                                                        );
+                                                                                      } else if (desECon.text == '') {
+                                                                                        Fluttertoast.showToast(
+                                                                                          msg: "Description cannot be empty",
+                                                                                          toastLength: Toast.LENGTH_LONG,
+                                                                                          gravity: ToastGravity.BOTTOM,
+                                                                                          timeInSecForIosWeb: 3,
+                                                                                          backgroundColor: Colors.red[400],
+                                                                                          textColor: Colors.white,
+                                                                                          fontSize: 15,
+                                                                                        );
+                                                                                      } else if (stap == false && ltap == false && mtap == false) {
+                                                                                        Fluttertoast.showToast(
+                                                                                          msg: "Price select a size",
+                                                                                          toastLength: Toast.LENGTH_LONG,
+                                                                                          gravity: ToastGravity.BOTTOM,
+                                                                                          timeInSecForIosWeb: 3,
+                                                                                          backgroundColor: Colors.red[400],
+                                                                                          textColor: Colors.white,
+                                                                                          fontSize: 15,
+                                                                                        );
+                                                                                      } else {
+                                                                                        try {
+                                                                                          final result = await InternetAddress.lookup('google.com');
+                                                                                          if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+                                                                                            print('connected');
+                                                                                            setState(() {
+                                                                                              edit = true;
+                                                                                            });
+                                                                                            if (_image == null) {
+                                                                                              try {
+                                                                                                await uploadFile(menSnap.docs[index].id, 'Men').then((value) async {
+                                                                                                  try {
+                                                                                                    FirebaseFirestore.instance.collection('product').doc('admin1@gmail.com').collection('products').doc('category').collection('men').doc(menSnap.docs[index].id).update({
+                                                                                                      'name': nameECon.text,
+                                                                                                      'quantity': quanECon.text,
+                                                                                                      'price': priECon.text,
+                                                                                                      'description': desECon.text,
+                                                                                                      'size': stap == true && mtap == false && ltap == false
+                                                                                                          ? 'S'
+                                                                                                          : stap == false && mtap == true && ltap == false
+                                                                                                              ? 'M'
+                                                                                                              : stap == false && mtap == false && ltap == true
+                                                                                                                  ? 'L'
+                                                                                                                  : stap == true && mtap == true && ltap == false
+                                                                                                                      ? 'SM'
+                                                                                                                      : stap == true && mtap == false && ltap == true
+                                                                                                                          ? 'SL'
+                                                                                                                          : stap == false && mtap == true && ltap == true
+                                                                                                                              ? 'ML'
+                                                                                                                              : stap == true && mtap == true && ltap == true
+                                                                                                                                  ? 'SML'
+                                                                                                                                  : 'nothing',
+                                                                                                      'image_path': _image == null ? menSnap.docs[index]['image_path'] : imagePath,
+                                                                                                      'bucket': _image == null ? menSnap.docs[index]['bucket'] : metaData.bucket,
+                                                                                                      'full_path': _image == null ? menSnap.docs[index]['full_path'] : metaData.fullPath
+                                                                                                    });
+                                                                                                    print('Updated');
+                                                                                                    setState(() {
+                                                                                                      _image = null;
+                                                                                                    });
+                                                                                                    Fluttertoast.showToast(
+                                                                                                      msg: "Product Updated",
+                                                                                                      toastLength: Toast.LENGTH_LONG,
+                                                                                                      gravity: ToastGravity.BOTTOM,
+                                                                                                      timeInSecForIosWeb: 3,
+                                                                                                      backgroundColor: Colors.green,
+                                                                                                      textColor: Colors.white,
+                                                                                                      fontSize: 15,
+                                                                                                    );
+                                                                                                    getProducts();
+                                                                                                    Navigator.pop(context);
+                                                                                                  } catch (e) {
+                                                                                                    print(e);
+                                                                                                    Fluttertoast.showToast(
+                                                                                                      msg: e,
+                                                                                                      toastLength: Toast.LENGTH_LONG,
+                                                                                                      gravity: ToastGravity.BOTTOM,
+                                                                                                      timeInSecForIosWeb: 3,
+                                                                                                      backgroundColor: Colors.red[400],
+                                                                                                      textColor: Colors.white,
+                                                                                                      fontSize: 15,
+                                                                                                    );
+                                                                                                  }
+                                                                                                });
+                                                                                              } catch (e) {
+                                                                                                print(e);
+                                                                                                Fluttertoast.showToast(
+                                                                                                  msg: e,
+                                                                                                  toastLength: Toast.LENGTH_LONG,
+                                                                                                  gravity: ToastGravity.BOTTOM,
+                                                                                                  timeInSecForIosWeb: 3,
+                                                                                                  backgroundColor: Colors.red[400],
+                                                                                                  textColor: Colors.white,
+                                                                                                  fontSize: 15,
+                                                                                                );
+                                                                                                setState(() {
+                                                                                                  edit = false;
+                                                                                                  _image = null;
+                                                                                                });
+                                                                                              }
+                                                                                            } else {
+                                                                                              try {
+                                                                                                await deleteFile(menSnap.docs[index]['bucket'], menSnap.docs[index]['full_path']).then((value) async {
+                                                                                                  try {
+                                                                                                    await uploadFile(menSnap.docs[index].id, 'Men').then((value) async {
+                                                                                                      try {
+                                                                                                        FirebaseFirestore.instance.collection('product').doc('admin1@gmail.com').collection('products').doc('category').collection('men').doc(menSnap.docs[index].id).update({
+                                                                                                          'name': nameECon.text,
+                                                                                                          'quantity': quanECon.text,
+                                                                                                          'price': priECon.text,
+                                                                                                          'description': desECon.text,
+                                                                                                          'size': stap == true && mtap == false && ltap == false
+                                                                                                              ? 'S'
+                                                                                                              : stap == false && mtap == true && ltap == false
+                                                                                                                  ? 'M'
+                                                                                                                  : stap == false && mtap == false && ltap == true
+                                                                                                                      ? 'L'
+                                                                                                                      : stap == true && mtap == true && ltap == false
+                                                                                                                          ? 'SM'
+                                                                                                                          : stap == true && mtap == false && ltap == true
+                                                                                                                              ? 'SL'
+                                                                                                                              : stap == false && mtap == true && ltap == true
+                                                                                                                                  ? 'ML'
+                                                                                                                                  : stap == true && mtap == true && ltap == true
+                                                                                                                                      ? 'SML'
+                                                                                                                                      : 'nothing',
+                                                                                                          'image_path': _image == null ? menSnap.docs[index]['image_path'] : imagePath,
+                                                                                                          'bucket': _image == null ? menSnap.docs[index]['bucket'] : metaData.bucket,
+                                                                                                          'full_path': _image == null ? menSnap.docs[index]['full_path'] : metaData.fullPath
+                                                                                                        });
+                                                                                                        print('Updated');
+                                                                                                        setState(() {
+                                                                                                          _image = null;
+                                                                                                        });
+                                                                                                        Fluttertoast.showToast(
+                                                                                                          msg: "Product Updated",
+                                                                                                          toastLength: Toast.LENGTH_LONG,
+                                                                                                          gravity: ToastGravity.BOTTOM,
+                                                                                                          timeInSecForIosWeb: 3,
+                                                                                                          backgroundColor: Colors.green,
+                                                                                                          textColor: Colors.white,
+                                                                                                          fontSize: 15,
+                                                                                                        );
+                                                                                                        getProducts();
+                                                                                                        Navigator.pop(context);
+                                                                                                      } catch (e) {
+                                                                                                        Fluttertoast.showToast(
+                                                                                                          msg: e,
+                                                                                                          toastLength: Toast.LENGTH_LONG,
+                                                                                                          gravity: ToastGravity.BOTTOM,
+                                                                                                          timeInSecForIosWeb: 3,
+                                                                                                          backgroundColor: Colors.red[400],
+                                                                                                          textColor: Colors.white,
+                                                                                                          fontSize: 15,
+                                                                                                        );
+                                                                                                        print(e);
+                                                                                                      }
+                                                                                                    });
+                                                                                                  } catch (e) {
+                                                                                                    Fluttertoast.showToast(
+                                                                                                      msg: e,
+                                                                                                      toastLength: Toast.LENGTH_LONG,
+                                                                                                      gravity: ToastGravity.BOTTOM,
+                                                                                                      timeInSecForIosWeb: 3,
+                                                                                                      backgroundColor: Colors.red[400],
+                                                                                                      textColor: Colors.white,
+                                                                                                      fontSize: 15,
+                                                                                                    );
+                                                                                                    print(e);
+                                                                                                    setState(() {
+                                                                                                      edit = false;
+                                                                                                      _image = null;
+                                                                                                    });
+                                                                                                  }
+                                                                                                });
+                                                                                              } catch (e) {
+                                                                                                print(e);
+                                                                                                Fluttertoast.showToast(
+                                                                                                  msg: e,
+                                                                                                  toastLength: Toast.LENGTH_LONG,
+                                                                                                  gravity: ToastGravity.BOTTOM,
+                                                                                                  timeInSecForIosWeb: 3,
+                                                                                                  backgroundColor: Colors.red[400],
+                                                                                                  textColor: Colors.white,
+                                                                                                  fontSize: 15,
+                                                                                                );
+                                                                                                setState(() {
+                                                                                                  edit = false;
+                                                                                                  _image = null;
+                                                                                                });
                                                                                               }
                                                                                             }
-                                                                                          } on SocketException catch (_) {
-                                                                                            Navigator.pop(context);
-
-                                                                                            print('not connected');
-                                                                                            setState(() {
-                                                                                              edit = false;
-                                                                                              _image = null;
-                                                                                            });
-                                                                                            Fluttertoast.showToast(
-                                                                                              msg: "You're not connected to the internet",
-                                                                                              toastLength: Toast.LENGTH_LONG,
-                                                                                              gravity: ToastGravity.BOTTOM,
-                                                                                              timeInSecForIosWeb: 3,
-                                                                                              backgroundColor: Colors.red[400],
-                                                                                              textColor: Colors.white,
-                                                                                              fontSize: 15,
-                                                                                            );
                                                                                           }
+                                                                                        } on SocketException catch (_) {
+                                                                                          Navigator.pop(context);
+
+                                                                                          print('not connected');
+                                                                                          setState(() {
+                                                                                            edit = false;
+                                                                                            _image = null;
+                                                                                          });
+                                                                                          Fluttertoast.showToast(
+                                                                                            msg: "You're not connected to the internet",
+                                                                                            toastLength: Toast.LENGTH_LONG,
+                                                                                            gravity: ToastGravity.BOTTOM,
+                                                                                            timeInSecForIosWeb: 3,
+                                                                                            backgroundColor: Colors.red[400],
+                                                                                            textColor: Colors.white,
+                                                                                            fontSize: 15,
+                                                                                          );
                                                                                         }
-                                                                                      },
-                                                                                      child: Text('Edit', style: TextStyle(fontFamily: "Segoe", fontWeight: FontWeight.bold, color: Color.fromRGBO(102, 126, 234, 1))),
-                                                                                    ),
-                                                                                  ]),
-                                                                                ),
-                                                                              ))
+                                                                                      }
+                                                                                    },
+                                                                                    child: Text('Edit', style: TextStyle(fontFamily: "Segoe", fontWeight: FontWeight.bold, color: Color.fromRGBO(102, 126, 234, 1))),
+                                                                                  ),
+                                                                                ]),
+                                                                              )
                                                                             ]),
                                                                       ),
                                                                     ),
@@ -738,6 +1107,9 @@ class _VendorProductState extends State<VendorProduct>
                                                     setState(() {
                                                       edit = false;
                                                       _image = null;
+                                                      stap = false;
+                                                      ltap = false;
+                                                      mtap = false;
                                                     });
                                                   });
                                                 },
@@ -869,6 +1241,15 @@ class _VendorProductState extends State<VendorProduct>
                                                                               Navigator.pop(context);
                                                                             } catch (e) {
                                                                               print(e);
+                                                                              Fluttertoast.showToast(
+                                                                                msg: e,
+                                                                                toastLength: Toast.LENGTH_LONG,
+                                                                                gravity: ToastGravity.BOTTOM,
+                                                                                timeInSecForIosWeb: 3,
+                                                                                backgroundColor: Colors.red[400],
+                                                                                textColor: Colors.white,
+                                                                                fontSize: 15,
+                                                                              );
                                                                               setState(() {
                                                                                 delete = false;
                                                                               });
@@ -877,6 +1258,23 @@ class _VendorProductState extends State<VendorProduct>
                                                                         } catch (e) {
                                                                           print(
                                                                               e);
+                                                                          Fluttertoast
+                                                                              .showToast(
+                                                                            msg:
+                                                                                e,
+                                                                            toastLength:
+                                                                                Toast.LENGTH_LONG,
+                                                                            gravity:
+                                                                                ToastGravity.BOTTOM,
+                                                                            timeInSecForIosWeb:
+                                                                                3,
+                                                                            backgroundColor:
+                                                                                Colors.red[400],
+                                                                            textColor:
+                                                                                Colors.white,
+                                                                            fontSize:
+                                                                                15,
+                                                                          );
                                                                           setState(
                                                                               () {
                                                                             delete =
@@ -1033,16 +1431,21 @@ class _VendorProductState extends State<VendorProduct>
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            Text(
-                                                menSnap.docs[index]['name'] ==
-                                                        null
-                                                    ? ''
-                                                    : menSnap.docs[index]
-                                                        ['name'],
-                                                style: TextStyle(
-                                                    fontFamily: 'Segoe',
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 20)),
+                                            Container(
+                                              width: 80,
+                                              height: 27,
+                                              child: Text(
+                                                  menSnap.docs[index]['name'] ==
+                                                          null
+                                                      ? ''
+                                                      : menSnap.docs[index]
+                                                          ['name'],
+                                                  style: TextStyle(
+                                                      fontFamily: 'Segoe',
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 20)),
+                                            ),
                                             SizedBox(
                                               height: 10,
                                             ),
@@ -1060,83 +1463,282 @@ class _VendorProductState extends State<VendorProduct>
                                           ],
                                         ),
                                         Expanded(
-                                          child: Column(
+                                          child: Stack(
                                             children: [
-                                              Expanded(
-                                                flex: 1,
-                                                child: Align(
-                                                  alignment: Alignment.topRight,
-                                                  child: Container(
+                                              Align(
+                                                alignment:
+                                                    Alignment.centerRight,
+                                                child: Container(
+                                                    height: MediaQuery.of(context).size.height *
+                                                        0.15,
+                                                    width: 165,
+                                                    padding: EdgeInsets.only(
+                                                        left: 13),
                                                     decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.only(
-                                                              topRight: Radius
-                                                                  .circular(10),
-                                                              bottomLeft: Radius
-                                                                  .circular(
-                                                                      10)),
-                                                      color: Colors.grey[300],
-                                                    ),
-                                                    // height: 35,
-                                                    width: 110,
-                                                    child: Center(
-                                                      child: Text(
-                                                          menSnap.docs[index]
-                                                                      .id ==
-                                                                  null
-                                                              ? ''
-                                                              : 'ID: ' +
-                                                                  menSnap
-                                                                      .docs[
-                                                                          index]
-                                                                      .id,
-                                                          style: TextStyle(
-                                                            color: Colors.black,
-                                                            fontFamily: 'Segoe',
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          )),
+                                                        // color: Colors.grey[50],
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                                10)),
+                                                    child:
+                                                        menSnap.docs[index]
+                                                                        ['size']
+                                                                    .split('')
+                                                                    .length ==
+                                                                3
+                                                            ? Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceEvenly,
+                                                                children: [
+                                                                  Container(
+                                                                    height: 25,
+                                                                    width: 25,
+                                                                    decoration: BoxDecoration(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(
+                                                                                5),
+                                                                        color: Color.fromRGBO(
+                                                                            102,
+                                                                            126,
+                                                                            234,
+                                                                            0.7)),
+                                                                    child:
+                                                                        Center(
+                                                                      child: Text(
+                                                                          menSnap.docs[index]['size'].split('')[
+                                                                              0],
+                                                                          style: TextStyle(
+                                                                              fontFamily: 'Segoe',
+                                                                              fontWeight: FontWeight.bold)),
+                                                                    ),
+                                                                  ),
+                                                                  Container(
+                                                                    height: 25,
+                                                                    width: 25,
+                                                                    decoration: BoxDecoration(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(
+                                                                                5),
+                                                                        color: Color.fromRGBO(
+                                                                            102,
+                                                                            126,
+                                                                            234,
+                                                                            0.7)),
+                                                                    child:
+                                                                        Center(
+                                                                      child: Text(
+                                                                          menSnap.docs[index]['size'].split('')[
+                                                                              1],
+                                                                          style: TextStyle(
+                                                                              fontFamily: 'Segoe',
+                                                                              fontWeight: FontWeight.bold)),
+                                                                    ),
+                                                                  ),
+                                                                  Container(
+                                                                    height: 25,
+                                                                    width: 25,
+                                                                    decoration: BoxDecoration(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(
+                                                                                5),
+                                                                        color: Color.fromRGBO(
+                                                                            102,
+                                                                            126,
+                                                                            234,
+                                                                            0.7)),
+                                                                    child:
+                                                                        Center(
+                                                                      child: Text(
+                                                                          menSnap.docs[index]['size'].split('')[
+                                                                              2],
+                                                                          style: TextStyle(
+                                                                              fontFamily: 'Segoe',
+                                                                              fontWeight: FontWeight.bold)),
+                                                                    ),
+                                                                  )
+                                                                ],
+                                                              )
+                                                            : menSnap.docs[index]
+                                                                            [
+                                                                            'size']
+                                                                        .split(
+                                                                            '')
+                                                                        .length ==
+                                                                    2
+                                                                ? Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .start,
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .spaceEvenly,
+                                                                    children: [
+                                                                      Container(
+                                                                        height:
+                                                                            25,
+                                                                        width:
+                                                                            25,
+                                                                        decoration: BoxDecoration(
+                                                                            borderRadius: BorderRadius.circular(
+                                                                                5),
+                                                                            color: Color.fromRGBO(
+                                                                                102,
+                                                                                126,
+                                                                                234,
+                                                                                0.7)),
+                                                                        child:
+                                                                            Center(
+                                                                          child: Text(
+                                                                              menSnap.docs[index]['size'].split('')[0],
+                                                                              style: TextStyle(fontFamily: 'Segoe', fontWeight: FontWeight.bold)),
+                                                                        ),
+                                                                      ),
+                                                                      Container(
+                                                                        height:
+                                                                            25,
+                                                                        width:
+                                                                            25,
+                                                                        decoration: BoxDecoration(
+                                                                            borderRadius: BorderRadius.circular(
+                                                                                5),
+                                                                            color: Color.fromRGBO(
+                                                                                102,
+                                                                                126,
+                                                                                234,
+                                                                                0.7)),
+                                                                        child:
+                                                                            Center(
+                                                                          child: Text(
+                                                                              menSnap.docs[index]['size'].split('')[1],
+                                                                              style: TextStyle(fontFamily: 'Segoe', fontWeight: FontWeight.bold)),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  )
+                                                                : menSnap.docs[index]['size']
+                                                                            .split('')
+                                                                            .length ==
+                                                                        1
+                                                                    ? Column(
+                                                                        crossAxisAlignment:
+                                                                            CrossAxisAlignment.start,
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.spaceEvenly,
+                                                                        children: [
+                                                                          Container(
+                                                                            height:
+                                                                                25,
+                                                                            width:
+                                                                                25,
+                                                                            decoration:
+                                                                                BoxDecoration(borderRadius: BorderRadius.circular(5), color: Color.fromRGBO(102, 126, 234, 0.7)),
+                                                                            child:
+                                                                                Center(
+                                                                              child: Text(menSnap.docs[index]['size'].split('')[0], style: TextStyle(fontFamily: 'Segoe', fontWeight: FontWeight.bold)),
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      )
+                                                                    : Container()),
+                                              ),
+                                              Column(
+                                                children: [
+                                                  Expanded(
+                                                    flex: 1,
+                                                    child: Align(
+                                                      alignment:
+                                                          Alignment.topRight,
+                                                      child: Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius.only(
+                                                                  topRight: Radius
+                                                                      .circular(
+                                                                          10),
+                                                                  bottomLeft:
+                                                                      Radius.circular(
+                                                                          10)),
+                                                          color:
+                                                              Colors.grey[300],
+                                                        ),
+                                                        // height: 35,
+                                                        width: 110,
+                                                        child: Center(
+                                                          child: Text(
+                                                              menSnap
+                                                                          .docs[
+                                                                              index]
+                                                                          .id ==
+                                                                      null
+                                                                  ? ''
+                                                                  : 'ID: ' +
+                                                                      menSnap
+                                                                          .docs[
+                                                                              index]
+                                                                          .id,
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontFamily:
+                                                                    'Segoe',
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              )),
+                                                        ),
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                              ),
-                                              SizedBox(height: 15),
-                                              Expanded(
-                                                flex: 1,
-                                                child: Align(
-                                                  alignment:
-                                                      Alignment.bottomRight,
-                                                  child: Container(
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.only(
-                                                              topLeft: Radius
-                                                                  .circular(10),
-                                                              bottomRight:
-                                                                  Radius
+                                                  SizedBox(height: 15),
+                                                  Expanded(
+                                                    flex: 1,
+                                                    child: Align(
+                                                      alignment:
+                                                          Alignment.bottomRight,
+                                                      child: Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius.only(
+                                                                  topLeft: Radius
+                                                                      .circular(
+                                                                          10),
+                                                                  bottomRight: Radius
                                                                       .circular(
                                                                           10)),
-                                                      color: Colors.grey[300],
-                                                    ),
-                                                    width: 110,
-                                                    child: Center(
-                                                      child: Text(
-                                                          menSnap.docs[index][
-                                                                      'quantity'] ==
-                                                                  null
-                                                              ? ''
-                                                              : menSnap.docs[
-                                                                      index]
-                                                                  ['quantity'],
-                                                          style: TextStyle(
-                                                            color: Colors.black,
-                                                            fontFamily: 'Segoe',
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          )),
+                                                          color:
+                                                              Colors.grey[300],
+                                                        ),
+                                                        width: 110,
+                                                        child: Center(
+                                                          child: Text(
+                                                              menSnap.docs[index]
+                                                                          [
+                                                                          'quantity'] ==
+                                                                      null
+                                                                  ? ''
+                                                                  : menSnap.docs[
+                                                                          index]
+                                                                      [
+                                                                      'quantity'],
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontFamily:
+                                                                    'Segoe',
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              )),
+                                                        ),
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
+                                                ],
                                               ),
                                             ],
                                           ),
@@ -1187,6 +1789,42 @@ class _VendorProductState extends State<VendorProduct>
                                 padding: const EdgeInsets.only(
                                     top: 5, bottom: 5, left: 5, right: 5),
                                 child: GestureDetector(
+                                  onTap: () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            title: Text(
+                                                womenSnap.docs[index]['name'],
+                                                style: TextStyle(
+                                                    fontFamily: 'Segoe',
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                            content: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'Description',
+                                                  style: TextStyle(
+                                                      fontFamily: 'Segoe',
+                                                      fontWeight:
+                                                          FontWeight.w700),
+                                                ),
+                                                SizedBox(height: 10),
+                                                Text(
+                                                  womenSnap.docs[index]
+                                                      ['description'],
+                                                  style: TextStyle(
+                                                    fontFamily: 'Segoe',
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        });
+                                  },
                                   onLongPress: () {
                                     showDialog(
                                       context: context,
@@ -1209,12 +1847,84 @@ class _VendorProductState extends State<VendorProduct>
                                             GestureDetector(
                                               onTap: () {
                                                 setState(() {
+                                                  setState(() {
+                                                    stap = false;
+                                                    ltap = false;
+                                                    mtap = false;
+                                                  });
+                                                  if (womenSnap.docs[index]
+                                                              ['size']
+                                                          .split('')
+                                                          .length ==
+                                                      3) {
+                                                    setState(() {
+                                                      stap = true;
+                                                      ltap = true;
+                                                      mtap = true;
+                                                    });
+                                                  } else if (womenSnap
+                                                          .docs[index]['size']
+                                                          .length ==
+                                                      2) {
+                                                    if (womenSnap.docs[index]
+                                                            ['size'] ==
+                                                        'SM') {
+                                                      setState(() {
+                                                        stap = true;
+                                                        mtap = true;
+                                                      });
+                                                    } else if (womenSnap
+                                                                .docs[index]
+                                                            ['size'] ==
+                                                        'SL') {
+                                                      setState(() {
+                                                        stap = true;
+                                                        ltap = true;
+                                                      });
+                                                    } else if (womenSnap
+                                                                .docs[index]
+                                                            ['size'] ==
+                                                        'ML') {
+                                                      setState(() {
+                                                        mtap = true;
+                                                        ltap = true;
+                                                      });
+                                                    }
+                                                  } else if (womenSnap
+                                                          .docs[index]['size']
+                                                          .length ==
+                                                      1) {
+                                                    if (womenSnap.docs[index]
+                                                            ['size'] ==
+                                                        'S') {
+                                                      setState(() {
+                                                        stap = true;
+                                                      });
+                                                    } else if (womenSnap
+                                                                .docs[index]
+                                                            ['size'] ==
+                                                        'M') {
+                                                      setState(() {
+                                                        mtap = true;
+                                                      });
+                                                    } else if (womenSnap
+                                                                .docs[index]
+                                                            ['size'] ==
+                                                        'L') {
+                                                      setState(() {
+                                                        ltap = true;
+                                                      });
+                                                    }
+                                                  }
                                                   nameECon.text = womenSnap
                                                       .docs[index]['name'];
                                                   priECon.text = womenSnap
                                                       .docs[index]['price'];
                                                   quanECon.text = womenSnap
                                                       .docs[index]['quantity'];
+                                                  desECon.text =
+                                                      womenSnap.docs[index]
+                                                          ['description'];
                                                 });
                                                 Navigator.pop(context);
                                                 showDialog(
@@ -1252,15 +1962,17 @@ class _VendorProductState extends State<VendorProduct>
                                                                         borderRadius:
                                                                             BorderRadius.circular(10),
                                                                       ),
-                                                                      height:
-                                                                          height *
-                                                                              0.67,
+                                                                      // height:
+                                                                      //     height *
+                                                                      //         0.67,
                                                                       width:
                                                                           width *
                                                                               0.9,
                                                                       child: Column(
-                                                                          crossAxisAlignment:
-                                                                              CrossAxisAlignment.start,
+                                                                          crossAxisAlignment: CrossAxisAlignment
+                                                                              .start,
+                                                                          mainAxisSize:
+                                                                              MainAxisSize.min,
                                                                           children: [
                                                                             Row(
                                                                               children: [
@@ -1292,9 +2004,6 @@ class _VendorProductState extends State<VendorProduct>
                                                                                 decoration: InputDecoration(enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)), hintText: 'Enter Name', hintStyle: TextStyle(fontFamily: 'Segoe', fontSize: 12)),
                                                                               ),
                                                                             ),
-                                                                            SizedBox(
-                                                                              height: 5,
-                                                                            ),
                                                                             Theme(
                                                                               data: new ThemeData(
                                                                                 primaryColor: Colors.grey[700],
@@ -1308,9 +2017,6 @@ class _VendorProductState extends State<VendorProduct>
                                                                                 decoration: InputDecoration(enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)), hintText: 'Enter Quantity', hintStyle: TextStyle(fontFamily: 'Segoe', fontSize: 12)),
                                                                               ),
                                                                             ),
-                                                                            SizedBox(
-                                                                              height: 5,
-                                                                            ),
                                                                             Theme(
                                                                               data: new ThemeData(
                                                                                 primaryColor: Colors.grey[700],
@@ -1322,6 +2028,141 @@ class _VendorProductState extends State<VendorProduct>
                                                                                 keyboardType: TextInputType.number,
                                                                                 cursorColor: Colors.grey[700],
                                                                                 decoration: InputDecoration(enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)), hintText: 'Enter Price', hintStyle: TextStyle(fontFamily: 'Segoe', fontSize: 12)),
+                                                                              ),
+                                                                            ),
+                                                                            Theme(
+                                                                              data: new ThemeData(
+                                                                                primaryColor: Colors.grey[700],
+                                                                              ),
+                                                                              child: TextField(
+                                                                                style: TextStyle(fontFamily: 'Segoe'),
+                                                                                controller: desECon,
+                                                                                textInputAction: TextInputAction.next,
+                                                                                cursorColor: Colors.grey[700],
+                                                                                decoration: InputDecoration(enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)), hintText: 'Enter Description', hintStyle: TextStyle(fontFamily: 'Segoe', fontSize: 12)),
+                                                                              ),
+                                                                            ),
+                                                                            SizedBox(
+                                                                              height: 10,
+                                                                            ),
+                                                                            Container(
+                                                                              height: 40,
+                                                                              width: width * 0.9,
+                                                                              child: Row(
+                                                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                                children: [
+                                                                                  Text(
+                                                                                    'Edit size',
+                                                                                    style: TextStyle(
+                                                                                      fontFamily: 'Segoe',
+                                                                                      fontSize: 13,
+                                                                                      color: Colors.black.withOpacity(0.6),
+                                                                                    ),
+                                                                                  ),
+                                                                                  Expanded(
+                                                                                    flex: 2,
+                                                                                    child: Align(
+                                                                                      alignment: Alignment.centerRight,
+                                                                                      child: Container(
+                                                                                        child: Row(
+                                                                                          mainAxisSize: MainAxisSize.min,
+                                                                                          children: [
+                                                                                            GestureDetector(
+                                                                                              onTap: () {
+                                                                                                stap == false
+                                                                                                    ? setState(() {
+                                                                                                        stap = true;
+                                                                                                      })
+                                                                                                    : setState(() {
+                                                                                                        stap = false;
+                                                                                                      });
+                                                                                              },
+                                                                                              child: Container(
+                                                                                                height: 35,
+                                                                                                width: 35,
+                                                                                                decoration: BoxDecoration(
+                                                                                                  borderRadius: BorderRadius.circular(5),
+                                                                                                  boxShadow: [
+                                                                                                    BoxShadow(color: stap == true ? Color.fromRGBO(102, 126, 234, 1) : Colors.transparent, offset: stap == true ? Offset(0, 6) : Offset(0, 0), blurRadius: stap == true ? 3 : 0, spreadRadius: stap == true ? -4 : 0)
+                                                                                                  ],
+                                                                                                  color: stap == true ? Color.fromRGBO(102, 126, 234, 1) : Colors.grey[300],
+                                                                                                ),
+                                                                                                child: Center(
+                                                                                                  child: Text(
+                                                                                                    'S',
+                                                                                                    style: TextStyle(fontFamily: 'Segoe', fontWeight: FontWeight.bold),
+                                                                                                  ),
+                                                                                                ),
+                                                                                              ),
+                                                                                            ),
+                                                                                            SizedBox(
+                                                                                              width: 9,
+                                                                                            ),
+                                                                                            GestureDetector(
+                                                                                              onTap: () {
+                                                                                                mtap == false
+                                                                                                    ? setState(() {
+                                                                                                        mtap = true;
+                                                                                                      })
+                                                                                                    : setState(() {
+                                                                                                        mtap = false;
+                                                                                                      });
+                                                                                              },
+                                                                                              child: Container(
+                                                                                                height: 35,
+                                                                                                width: 35,
+                                                                                                decoration: BoxDecoration(
+                                                                                                  borderRadius: BorderRadius.circular(5),
+                                                                                                  boxShadow: [
+                                                                                                    BoxShadow(color: mtap == true ? Color.fromRGBO(102, 126, 234, 1) : Colors.transparent, offset: mtap == true ? Offset(0, 6) : Offset(0, 0), blurRadius: mtap == true ? 3 : 0, spreadRadius: mtap == true ? -4 : 0)
+                                                                                                  ],
+                                                                                                  color: mtap == true ? Color.fromRGBO(102, 126, 234, 1) : Colors.grey[300],
+                                                                                                ),
+                                                                                                child: Center(
+                                                                                                  child: Text(
+                                                                                                    'M',
+                                                                                                    style: TextStyle(fontFamily: 'Segoe', fontWeight: FontWeight.bold),
+                                                                                                  ),
+                                                                                                ),
+                                                                                              ),
+                                                                                            ),
+                                                                                            SizedBox(
+                                                                                              width: 9,
+                                                                                            ),
+                                                                                            GestureDetector(
+                                                                                              onTap: () {
+                                                                                                ltap == false
+                                                                                                    ? setState(() {
+                                                                                                        ltap = true;
+                                                                                                      })
+                                                                                                    : setState(() {
+                                                                                                        ltap = false;
+                                                                                                      });
+                                                                                              },
+                                                                                              child: Container(
+                                                                                                height: 35,
+                                                                                                width: 35,
+                                                                                                decoration: BoxDecoration(
+                                                                                                  borderRadius: BorderRadius.circular(5),
+                                                                                                  boxShadow: [
+                                                                                                    BoxShadow(color: ltap == true ? Color.fromRGBO(102, 126, 234, 1) : Colors.transparent, offset: ltap == true ? Offset(0, 6) : Offset(0, 0), blurRadius: ltap == true ? 3 : 0, spreadRadius: ltap == true ? -4 : 0)
+                                                                                                  ],
+                                                                                                  color: ltap == true ? Color.fromRGBO(102, 126, 234, 1) : Colors.grey[300],
+                                                                                                ),
+                                                                                                child: Center(
+                                                                                                  child: Text(
+                                                                                                    'L',
+                                                                                                    style: TextStyle(fontFamily: 'Segoe', fontWeight: FontWeight.bold),
+                                                                                                  ),
+                                                                                                ),
+                                                                                              ),
+                                                                                            ),
+                                                                                          ],
+                                                                                        ),
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                                ],
                                                                               ),
                                                                             ),
                                                                             SizedBox(
@@ -1387,183 +2228,269 @@ class _VendorProductState extends State<VendorProduct>
                                                                             SizedBox(
                                                                               height: 10,
                                                                             ),
-                                                                            Expanded(
-                                                                                child: Align(
-                                                                              alignment: Alignment.bottomCenter,
-                                                                              child: Container(
-                                                                                padding: EdgeInsets.only(right: 10),
-                                                                                height: 40,
-                                                                                width: width * 0.9,
-                                                                                child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                                                                                  GestureDetector(
-                                                                                    onTap: () {
-                                                                                      nameECon.clear();
-                                                                                      quanECon.clear();
-                                                                                      priECon.clear();
-                                                                                      edititems = null;
-                                                                                      setState(() {
-                                                                                        edit = false;
-                                                                                        _image = null;
-                                                                                      });
-                                                                                      Navigator.pop(context);
-                                                                                    },
-                                                                                    child: Text('Cancel', style: TextStyle(fontFamily: "Segoe", fontWeight: FontWeight.bold)),
-                                                                                  ),
-                                                                                  SizedBox(width: 20),
-                                                                                  GestureDetector(
-                                                                                    onTap: () async {
-                                                                                      if (nameECon.text == '') {
-                                                                                        Fluttertoast.showToast(
-                                                                                          msg: "Name cannot be empty",
-                                                                                          toastLength: Toast.LENGTH_LONG,
-                                                                                          gravity: ToastGravity.BOTTOM,
-                                                                                          timeInSecForIosWeb: 3,
-                                                                                          backgroundColor: Colors.red[400],
-                                                                                          textColor: Colors.white,
-                                                                                          fontSize: 15,
-                                                                                        );
-                                                                                      } else if (quanECon.text == '') {
-                                                                                        Fluttertoast.showToast(
-                                                                                          msg: "Quantity cannot be empty",
-                                                                                          toastLength: Toast.LENGTH_LONG,
-                                                                                          gravity: ToastGravity.BOTTOM,
-                                                                                          timeInSecForIosWeb: 3,
-                                                                                          backgroundColor: Colors.red[400],
-                                                                                          textColor: Colors.white,
-                                                                                          fontSize: 15,
-                                                                                        );
-                                                                                      } else if (priECon.text == '') {
-                                                                                        Fluttertoast.showToast(
-                                                                                          msg: "Price cannot be empty",
-                                                                                          toastLength: Toast.LENGTH_LONG,
-                                                                                          gravity: ToastGravity.BOTTOM,
-                                                                                          timeInSecForIosWeb: 3,
-                                                                                          backgroundColor: Colors.red[400],
-                                                                                          textColor: Colors.white,
-                                                                                          fontSize: 15,
-                                                                                        );
-                                                                                      } else {
-                                                                                        try {
-                                                                                          final result = await InternetAddress.lookup('google.com');
-                                                                                          if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-                                                                                            print('connected');
-                                                                                            setState(() {
-                                                                                              edit = true;
-                                                                                            });
+                                                                            Container(
+                                                                              padding: EdgeInsets.only(right: 10),
+                                                                              height: 40,
+                                                                              width: width * 0.9,
+                                                                              child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                                                                                GestureDetector(
+                                                                                  onTap: () {
+                                                                                    nameECon.clear();
+                                                                                    quanECon.clear();
+                                                                                    priECon.clear();
+                                                                                    edititems = null;
+                                                                                    setState(() {
+                                                                                      edit = false;
+                                                                                      _image = null;
+                                                                                      stap = false;
+                                                                                      ltap = false;
+                                                                                      mtap = false;
+                                                                                    });
+                                                                                    Navigator.pop(context);
+                                                                                  },
+                                                                                  child: Text('Cancel', style: TextStyle(fontFamily: "Segoe", fontWeight: FontWeight.bold)),
+                                                                                ),
+                                                                                SizedBox(width: 20),
+                                                                                GestureDetector(
+                                                                                  onTap: () async {
+                                                                                    if (nameECon.text == '') {
+                                                                                      Fluttertoast.showToast(
+                                                                                        msg: "Name cannot be empty",
+                                                                                        toastLength: Toast.LENGTH_LONG,
+                                                                                        gravity: ToastGravity.BOTTOM,
+                                                                                        timeInSecForIosWeb: 3,
+                                                                                        backgroundColor: Colors.red[400],
+                                                                                        textColor: Colors.white,
+                                                                                        fontSize: 15,
+                                                                                      );
+                                                                                    } else if (quanECon.text == '') {
+                                                                                      Fluttertoast.showToast(
+                                                                                        msg: "Quantity cannot be empty",
+                                                                                        toastLength: Toast.LENGTH_LONG,
+                                                                                        gravity: ToastGravity.BOTTOM,
+                                                                                        timeInSecForIosWeb: 3,
+                                                                                        backgroundColor: Colors.red[400],
+                                                                                        textColor: Colors.white,
+                                                                                        fontSize: 15,
+                                                                                      );
+                                                                                    } else if (priECon.text == '') {
+                                                                                      Fluttertoast.showToast(
+                                                                                        msg: "Price cannot be empty",
+                                                                                        toastLength: Toast.LENGTH_LONG,
+                                                                                        gravity: ToastGravity.BOTTOM,
+                                                                                        timeInSecForIosWeb: 3,
+                                                                                        backgroundColor: Colors.red[400],
+                                                                                        textColor: Colors.white,
+                                                                                        fontSize: 15,
+                                                                                      );
+                                                                                    } else if (stap == false && ltap == false && mtap == false) {
+                                                                                      Fluttertoast.showToast(
+                                                                                        msg: "Please select a size",
+                                                                                        toastLength: Toast.LENGTH_LONG,
+                                                                                        gravity: ToastGravity.BOTTOM,
+                                                                                        timeInSecForIosWeb: 3,
+                                                                                        backgroundColor: Colors.red[400],
+                                                                                        textColor: Colors.white,
+                                                                                        fontSize: 15,
+                                                                                      );
+                                                                                    } else {
+                                                                                      try {
+                                                                                        final result = await InternetAddress.lookup('google.com');
+                                                                                        if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+                                                                                          print('connected');
+                                                                                          setState(() {
+                                                                                            edit = true;
+                                                                                          });
 
-                                                                                            if (_image == null) {
-                                                                                              try {
-                                                                                                await uploadFile(womenSnap.docs[index].id, 'Women').then((value) async {
-                                                                                                  try {
-                                                                                                    FirebaseFirestore.instance.collection('product').doc('admin1@gmail.com').collection('products').doc('category').collection('women').doc(womenSnap.docs[index].id).update({
-                                                                                                      'name': nameECon.text,
-                                                                                                      'quantity': quanECon.text,
-                                                                                                      'price': priECon.text,
-                                                                                                      'image_path': _image == null ? womenSnap.docs[index]['image_path'] : imagePath,
-                                                                                                      'bucket': _image == null ? womenSnap.docs[index]['bucket'] : metaData.bucket,
-                                                                                                      'full_path': _image == null ? womenSnap.docs[index]['full_path'] : metaData.fullPath
-                                                                                                    });
-                                                                                                    print('Updated');
-                                                                                                    setState(() {
-                                                                                                      _image = null;
-                                                                                                    });
-                                                                                                    Fluttertoast.showToast(
-                                                                                                      msg: "Product Updated",
-                                                                                                      toastLength: Toast.LENGTH_LONG,
-                                                                                                      gravity: ToastGravity.BOTTOM,
-                                                                                                      timeInSecForIosWeb: 3,
-                                                                                                      backgroundColor: Colors.green,
-                                                                                                      textColor: Colors.white,
-                                                                                                      fontSize: 15,
-                                                                                                    );
-                                                                                                    getProducts();
-                                                                                                    Navigator.pop(context);
-                                                                                                  } catch (e) {
-                                                                                                    print(e);
-                                                                                                  }
-                                                                                                });
-                                                                                              } catch (e) {
-                                                                                                print(e);
-                                                                                                setState(() {
-                                                                                                  edit = false;
-                                                                                                  _image = null;
-                                                                                                });
-                                                                                              }
-                                                                                            } else {
-                                                                                              try {
-                                                                                                await deleteFile(womenSnap.docs[index]['bucket'], womenSnap.docs[index]['full_path']).then((value) async {
-                                                                                                  try {
-                                                                                                    await uploadFile(womenSnap.docs[index].id, 'Women').then((value) async {
-                                                                                                      try {
-                                                                                                        FirebaseFirestore.instance.collection('product').doc('admin1@gmail.com').collection('products').doc('category').collection('women').doc(womenSnap.docs[index].id).update({
-                                                                                                          'name': nameECon.text,
-                                                                                                          'quantity': quanECon.text,
-                                                                                                          'price': priECon.text,
-                                                                                                          'image_path': _image == null ? womenSnap.docs[index]['image_path'] : imagePath,
-                                                                                                          'bucket': _image == null ? womenSnap.docs[index]['bucket'] : metaData.bucket,
-                                                                                                          'full_path': _image == null ? womenSnap.docs[index]['full_path'] : metaData.fullPath
-                                                                                                        });
-                                                                                                        print('Updated');
-                                                                                                        setState(() {
-                                                                                                          _image = null;
-                                                                                                        });
-                                                                                                        Fluttertoast.showToast(
-                                                                                                          msg: "Product Updated",
-                                                                                                          toastLength: Toast.LENGTH_LONG,
-                                                                                                          gravity: ToastGravity.BOTTOM,
-                                                                                                          timeInSecForIosWeb: 3,
-                                                                                                          backgroundColor: Colors.green,
-                                                                                                          textColor: Colors.white,
-                                                                                                          fontSize: 15,
-                                                                                                        );
-                                                                                                        getProducts();
-                                                                                                        Navigator.pop(context);
-                                                                                                      } catch (e) {
-                                                                                                        print(e);
-                                                                                                      }
-                                                                                                    });
-                                                                                                  } catch (e) {
-                                                                                                    print(e);
-                                                                                                    setState(() {
-                                                                                                      edit = false;
-                                                                                                      _image = null;
-                                                                                                    });
-                                                                                                  }
-                                                                                                });
-                                                                                              } catch (e) {
-                                                                                                print(e);
-                                                                                                setState(() {
-                                                                                                  edit = false;
-                                                                                                  _image = null;
-                                                                                                });
-                                                                                              }
+                                                                                          if (_image == null) {
+                                                                                            try {
+                                                                                              await uploadFile(womenSnap.docs[index].id, 'Women').then((value) async {
+                                                                                                try {
+                                                                                                  FirebaseFirestore.instance.collection('product').doc('admin1@gmail.com').collection('products').doc('category').collection('women').doc(womenSnap.docs[index].id).update({
+                                                                                                    'name': nameECon.text,
+                                                                                                    'quantity': quanECon.text,
+                                                                                                    'price': priECon.text,
+                                                                                                    'description': desECon.text,
+                                                                                                    'size': stap == true && mtap == false && ltap == false
+                                                                                                        ? 'S'
+                                                                                                        : stap == false && mtap == true && ltap == false
+                                                                                                            ? 'M'
+                                                                                                            : stap == false && mtap == false && ltap == true
+                                                                                                                ? 'L'
+                                                                                                                : stap == true && mtap == true && ltap == false
+                                                                                                                    ? 'SM'
+                                                                                                                    : stap == true && mtap == false && ltap == true
+                                                                                                                        ? 'SL'
+                                                                                                                        : stap == false && mtap == true && ltap == true
+                                                                                                                            ? 'ML'
+                                                                                                                            : stap == true && mtap == true && ltap == true
+                                                                                                                                ? 'SML'
+                                                                                                                                : 'nothing',
+                                                                                                    'image_path': _image == null ? womenSnap.docs[index]['image_path'] : imagePath,
+                                                                                                    'bucket': _image == null ? womenSnap.docs[index]['bucket'] : metaData.bucket,
+                                                                                                    'full_path': _image == null ? womenSnap.docs[index]['full_path'] : metaData.fullPath
+                                                                                                  });
+                                                                                                  print('Updated');
+                                                                                                  setState(() {
+                                                                                                    _image = null;
+                                                                                                  });
+                                                                                                  Fluttertoast.showToast(
+                                                                                                    msg: "Product Updated",
+                                                                                                    toastLength: Toast.LENGTH_LONG,
+                                                                                                    gravity: ToastGravity.BOTTOM,
+                                                                                                    timeInSecForIosWeb: 3,
+                                                                                                    backgroundColor: Colors.green,
+                                                                                                    textColor: Colors.white,
+                                                                                                    fontSize: 15,
+                                                                                                  );
+                                                                                                  getProducts();
+                                                                                                  Navigator.pop(context);
+                                                                                                } catch (e) {
+                                                                                                  print(e);
+                                                                                                  Fluttertoast.showToast(
+                                                                                                    msg: e,
+                                                                                                    toastLength: Toast.LENGTH_LONG,
+                                                                                                    gravity: ToastGravity.BOTTOM,
+                                                                                                    timeInSecForIosWeb: 3,
+                                                                                                    backgroundColor: Colors.red[400],
+                                                                                                    textColor: Colors.white,
+                                                                                                    fontSize: 15,
+                                                                                                  );
+                                                                                                }
+                                                                                              });
+                                                                                            } catch (e) {
+                                                                                              print(e);
+                                                                                              Fluttertoast.showToast(
+                                                                                                msg: e,
+                                                                                                toastLength: Toast.LENGTH_LONG,
+                                                                                                gravity: ToastGravity.BOTTOM,
+                                                                                                timeInSecForIosWeb: 3,
+                                                                                                backgroundColor: Colors.red[400],
+                                                                                                textColor: Colors.white,
+                                                                                                fontSize: 15,
+                                                                                              );
+                                                                                              setState(() {
+                                                                                                edit = false;
+                                                                                                _image = null;
+                                                                                              });
+                                                                                            }
+                                                                                          } else {
+                                                                                            try {
+                                                                                              await deleteFile(womenSnap.docs[index]['bucket'], womenSnap.docs[index]['full_path']).then((value) async {
+                                                                                                try {
+                                                                                                  await uploadFile(womenSnap.docs[index].id, 'Women').then((value) async {
+                                                                                                    try {
+                                                                                                      FirebaseFirestore.instance.collection('product').doc('admin1@gmail.com').collection('products').doc('category').collection('women').doc(womenSnap.docs[index].id).update({
+                                                                                                        'name': nameECon.text,
+                                                                                                        'quantity': quanECon.text,
+                                                                                                        'price': priECon.text,
+                                                                                                        'description': desECon.text,
+                                                                                                        'size': stap == true && mtap == false && ltap == false
+                                                                                                            ? 'S'
+                                                                                                            : stap == false && mtap == true && ltap == false
+                                                                                                                ? 'M'
+                                                                                                                : stap == false && mtap == false && ltap == true
+                                                                                                                    ? 'L'
+                                                                                                                    : stap == true && mtap == true && ltap == false
+                                                                                                                        ? 'SM'
+                                                                                                                        : stap == true && mtap == false && ltap == true
+                                                                                                                            ? 'SL'
+                                                                                                                            : stap == false && mtap == true && ltap == true
+                                                                                                                                ? 'ML'
+                                                                                                                                : stap == true && mtap == true && ltap == true
+                                                                                                                                    ? 'SML'
+                                                                                                                                    : 'nothing',
+                                                                                                        'image_path': _image == null ? womenSnap.docs[index]['image_path'] : imagePath,
+                                                                                                        'bucket': _image == null ? womenSnap.docs[index]['bucket'] : metaData.bucket,
+                                                                                                        'full_path': _image == null ? womenSnap.docs[index]['full_path'] : metaData.fullPath
+                                                                                                      });
+                                                                                                      print('Updated');
+                                                                                                      setState(() {
+                                                                                                        _image = null;
+                                                                                                      });
+                                                                                                      Fluttertoast.showToast(
+                                                                                                        msg: "Product Updated",
+                                                                                                        toastLength: Toast.LENGTH_LONG,
+                                                                                                        gravity: ToastGravity.BOTTOM,
+                                                                                                        timeInSecForIosWeb: 3,
+                                                                                                        backgroundColor: Colors.green,
+                                                                                                        textColor: Colors.white,
+                                                                                                        fontSize: 15,
+                                                                                                      );
+                                                                                                      getProducts();
+                                                                                                      Navigator.pop(context);
+                                                                                                    } catch (e) {
+                                                                                                      print(e);
+                                                                                                      Fluttertoast.showToast(
+                                                                                                        msg: e,
+                                                                                                        toastLength: Toast.LENGTH_LONG,
+                                                                                                        gravity: ToastGravity.BOTTOM,
+                                                                                                        timeInSecForIosWeb: 3,
+                                                                                                        backgroundColor: Colors.red[400],
+                                                                                                        textColor: Colors.white,
+                                                                                                        fontSize: 15,
+                                                                                                      );
+                                                                                                    }
+                                                                                                  });
+                                                                                                } catch (e) {
+                                                                                                  print(e);
+                                                                                                  Fluttertoast.showToast(
+                                                                                                    msg: e,
+                                                                                                    toastLength: Toast.LENGTH_LONG,
+                                                                                                    gravity: ToastGravity.BOTTOM,
+                                                                                                    timeInSecForIosWeb: 3,
+                                                                                                    backgroundColor: Colors.red[400],
+                                                                                                    textColor: Colors.white,
+                                                                                                    fontSize: 15,
+                                                                                                  );
+                                                                                                  setState(() {
+                                                                                                    edit = false;
+                                                                                                    _image = null;
+                                                                                                  });
+                                                                                                }
+                                                                                              });
+                                                                                            } catch (e) {
+                                                                                              print(e);
+                                                                                              Fluttertoast.showToast(
+                                                                                                msg: e,
+                                                                                                toastLength: Toast.LENGTH_LONG,
+                                                                                                gravity: ToastGravity.BOTTOM,
+                                                                                                timeInSecForIosWeb: 3,
+                                                                                                backgroundColor: Colors.red[400],
+                                                                                                textColor: Colors.white,
+                                                                                                fontSize: 15,
+                                                                                              );
+                                                                                              setState(() {
+                                                                                                edit = false;
+                                                                                                _image = null;
+                                                                                              });
                                                                                             }
                                                                                           }
-                                                                                        } on SocketException catch (_) {
-                                                                                          Navigator.pop(context);
-
-                                                                                          print('not connected');
-                                                                                          setState(() {
-                                                                                            edit = false;
-                                                                                            _image = null;
-                                                                                          });
-                                                                                          Fluttertoast.showToast(
-                                                                                            msg: "You're not connected to the internet",
-                                                                                            toastLength: Toast.LENGTH_LONG,
-                                                                                            gravity: ToastGravity.BOTTOM,
-                                                                                            timeInSecForIosWeb: 3,
-                                                                                            backgroundColor: Colors.red[400],
-                                                                                            textColor: Colors.white,
-                                                                                            fontSize: 15,
-                                                                                          );
                                                                                         }
+                                                                                      } on SocketException catch (_) {
+                                                                                        Navigator.pop(context);
+
+                                                                                        print('not connected');
+                                                                                        setState(() {
+                                                                                          edit = false;
+                                                                                          _image = null;
+                                                                                        });
+                                                                                        Fluttertoast.showToast(
+                                                                                          msg: "You're not connected to the internet",
+                                                                                          toastLength: Toast.LENGTH_LONG,
+                                                                                          gravity: ToastGravity.BOTTOM,
+                                                                                          timeInSecForIosWeb: 3,
+                                                                                          backgroundColor: Colors.red[400],
+                                                                                          textColor: Colors.white,
+                                                                                          fontSize: 15,
+                                                                                        );
                                                                                       }
-                                                                                    },
-                                                                                    child: Text('Edit', style: TextStyle(fontFamily: "Segoe", fontWeight: FontWeight.bold, color: Color.fromRGBO(102, 126, 234, 1))),
-                                                                                  ),
-                                                                                ]),
-                                                                              ),
-                                                                            ))
+                                                                                    }
+                                                                                  },
+                                                                                  child: Text('Edit', style: TextStyle(fontFamily: "Segoe", fontWeight: FontWeight.bold, color: Color.fromRGBO(102, 126, 234, 1))),
+                                                                                ),
+                                                                              ]),
+                                                                            )
                                                                           ]),
                                                                     ),
                                                                   ),
@@ -1599,6 +2526,9 @@ class _VendorProductState extends State<VendorProduct>
                                                   setState(() {
                                                     edit = false;
                                                     _image = null;
+                                                    stap = false;
+                                                    ltap = false;
+                                                    mtap = false;
                                                   });
                                                 });
                                               },
@@ -1731,6 +2661,15 @@ class _VendorProductState extends State<VendorProduct>
                                                                             Navigator.pop(context);
                                                                           } catch (e) {
                                                                             print(e);
+                                                                            Fluttertoast.showToast(
+                                                                              msg: e,
+                                                                              toastLength: Toast.LENGTH_LONG,
+                                                                              gravity: ToastGravity.BOTTOM,
+                                                                              timeInSecForIosWeb: 3,
+                                                                              backgroundColor: Colors.red[400],
+                                                                              textColor: Colors.white,
+                                                                              fontSize: 15,
+                                                                            );
                                                                             setState(() {
                                                                               delete = false;
                                                                             });
@@ -1739,6 +2678,23 @@ class _VendorProductState extends State<VendorProduct>
                                                                       } catch (e) {
                                                                         print(
                                                                             e);
+                                                                        Fluttertoast
+                                                                            .showToast(
+                                                                          msg:
+                                                                              e,
+                                                                          toastLength:
+                                                                              Toast.LENGTH_LONG,
+                                                                          gravity:
+                                                                              ToastGravity.BOTTOM,
+                                                                          timeInSecForIosWeb:
+                                                                              3,
+                                                                          backgroundColor:
+                                                                              Colors.red[400],
+                                                                          textColor:
+                                                                              Colors.white,
+                                                                          fontSize:
+                                                                              15,
+                                                                        );
                                                                         setState(
                                                                             () {
                                                                           delete =
@@ -1898,16 +2854,22 @@ class _VendorProductState extends State<VendorProduct>
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            Text(
-                                                womenSnap.docs[index]['name'] ==
-                                                        null
-                                                    ? ''
-                                                    : womenSnap.docs[index]
-                                                        ['name'],
-                                                style: TextStyle(
-                                                    fontFamily: 'Segoe',
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 20)),
+                                            Container(
+                                              width: 80,
+                                              height: 27,
+                                              child: Text(
+                                                  womenSnap.docs[index]
+                                                              ['name'] ==
+                                                          null
+                                                      ? ''
+                                                      : womenSnap.docs[index]
+                                                          ['name'],
+                                                  style: TextStyle(
+                                                      fontFamily: 'Segoe',
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 20)),
+                                            ),
                                             SizedBox(
                                               height: 10,
                                             ),
@@ -1926,82 +2888,282 @@ class _VendorProductState extends State<VendorProduct>
                                           ],
                                         ),
                                         Expanded(
-                                          child: Column(
+                                          child: Stack(
                                             children: [
-                                              Expanded(
-                                                flex: 1,
-                                                child: Align(
-                                                  alignment: Alignment.topRight,
-                                                  child: Container(
+                                              Align(
+                                                alignment:
+                                                    Alignment.centerRight,
+                                                child: Container(
+                                                    height: MediaQuery.of(context).size.height *
+                                                        0.15,
+                                                    width: 165,
+                                                    padding: EdgeInsets.only(
+                                                        left: 13),
                                                     decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.only(
-                                                              topRight: Radius
-                                                                  .circular(10),
-                                                              bottomLeft: Radius
-                                                                  .circular(
-                                                                      10)),
-                                                      color: Colors.grey[300],
-                                                    ),
-                                                    width: 110,
-                                                    child: Center(
-                                                      child: Text(
-                                                          womenSnap.docs[index]
-                                                                      .id ==
-                                                                  null
-                                                              ? ''
-                                                              : 'ID: ' +
-                                                                  womenSnap
-                                                                      .docs[
-                                                                          index]
-                                                                      .id,
-                                                          style: TextStyle(
-                                                            color: Colors.black,
-                                                            fontFamily: 'Segoe',
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          )),
+                                                        // color: Colors.grey[50],
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                                10)),
+                                                    child:
+                                                        womenSnap.docs[index]
+                                                                        ['size']
+                                                                    .split('')
+                                                                    .length ==
+                                                                3
+                                                            ? Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceEvenly,
+                                                                children: [
+                                                                  Container(
+                                                                    height: 25,
+                                                                    width: 25,
+                                                                    decoration: BoxDecoration(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(
+                                                                                5),
+                                                                        color: Color.fromRGBO(
+                                                                            102,
+                                                                            126,
+                                                                            234,
+                                                                            0.7)),
+                                                                    child:
+                                                                        Center(
+                                                                      child: Text(
+                                                                          womenSnap.docs[index]['size'].split('')[
+                                                                              0],
+                                                                          style: TextStyle(
+                                                                              fontFamily: 'Segoe',
+                                                                              fontWeight: FontWeight.bold)),
+                                                                    ),
+                                                                  ),
+                                                                  Container(
+                                                                    height: 25,
+                                                                    width: 25,
+                                                                    decoration: BoxDecoration(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(
+                                                                                5),
+                                                                        color: Color.fromRGBO(
+                                                                            102,
+                                                                            126,
+                                                                            234,
+                                                                            0.7)),
+                                                                    child:
+                                                                        Center(
+                                                                      child: Text(
+                                                                          womenSnap.docs[index]['size'].split('')[
+                                                                              1],
+                                                                          style: TextStyle(
+                                                                              fontFamily: 'Segoe',
+                                                                              fontWeight: FontWeight.bold)),
+                                                                    ),
+                                                                  ),
+                                                                  Container(
+                                                                    height: 25,
+                                                                    width: 25,
+                                                                    decoration: BoxDecoration(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(
+                                                                                5),
+                                                                        color: Color.fromRGBO(
+                                                                            102,
+                                                                            126,
+                                                                            234,
+                                                                            0.7)),
+                                                                    child:
+                                                                        Center(
+                                                                      child: Text(
+                                                                          womenSnap.docs[index]['size'].split('')[
+                                                                              2],
+                                                                          style: TextStyle(
+                                                                              fontFamily: 'Segoe',
+                                                                              fontWeight: FontWeight.bold)),
+                                                                    ),
+                                                                  )
+                                                                ],
+                                                              )
+                                                            : womenSnap.docs[
+                                                                            index]
+                                                                            [
+                                                                            'size']
+                                                                        .split(
+                                                                            '')
+                                                                        .length ==
+                                                                    2
+                                                                ? Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .start,
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .spaceEvenly,
+                                                                    children: [
+                                                                      Container(
+                                                                        height:
+                                                                            25,
+                                                                        width:
+                                                                            25,
+                                                                        decoration: BoxDecoration(
+                                                                            borderRadius: BorderRadius.circular(
+                                                                                5),
+                                                                            color: Color.fromRGBO(
+                                                                                102,
+                                                                                126,
+                                                                                234,
+                                                                                0.7)),
+                                                                        child:
+                                                                            Center(
+                                                                          child: Text(
+                                                                              womenSnap.docs[index]['size'].split('')[0],
+                                                                              style: TextStyle(fontFamily: 'Segoe', fontWeight: FontWeight.bold)),
+                                                                        ),
+                                                                      ),
+                                                                      Container(
+                                                                        height:
+                                                                            25,
+                                                                        width:
+                                                                            25,
+                                                                        decoration: BoxDecoration(
+                                                                            borderRadius: BorderRadius.circular(
+                                                                                5),
+                                                                            color: Color.fromRGBO(
+                                                                                102,
+                                                                                126,
+                                                                                234,
+                                                                                0.7)),
+                                                                        child:
+                                                                            Center(
+                                                                          child: Text(
+                                                                              womenSnap.docs[index]['size'].split('')[1],
+                                                                              style: TextStyle(fontFamily: 'Segoe', fontWeight: FontWeight.bold)),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  )
+                                                                : womenSnap.docs[index]['size']
+                                                                            .split('')
+                                                                            .length ==
+                                                                        1
+                                                                    ? Column(
+                                                                        crossAxisAlignment:
+                                                                            CrossAxisAlignment.start,
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.spaceEvenly,
+                                                                        children: [
+                                                                          Container(
+                                                                            height:
+                                                                                25,
+                                                                            width:
+                                                                                25,
+                                                                            decoration:
+                                                                                BoxDecoration(borderRadius: BorderRadius.circular(5), color: Color.fromRGBO(102, 126, 234, 0.7)),
+                                                                            child:
+                                                                                Center(
+                                                                              child: Text(womenSnap.docs[index]['size'].split('')[0], style: TextStyle(fontFamily: 'Segoe', fontWeight: FontWeight.bold)),
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      )
+                                                                    : Container()),
+                                              ),
+                                              Column(
+                                                children: [
+                                                  Expanded(
+                                                    flex: 1,
+                                                    child: Align(
+                                                      alignment:
+                                                          Alignment.topRight,
+                                                      child: Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius.only(
+                                                                  topRight: Radius
+                                                                      .circular(
+                                                                          10),
+                                                                  bottomLeft:
+                                                                      Radius.circular(
+                                                                          10)),
+                                                          color:
+                                                              Colors.grey[300],
+                                                        ),
+                                                        width: 110,
+                                                        child: Center(
+                                                          child: Text(
+                                                              womenSnap
+                                                                          .docs[
+                                                                              index]
+                                                                          .id ==
+                                                                      null
+                                                                  ? ''
+                                                                  : 'ID: ' +
+                                                                      womenSnap
+                                                                          .docs[
+                                                                              index]
+                                                                          .id,
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontFamily:
+                                                                    'Segoe',
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              )),
+                                                        ),
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                              ),
-                                              SizedBox(height: 15),
-                                              Expanded(
-                                                flex: 1,
-                                                child: Align(
-                                                  alignment:
-                                                      Alignment.bottomRight,
-                                                  child: Container(
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.only(
-                                                              topLeft: Radius
-                                                                  .circular(10),
-                                                              bottomRight:
-                                                                  Radius
+                                                  SizedBox(height: 15),
+                                                  Expanded(
+                                                    flex: 1,
+                                                    child: Align(
+                                                      alignment:
+                                                          Alignment.bottomRight,
+                                                      child: Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius.only(
+                                                                  topLeft: Radius
+                                                                      .circular(
+                                                                          10),
+                                                                  bottomRight: Radius
                                                                       .circular(
                                                                           10)),
-                                                      color: Colors.grey[300],
-                                                    ),
-                                                    width: 110,
-                                                    child: Center(
-                                                      child: Text(
-                                                          womenSnap.docs[index][
-                                                                      'quantity'] ==
-                                                                  null
-                                                              ? ''
-                                                              : womenSnap.docs[
-                                                                      index]
-                                                                  ['quantity'],
-                                                          style: TextStyle(
-                                                            color: Colors.black,
-                                                            fontFamily: 'Segoe',
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          )),
+                                                          color:
+                                                              Colors.grey[300],
+                                                        ),
+                                                        width: 110,
+                                                        child: Center(
+                                                          child: Text(
+                                                              womenSnap.docs[index]
+                                                                          [
+                                                                          'quantity'] ==
+                                                                      null
+                                                                  ? ''
+                                                                  : womenSnap.docs[
+                                                                          index]
+                                                                      [
+                                                                      'quantity'],
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontFamily:
+                                                                    'Segoe',
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              )),
+                                                        ),
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
+                                                ],
                                               ),
                                             ],
                                           ),
@@ -2052,6 +3214,44 @@ class _VendorProductState extends State<VendorProduct>
                                 padding: const EdgeInsets.only(
                                     top: 5, bottom: 5, left: 5, right: 5),
                                 child: GestureDetector(
+                                  onTap: () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            title: Text(
+                                                kidsSnap.docs[index]['name'],
+                                                style: TextStyle(
+                                                    fontFamily: 'Segoe',
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                            content: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'Description',
+                                                  style: TextStyle(
+                                                      fontFamily: 'Segoe',
+                                                      fontWeight:
+                                                          FontWeight.w700),
+                                                ),
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
+                                                Text(
+                                                  kidsSnap.docs[index]
+                                                      ['description'],
+                                                  style: TextStyle(
+                                                    fontFamily: 'Segoe',
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        });
+                                  },
                                   onLongPress: () {
                                     print('long press');
                                     showDialog(
@@ -2075,12 +3275,83 @@ class _VendorProductState extends State<VendorProduct>
                                             GestureDetector(
                                               onTap: () {
                                                 setState(() {
+                                                  stap = false;
+                                                  ltap = false;
+                                                  mtap = false;
+                                                });
+                                                if (kidsSnap.docs[index]['size']
+                                                        .split('')
+                                                        .length ==
+                                                    3) {
+                                                  setState(() {
+                                                    stap = true;
+                                                    ltap = true;
+                                                    mtap = true;
+                                                  });
+                                                } else if (kidsSnap
+                                                        .docs[index]['size']
+                                                        .length ==
+                                                    2) {
+                                                  if (kidsSnap.docs[index]
+                                                          ['size'] ==
+                                                      'SM') {
+                                                    setState(() {
+                                                      stap = true;
+                                                      mtap = true;
+                                                    });
+                                                  } else if (kidsSnap
+                                                              .docs[index]
+                                                          ['size'] ==
+                                                      'SL') {
+                                                    setState(() {
+                                                      stap = true;
+                                                      ltap = true;
+                                                    });
+                                                  } else if (kidsSnap
+                                                              .docs[index]
+                                                          ['size'] ==
+                                                      'ML') {
+                                                    setState(() {
+                                                      mtap = true;
+                                                      ltap = true;
+                                                    });
+                                                  }
+                                                } else if (kidsSnap
+                                                        .docs[index]['size']
+                                                        .length ==
+                                                    1) {
+                                                  if (kidsSnap.docs[index]
+                                                          ['size'] ==
+                                                      'S') {
+                                                    setState(() {
+                                                      stap = true;
+                                                    });
+                                                  } else if (kidsSnap
+                                                              .docs[index]
+                                                          ['size'] ==
+                                                      'M') {
+                                                    setState(() {
+                                                      mtap = true;
+                                                    });
+                                                  } else if (kidsSnap
+                                                              .docs[index]
+                                                          ['size'] ==
+                                                      'L') {
+                                                    setState(() {
+                                                      ltap = true;
+                                                    });
+                                                  }
+                                                }
+                                                setState(() {
                                                   nameECon.text = kidsSnap
                                                       .docs[index]['name'];
                                                   priECon.text = kidsSnap
                                                       .docs[index]['price'];
                                                   quanECon.text = kidsSnap
                                                       .docs[index]['quantity'];
+                                                  desECon.text =
+                                                      kidsSnap.docs[index]
+                                                          ['description'];
                                                 });
                                                 Navigator.pop(context);
                                                 showDialog(
@@ -2118,15 +3389,17 @@ class _VendorProductState extends State<VendorProduct>
                                                                         borderRadius:
                                                                             BorderRadius.circular(10),
                                                                       ),
-                                                                      height:
-                                                                          height *
-                                                                              0.67,
+                                                                      // height:
+                                                                      //     height *
+                                                                      //         0.67,
                                                                       width:
                                                                           width *
                                                                               0.9,
                                                                       child: Column(
-                                                                          crossAxisAlignment:
-                                                                              CrossAxisAlignment.start,
+                                                                          crossAxisAlignment: CrossAxisAlignment
+                                                                              .start,
+                                                                          mainAxisSize:
+                                                                              MainAxisSize.min,
                                                                           children: [
                                                                             Row(
                                                                               children: [
@@ -2158,9 +3431,6 @@ class _VendorProductState extends State<VendorProduct>
                                                                                 decoration: InputDecoration(enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)), hintText: 'Enter Name', hintStyle: TextStyle(fontFamily: 'Segoe', fontSize: 12)),
                                                                               ),
                                                                             ),
-                                                                            SizedBox(
-                                                                              height: 5,
-                                                                            ),
                                                                             Theme(
                                                                               data: new ThemeData(
                                                                                 primaryColor: Colors.grey[700],
@@ -2174,9 +3444,6 @@ class _VendorProductState extends State<VendorProduct>
                                                                                 decoration: InputDecoration(enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)), hintText: 'Enter Quantity', hintStyle: TextStyle(fontFamily: 'Segoe', fontSize: 12)),
                                                                               ),
                                                                             ),
-                                                                            SizedBox(
-                                                                              height: 5,
-                                                                            ),
                                                                             Theme(
                                                                               data: new ThemeData(
                                                                                 primaryColor: Colors.grey[700],
@@ -2188,6 +3455,141 @@ class _VendorProductState extends State<VendorProduct>
                                                                                 keyboardType: TextInputType.number,
                                                                                 cursorColor: Colors.grey[700],
                                                                                 decoration: InputDecoration(enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)), hintText: 'Enter Price', hintStyle: TextStyle(fontFamily: 'Segoe', fontSize: 12)),
+                                                                              ),
+                                                                            ),
+                                                                            Theme(
+                                                                              data: new ThemeData(
+                                                                                primaryColor: Colors.grey[700],
+                                                                              ),
+                                                                              child: TextField(
+                                                                                style: TextStyle(fontFamily: 'Segoe'),
+                                                                                controller: desECon,
+                                                                                textInputAction: TextInputAction.next,
+                                                                                cursorColor: Colors.grey[700],
+                                                                                decoration: InputDecoration(enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.black)), hintText: 'Enter Description', hintStyle: TextStyle(fontFamily: 'Segoe', fontSize: 12)),
+                                                                              ),
+                                                                            ),
+                                                                            SizedBox(
+                                                                              height: 10,
+                                                                            ),
+                                                                            Container(
+                                                                              height: 40,
+                                                                              width: width * 0.9,
+                                                                              child: Row(
+                                                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                                children: [
+                                                                                  Text(
+                                                                                    'Edit size',
+                                                                                    style: TextStyle(
+                                                                                      fontFamily: 'Segoe',
+                                                                                      fontSize: 13,
+                                                                                      color: Colors.black.withOpacity(0.6),
+                                                                                    ),
+                                                                                  ),
+                                                                                  Expanded(
+                                                                                    flex: 2,
+                                                                                    child: Align(
+                                                                                      alignment: Alignment.centerRight,
+                                                                                      child: Container(
+                                                                                        child: Row(
+                                                                                          mainAxisSize: MainAxisSize.min,
+                                                                                          children: [
+                                                                                            GestureDetector(
+                                                                                              onTap: () {
+                                                                                                stap == false
+                                                                                                    ? setState(() {
+                                                                                                        stap = true;
+                                                                                                      })
+                                                                                                    : setState(() {
+                                                                                                        stap = false;
+                                                                                                      });
+                                                                                              },
+                                                                                              child: Container(
+                                                                                                height: 35,
+                                                                                                width: 35,
+                                                                                                decoration: BoxDecoration(
+                                                                                                  borderRadius: BorderRadius.circular(5),
+                                                                                                  boxShadow: [
+                                                                                                    BoxShadow(color: stap == true ? Color.fromRGBO(102, 126, 234, 1) : Colors.transparent, offset: stap == true ? Offset(0, 6) : Offset(0, 0), blurRadius: stap == true ? 3 : 0, spreadRadius: stap == true ? -4 : 0)
+                                                                                                  ],
+                                                                                                  color: stap == true ? Color.fromRGBO(102, 126, 234, 1) : Colors.grey[300],
+                                                                                                ),
+                                                                                                child: Center(
+                                                                                                  child: Text(
+                                                                                                    'S',
+                                                                                                    style: TextStyle(fontFamily: 'Segoe', fontWeight: FontWeight.bold),
+                                                                                                  ),
+                                                                                                ),
+                                                                                              ),
+                                                                                            ),
+                                                                                            SizedBox(
+                                                                                              width: 9,
+                                                                                            ),
+                                                                                            GestureDetector(
+                                                                                              onTap: () {
+                                                                                                mtap == false
+                                                                                                    ? setState(() {
+                                                                                                        mtap = true;
+                                                                                                      })
+                                                                                                    : setState(() {
+                                                                                                        mtap = false;
+                                                                                                      });
+                                                                                              },
+                                                                                              child: Container(
+                                                                                                height: 35,
+                                                                                                width: 35,
+                                                                                                decoration: BoxDecoration(
+                                                                                                  borderRadius: BorderRadius.circular(5),
+                                                                                                  boxShadow: [
+                                                                                                    BoxShadow(color: mtap == true ? Color.fromRGBO(102, 126, 234, 1) : Colors.transparent, offset: mtap == true ? Offset(0, 6) : Offset(0, 0), blurRadius: mtap == true ? 3 : 0, spreadRadius: mtap == true ? -4 : 0)
+                                                                                                  ],
+                                                                                                  color: mtap == true ? Color.fromRGBO(102, 126, 234, 1) : Colors.grey[300],
+                                                                                                ),
+                                                                                                child: Center(
+                                                                                                  child: Text(
+                                                                                                    'M',
+                                                                                                    style: TextStyle(fontFamily: 'Segoe', fontWeight: FontWeight.bold),
+                                                                                                  ),
+                                                                                                ),
+                                                                                              ),
+                                                                                            ),
+                                                                                            SizedBox(
+                                                                                              width: 9,
+                                                                                            ),
+                                                                                            GestureDetector(
+                                                                                              onTap: () {
+                                                                                                ltap == false
+                                                                                                    ? setState(() {
+                                                                                                        ltap = true;
+                                                                                                      })
+                                                                                                    : setState(() {
+                                                                                                        ltap = false;
+                                                                                                      });
+                                                                                              },
+                                                                                              child: Container(
+                                                                                                height: 35,
+                                                                                                width: 35,
+                                                                                                decoration: BoxDecoration(
+                                                                                                  borderRadius: BorderRadius.circular(5),
+                                                                                                  boxShadow: [
+                                                                                                    BoxShadow(color: ltap == true ? Color.fromRGBO(102, 126, 234, 1) : Colors.transparent, offset: ltap == true ? Offset(0, 6) : Offset(0, 0), blurRadius: ltap == true ? 3 : 0, spreadRadius: ltap == true ? -4 : 0)
+                                                                                                  ],
+                                                                                                  color: ltap == true ? Color.fromRGBO(102, 126, 234, 1) : Colors.grey[300],
+                                                                                                ),
+                                                                                                child: Center(
+                                                                                                  child: Text(
+                                                                                                    'L',
+                                                                                                    style: TextStyle(fontFamily: 'Segoe', fontWeight: FontWeight.bold),
+                                                                                                  ),
+                                                                                                ),
+                                                                                              ),
+                                                                                            ),
+                                                                                          ],
+                                                                                        ),
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                                ],
                                                                               ),
                                                                             ),
                                                                             SizedBox(
@@ -2253,183 +3655,269 @@ class _VendorProductState extends State<VendorProduct>
                                                                             SizedBox(
                                                                               height: 10,
                                                                             ),
-                                                                            Expanded(
-                                                                                child: Align(
-                                                                              alignment: Alignment.bottomCenter,
-                                                                              child: Container(
-                                                                                padding: EdgeInsets.only(right: 10),
-                                                                                height: 40,
-                                                                                width: width * 0.9,
-                                                                                child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                                                                                  GestureDetector(
-                                                                                    onTap: () {
-                                                                                      nameECon.clear();
-                                                                                      quanECon.clear();
-                                                                                      priECon.clear();
-                                                                                      edititems = null;
-                                                                                      setState(() {
-                                                                                        edit = false;
-                                                                                        _image = null;
-                                                                                      });
-                                                                                      Navigator.pop(context);
-                                                                                    },
-                                                                                    child: Text('Cancel', style: TextStyle(fontFamily: "Segoe", fontWeight: FontWeight.bold)),
-                                                                                  ),
-                                                                                  SizedBox(width: 20),
-                                                                                  GestureDetector(
-                                                                                    onTap: () async {
-                                                                                      if (nameECon.text == '') {
-                                                                                        Fluttertoast.showToast(
-                                                                                          msg: "Name cannot be empty",
-                                                                                          toastLength: Toast.LENGTH_LONG,
-                                                                                          gravity: ToastGravity.BOTTOM,
-                                                                                          timeInSecForIosWeb: 3,
-                                                                                          backgroundColor: Colors.red[400],
-                                                                                          textColor: Colors.white,
-                                                                                          fontSize: 15,
-                                                                                        );
-                                                                                      } else if (quanECon.text == '') {
-                                                                                        Fluttertoast.showToast(
-                                                                                          msg: "Quantity cannot be empty",
-                                                                                          toastLength: Toast.LENGTH_LONG,
-                                                                                          gravity: ToastGravity.BOTTOM,
-                                                                                          timeInSecForIosWeb: 3,
-                                                                                          backgroundColor: Colors.red[400],
-                                                                                          textColor: Colors.white,
-                                                                                          fontSize: 15,
-                                                                                        );
-                                                                                      } else if (priECon.text == '') {
-                                                                                        Fluttertoast.showToast(
-                                                                                          msg: "Price cannot be empty",
-                                                                                          toastLength: Toast.LENGTH_LONG,
-                                                                                          gravity: ToastGravity.BOTTOM,
-                                                                                          timeInSecForIosWeb: 3,
-                                                                                          backgroundColor: Colors.red[400],
-                                                                                          textColor: Colors.white,
-                                                                                          fontSize: 15,
-                                                                                        );
-                                                                                      } else {
-                                                                                        try {
-                                                                                          final result = await InternetAddress.lookup('google.com');
-                                                                                          if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-                                                                                            print('connected');
-                                                                                            setState(() {
-                                                                                              edit = true;
-                                                                                            });
+                                                                            Container(
+                                                                              padding: EdgeInsets.only(right: 10),
+                                                                              height: 40,
+                                                                              width: width * 0.9,
+                                                                              child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                                                                                GestureDetector(
+                                                                                  onTap: () {
+                                                                                    nameECon.clear();
+                                                                                    quanECon.clear();
+                                                                                    priECon.clear();
+                                                                                    edititems = null;
+                                                                                    setState(() {
+                                                                                      edit = false;
+                                                                                      _image = null;
+                                                                                      stap = false;
+                                                                                      ltap = false;
+                                                                                      mtap = false;
+                                                                                    });
+                                                                                    Navigator.pop(context);
+                                                                                  },
+                                                                                  child: Text('Cancel', style: TextStyle(fontFamily: "Segoe", fontWeight: FontWeight.bold)),
+                                                                                ),
+                                                                                SizedBox(width: 20),
+                                                                                GestureDetector(
+                                                                                  onTap: () async {
+                                                                                    if (nameECon.text == '') {
+                                                                                      Fluttertoast.showToast(
+                                                                                        msg: "Name cannot be empty",
+                                                                                        toastLength: Toast.LENGTH_LONG,
+                                                                                        gravity: ToastGravity.BOTTOM,
+                                                                                        timeInSecForIosWeb: 3,
+                                                                                        backgroundColor: Colors.red[400],
+                                                                                        textColor: Colors.white,
+                                                                                        fontSize: 15,
+                                                                                      );
+                                                                                    } else if (quanECon.text == '') {
+                                                                                      Fluttertoast.showToast(
+                                                                                        msg: "Quantity cannot be empty",
+                                                                                        toastLength: Toast.LENGTH_LONG,
+                                                                                        gravity: ToastGravity.BOTTOM,
+                                                                                        timeInSecForIosWeb: 3,
+                                                                                        backgroundColor: Colors.red[400],
+                                                                                        textColor: Colors.white,
+                                                                                        fontSize: 15,
+                                                                                      );
+                                                                                    } else if (priECon.text == '') {
+                                                                                      Fluttertoast.showToast(
+                                                                                        msg: "Price cannot be empty",
+                                                                                        toastLength: Toast.LENGTH_LONG,
+                                                                                        gravity: ToastGravity.BOTTOM,
+                                                                                        timeInSecForIosWeb: 3,
+                                                                                        backgroundColor: Colors.red[400],
+                                                                                        textColor: Colors.white,
+                                                                                        fontSize: 15,
+                                                                                      );
+                                                                                    } else if (stap == false && ltap == false && mtap == false) {
+                                                                                      Fluttertoast.showToast(
+                                                                                        msg: "Please select a size",
+                                                                                        toastLength: Toast.LENGTH_LONG,
+                                                                                        gravity: ToastGravity.BOTTOM,
+                                                                                        timeInSecForIosWeb: 3,
+                                                                                        backgroundColor: Colors.red[400],
+                                                                                        textColor: Colors.white,
+                                                                                        fontSize: 15,
+                                                                                      );
+                                                                                    } else {
+                                                                                      try {
+                                                                                        final result = await InternetAddress.lookup('google.com');
+                                                                                        if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+                                                                                          print('connected');
+                                                                                          setState(() {
+                                                                                            edit = true;
+                                                                                          });
 
-                                                                                            if (_image == null) {
-                                                                                              try {
-                                                                                                await uploadFile(kidsSnap.docs[index].id, 'Kids').then((value) async {
-                                                                                                  try {
-                                                                                                    FirebaseFirestore.instance.collection('product').doc('admin1@gmail.com').collection('products').doc('category').collection('kids').doc(kidsSnap.docs[index].id).update({
-                                                                                                      'name': nameECon.text,
-                                                                                                      'quantity': quanECon.text,
-                                                                                                      'price': priECon.text,
-                                                                                                      'image_path': _image == null ? kidsSnap.docs[index]['image_path'] : imagePath,
-                                                                                                      'bucket': _image == null ? kidsSnap.docs[index]['bucket'] : metaData.bucket,
-                                                                                                      'full_path': _image == null ? kidsSnap.docs[index]['full_path'] : metaData.fullPath
-                                                                                                    });
-                                                                                                    print('Updated');
-                                                                                                    setState(() {
-                                                                                                      _image = null;
-                                                                                                    });
-                                                                                                    Fluttertoast.showToast(
-                                                                                                      msg: "Product Updated",
-                                                                                                      toastLength: Toast.LENGTH_LONG,
-                                                                                                      gravity: ToastGravity.BOTTOM,
-                                                                                                      timeInSecForIosWeb: 3,
-                                                                                                      backgroundColor: Colors.green,
-                                                                                                      textColor: Colors.white,
-                                                                                                      fontSize: 15,
-                                                                                                    );
-                                                                                                    getProducts();
-                                                                                                    Navigator.pop(context);
-                                                                                                  } catch (e) {
-                                                                                                    print(e);
-                                                                                                  }
-                                                                                                });
-                                                                                              } catch (e) {
-                                                                                                print(e);
-                                                                                                setState(() {
-                                                                                                  edit = false;
-                                                                                                  _image = null;
-                                                                                                });
-                                                                                              }
-                                                                                            } else {
-                                                                                              try {
-                                                                                                await deleteFile(kidsSnap.docs[index]['bucket'], kidsSnap.docs[index]['full_path']).then((value) async {
-                                                                                                  try {
-                                                                                                    await uploadFile(kidsSnap.docs[index].id, 'Women').then((value) async {
-                                                                                                      try {
-                                                                                                        FirebaseFirestore.instance.collection('product').doc('admin1@gmail.com').collection('products').doc('category').collection('kids').doc(kidsSnap.docs[index].id).update({
-                                                                                                          'name': nameECon.text,
-                                                                                                          'quantity': quanECon.text,
-                                                                                                          'price': priECon.text,
-                                                                                                          'image_path': _image == null ? kidsSnap.docs[index]['image_path'] : imagePath,
-                                                                                                          'bucket': _image == null ? kidsSnap.docs[index]['bucket'] : metaData.bucket,
-                                                                                                          'full_path': _image == null ? kidsSnap.docs[index]['full_path'] : metaData.fullPath
-                                                                                                        });
-                                                                                                        print('Updated');
-                                                                                                        setState(() {
-                                                                                                          _image = null;
-                                                                                                        });
-                                                                                                        Fluttertoast.showToast(
-                                                                                                          msg: "Product Updated",
-                                                                                                          toastLength: Toast.LENGTH_LONG,
-                                                                                                          gravity: ToastGravity.BOTTOM,
-                                                                                                          timeInSecForIosWeb: 3,
-                                                                                                          backgroundColor: Colors.green,
-                                                                                                          textColor: Colors.white,
-                                                                                                          fontSize: 15,
-                                                                                                        );
-                                                                                                        getProducts();
-                                                                                                        Navigator.pop(context);
-                                                                                                      } catch (e) {
-                                                                                                        print(e);
-                                                                                                      }
-                                                                                                    });
-                                                                                                  } catch (e) {
-                                                                                                    print(e);
-                                                                                                    setState(() {
-                                                                                                      edit = false;
-                                                                                                      _image = null;
-                                                                                                    });
-                                                                                                  }
-                                                                                                });
-                                                                                              } catch (e) {
-                                                                                                print(e);
-                                                                                                setState(() {
-                                                                                                  edit = false;
-                                                                                                  _image = null;
-                                                                                                });
-                                                                                              }
+                                                                                          if (_image == null) {
+                                                                                            try {
+                                                                                              await uploadFile(kidsSnap.docs[index].id, 'Kids').then((value) async {
+                                                                                                try {
+                                                                                                  FirebaseFirestore.instance.collection('product').doc('admin1@gmail.com').collection('products').doc('category').collection('kids').doc(kidsSnap.docs[index].id).update({
+                                                                                                    'name': nameECon.text,
+                                                                                                    'quantity': quanECon.text,
+                                                                                                    'price': priECon.text,
+                                                                                                    'description': desECon.text,
+                                                                                                    'size': stap == true && mtap == false && ltap == false
+                                                                                                        ? 'S'
+                                                                                                        : stap == false && mtap == true && ltap == false
+                                                                                                            ? 'M'
+                                                                                                            : stap == false && mtap == false && ltap == true
+                                                                                                                ? 'L'
+                                                                                                                : stap == true && mtap == true && ltap == false
+                                                                                                                    ? 'SM'
+                                                                                                                    : stap == true && mtap == false && ltap == true
+                                                                                                                        ? 'SL'
+                                                                                                                        : stap == false && mtap == true && ltap == true
+                                                                                                                            ? 'ML'
+                                                                                                                            : stap == true && mtap == true && ltap == true
+                                                                                                                                ? 'SML'
+                                                                                                                                : 'nothing',
+                                                                                                    'image_path': _image == null ? kidsSnap.docs[index]['image_path'] : imagePath,
+                                                                                                    'bucket': _image == null ? kidsSnap.docs[index]['bucket'] : metaData.bucket,
+                                                                                                    'full_path': _image == null ? kidsSnap.docs[index]['full_path'] : metaData.fullPath
+                                                                                                  });
+                                                                                                  print('Updated');
+                                                                                                  setState(() {
+                                                                                                    _image = null;
+                                                                                                  });
+                                                                                                  Fluttertoast.showToast(
+                                                                                                    msg: "Product Updated",
+                                                                                                    toastLength: Toast.LENGTH_LONG,
+                                                                                                    gravity: ToastGravity.BOTTOM,
+                                                                                                    timeInSecForIosWeb: 3,
+                                                                                                    backgroundColor: Colors.green,
+                                                                                                    textColor: Colors.white,
+                                                                                                    fontSize: 15,
+                                                                                                  );
+                                                                                                  getProducts();
+                                                                                                  Navigator.pop(context);
+                                                                                                } catch (e) {
+                                                                                                  print(e);
+                                                                                                  Fluttertoast.showToast(
+                                                                                                    msg: e,
+                                                                                                    toastLength: Toast.LENGTH_LONG,
+                                                                                                    gravity: ToastGravity.BOTTOM,
+                                                                                                    timeInSecForIosWeb: 3,
+                                                                                                    backgroundColor: Colors.red[400],
+                                                                                                    textColor: Colors.white,
+                                                                                                    fontSize: 15,
+                                                                                                  );
+                                                                                                }
+                                                                                              });
+                                                                                            } catch (e) {
+                                                                                              print(e);
+                                                                                              Fluttertoast.showToast(
+                                                                                                msg: e,
+                                                                                                toastLength: Toast.LENGTH_LONG,
+                                                                                                gravity: ToastGravity.BOTTOM,
+                                                                                                timeInSecForIosWeb: 3,
+                                                                                                backgroundColor: Colors.red[400],
+                                                                                                textColor: Colors.white,
+                                                                                                fontSize: 15,
+                                                                                              );
+                                                                                              setState(() {
+                                                                                                edit = false;
+                                                                                                _image = null;
+                                                                                              });
+                                                                                            }
+                                                                                          } else {
+                                                                                            try {
+                                                                                              await deleteFile(kidsSnap.docs[index]['bucket'], kidsSnap.docs[index]['full_path']).then((value) async {
+                                                                                                try {
+                                                                                                  await uploadFile(kidsSnap.docs[index].id, 'Kids').then((value) async {
+                                                                                                    try {
+                                                                                                      FirebaseFirestore.instance.collection('product').doc('admin1@gmail.com').collection('products').doc('category').collection('kids').doc(kidsSnap.docs[index].id).update({
+                                                                                                        'name': nameECon.text,
+                                                                                                        'quantity': quanECon.text,
+                                                                                                        'price': priECon.text,
+                                                                                                        'description': desECon.text,
+                                                                                                        'size': stap == true && mtap == false && ltap == false
+                                                                                                            ? 'S'
+                                                                                                            : stap == false && mtap == true && ltap == false
+                                                                                                                ? 'M'
+                                                                                                                : stap == false && mtap == false && ltap == true
+                                                                                                                    ? 'L'
+                                                                                                                    : stap == true && mtap == true && ltap == false
+                                                                                                                        ? 'SM'
+                                                                                                                        : stap == true && mtap == false && ltap == true
+                                                                                                                            ? 'SL'
+                                                                                                                            : stap == false && mtap == true && ltap == true
+                                                                                                                                ? 'ML'
+                                                                                                                                : stap == true && mtap == true && ltap == true
+                                                                                                                                    ? 'SML'
+                                                                                                                                    : 'nothing',
+                                                                                                        'image_path': _image == null ? kidsSnap.docs[index]['image_path'] : imagePath,
+                                                                                                        'bucket': _image == null ? kidsSnap.docs[index]['bucket'] : metaData.bucket,
+                                                                                                        'full_path': _image == null ? kidsSnap.docs[index]['full_path'] : metaData.fullPath
+                                                                                                      });
+                                                                                                      print('Updated');
+                                                                                                      setState(() {
+                                                                                                        _image = null;
+                                                                                                      });
+                                                                                                      Fluttertoast.showToast(
+                                                                                                        msg: "Product Updated",
+                                                                                                        toastLength: Toast.LENGTH_LONG,
+                                                                                                        gravity: ToastGravity.BOTTOM,
+                                                                                                        timeInSecForIosWeb: 3,
+                                                                                                        backgroundColor: Colors.green,
+                                                                                                        textColor: Colors.white,
+                                                                                                        fontSize: 15,
+                                                                                                      );
+                                                                                                      getProducts();
+                                                                                                      Navigator.pop(context);
+                                                                                                    } catch (e) {
+                                                                                                      print(e);
+                                                                                                      Fluttertoast.showToast(
+                                                                                                        msg: e,
+                                                                                                        toastLength: Toast.LENGTH_LONG,
+                                                                                                        gravity: ToastGravity.BOTTOM,
+                                                                                                        timeInSecForIosWeb: 3,
+                                                                                                        backgroundColor: Colors.red[400],
+                                                                                                        textColor: Colors.white,
+                                                                                                        fontSize: 15,
+                                                                                                      );
+                                                                                                    }
+                                                                                                  });
+                                                                                                } catch (e) {
+                                                                                                  print(e);
+                                                                                                  Fluttertoast.showToast(
+                                                                                                    msg: e,
+                                                                                                    toastLength: Toast.LENGTH_LONG,
+                                                                                                    gravity: ToastGravity.BOTTOM,
+                                                                                                    timeInSecForIosWeb: 3,
+                                                                                                    backgroundColor: Colors.red[400],
+                                                                                                    textColor: Colors.white,
+                                                                                                    fontSize: 15,
+                                                                                                  );
+                                                                                                  setState(() {
+                                                                                                    edit = false;
+                                                                                                    _image = null;
+                                                                                                  });
+                                                                                                }
+                                                                                              });
+                                                                                            } catch (e) {
+                                                                                              print(e);
+                                                                                              Fluttertoast.showToast(
+                                                                                                msg: e,
+                                                                                                toastLength: Toast.LENGTH_LONG,
+                                                                                                gravity: ToastGravity.BOTTOM,
+                                                                                                timeInSecForIosWeb: 3,
+                                                                                                backgroundColor: Colors.red[400],
+                                                                                                textColor: Colors.white,
+                                                                                                fontSize: 15,
+                                                                                              );
+                                                                                              setState(() {
+                                                                                                edit = false;
+                                                                                                _image = null;
+                                                                                              });
                                                                                             }
                                                                                           }
-                                                                                        } on SocketException catch (_) {
-                                                                                          Navigator.pop(context);
-
-                                                                                          print('not connected');
-                                                                                          setState(() {
-                                                                                            edit = false;
-                                                                                            _image = null;
-                                                                                          });
-                                                                                          Fluttertoast.showToast(
-                                                                                            msg: "You're not connected to the internet",
-                                                                                            toastLength: Toast.LENGTH_LONG,
-                                                                                            gravity: ToastGravity.BOTTOM,
-                                                                                            timeInSecForIosWeb: 3,
-                                                                                            backgroundColor: Colors.red[400],
-                                                                                            textColor: Colors.white,
-                                                                                            fontSize: 15,
-                                                                                          );
                                                                                         }
+                                                                                      } on SocketException catch (_) {
+                                                                                        Navigator.pop(context);
+
+                                                                                        print('not connected');
+                                                                                        setState(() {
+                                                                                          edit = false;
+                                                                                          _image = null;
+                                                                                        });
+                                                                                        Fluttertoast.showToast(
+                                                                                          msg: "You're not connected to the internet",
+                                                                                          toastLength: Toast.LENGTH_LONG,
+                                                                                          gravity: ToastGravity.BOTTOM,
+                                                                                          timeInSecForIosWeb: 3,
+                                                                                          backgroundColor: Colors.red[400],
+                                                                                          textColor: Colors.white,
+                                                                                          fontSize: 15,
+                                                                                        );
                                                                                       }
-                                                                                    },
-                                                                                    child: Text('Edit', style: TextStyle(fontFamily: "Segoe", fontWeight: FontWeight.bold, color: Color.fromRGBO(102, 126, 234, 1))),
-                                                                                  ),
-                                                                                ]),
-                                                                              ),
-                                                                            ))
+                                                                                    }
+                                                                                  },
+                                                                                  child: Text('Edit', style: TextStyle(fontFamily: "Segoe", fontWeight: FontWeight.bold, color: Color.fromRGBO(102, 126, 234, 1))),
+                                                                                ),
+                                                                              ]),
+                                                                            )
                                                                           ]),
                                                                     ),
                                                                   ),
@@ -2465,6 +3953,9 @@ class _VendorProductState extends State<VendorProduct>
                                                   setState(() {
                                                     edit = false;
                                                     _image = null;
+                                                    stap = false;
+                                                    ltap = false;
+                                                    mtap = false;
                                                   });
                                                 });
                                               },
@@ -2597,6 +4088,15 @@ class _VendorProductState extends State<VendorProduct>
                                                                             Navigator.pop(context);
                                                                           } catch (e) {
                                                                             print(e);
+                                                                            Fluttertoast.showToast(
+                                                                              msg: e,
+                                                                              toastLength: Toast.LENGTH_LONG,
+                                                                              gravity: ToastGravity.BOTTOM,
+                                                                              timeInSecForIosWeb: 3,
+                                                                              backgroundColor: Colors.red[400],
+                                                                              textColor: Colors.white,
+                                                                              fontSize: 15,
+                                                                            );
                                                                             setState(() {
                                                                               delete = false;
                                                                             });
@@ -2605,6 +4105,23 @@ class _VendorProductState extends State<VendorProduct>
                                                                       } catch (e) {
                                                                         print(
                                                                             e);
+                                                                        Fluttertoast
+                                                                            .showToast(
+                                                                          msg:
+                                                                              e,
+                                                                          toastLength:
+                                                                              Toast.LENGTH_LONG,
+                                                                          gravity:
+                                                                              ToastGravity.BOTTOM,
+                                                                          timeInSecForIosWeb:
+                                                                              3,
+                                                                          backgroundColor:
+                                                                              Colors.red[400],
+                                                                          textColor:
+                                                                              Colors.white,
+                                                                          fontSize:
+                                                                              15,
+                                                                        );
                                                                         setState(
                                                                             () {
                                                                           delete =
@@ -2764,16 +4281,22 @@ class _VendorProductState extends State<VendorProduct>
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            Text(
-                                                kidsSnap.docs[index]['name'] ==
-                                                        null
-                                                    ? ''
-                                                    : kidsSnap.docs[index]
-                                                        ['name'],
-                                                style: TextStyle(
-                                                    fontFamily: 'Segoe',
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 20)),
+                                            Container(
+                                              width: 80,
+                                              height: 27,
+                                              child: Text(
+                                                  kidsSnap.docs[index]
+                                                              ['name'] ==
+                                                          null
+                                                      ? ''
+                                                      : kidsSnap.docs[index]
+                                                          ['name'],
+                                                  style: TextStyle(
+                                                      fontFamily: 'Segoe',
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 20)),
+                                            ),
                                             SizedBox(
                                               height: 10,
                                             ),
@@ -2791,82 +4314,281 @@ class _VendorProductState extends State<VendorProduct>
                                           ],
                                         ),
                                         Expanded(
-                                          child: Column(
+                                          child: Stack(
                                             children: [
-                                              Expanded(
-                                                flex: 1,
-                                                child: Align(
-                                                  alignment: Alignment.topRight,
-                                                  child: Container(
+                                              Align(
+                                                alignment:
+                                                    Alignment.centerRight,
+                                                child: Container(
+                                                    height: MediaQuery.of(context).size.height *
+                                                        0.15,
+                                                    width: 165,
+                                                    padding: EdgeInsets.only(
+                                                        left: 13),
                                                     decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.only(
-                                                              topRight: Radius
-                                                                  .circular(10),
-                                                              bottomLeft: Radius
-                                                                  .circular(
-                                                                      10)),
-                                                      color: Colors.grey[300],
-                                                    ),
-                                                    width: 110,
-                                                    child: Center(
-                                                      child: Text(
-                                                          kidsSnap.docs[index]
-                                                                      .id ==
-                                                                  null
-                                                              ? ''
-                                                              : 'ID: ' +
-                                                                  kidsSnap
-                                                                      .docs[
-                                                                          index]
-                                                                      .id,
-                                                          style: TextStyle(
-                                                            color: Colors.black,
-                                                            fontFamily: 'Segoe',
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          )),
+                                                        // color: Colors.grey[50],
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                                10)),
+                                                    child:
+                                                        kidsSnap.docs[index]
+                                                                        ['size']
+                                                                    .split('')
+                                                                    .length ==
+                                                                3
+                                                            ? Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceEvenly,
+                                                                children: [
+                                                                  Container(
+                                                                    height: 25,
+                                                                    width: 25,
+                                                                    decoration: BoxDecoration(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(
+                                                                                5),
+                                                                        color: Color.fromRGBO(
+                                                                            102,
+                                                                            126,
+                                                                            234,
+                                                                            0.7)),
+                                                                    child:
+                                                                        Center(
+                                                                      child: Text(
+                                                                          kidsSnap.docs[index]['size'].split('')[
+                                                                              0],
+                                                                          style: TextStyle(
+                                                                              fontFamily: 'Segoe',
+                                                                              fontWeight: FontWeight.bold)),
+                                                                    ),
+                                                                  ),
+                                                                  Container(
+                                                                    height: 25,
+                                                                    width: 25,
+                                                                    decoration: BoxDecoration(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(
+                                                                                5),
+                                                                        color: Color.fromRGBO(
+                                                                            102,
+                                                                            126,
+                                                                            234,
+                                                                            0.7)),
+                                                                    child:
+                                                                        Center(
+                                                                      child: Text(
+                                                                          kidsSnap.docs[index]['size'].split('')[
+                                                                              1],
+                                                                          style: TextStyle(
+                                                                              fontFamily: 'Segoe',
+                                                                              fontWeight: FontWeight.bold)),
+                                                                    ),
+                                                                  ),
+                                                                  Container(
+                                                                    height: 25,
+                                                                    width: 25,
+                                                                    decoration: BoxDecoration(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(
+                                                                                5),
+                                                                        color: Color.fromRGBO(
+                                                                            102,
+                                                                            126,
+                                                                            234,
+                                                                            0.7)),
+                                                                    child:
+                                                                        Center(
+                                                                      child: Text(
+                                                                          kidsSnap.docs[index]['size'].split('')[
+                                                                              2],
+                                                                          style: TextStyle(
+                                                                              fontFamily: 'Segoe',
+                                                                              fontWeight: FontWeight.bold)),
+                                                                    ),
+                                                                  )
+                                                                ],
+                                                              )
+                                                            : kidsSnap.docs[index]
+                                                                            [
+                                                                            'size']
+                                                                        .split(
+                                                                            '')
+                                                                        .length ==
+                                                                    2
+                                                                ? Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .start,
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .spaceEvenly,
+                                                                    children: [
+                                                                      Container(
+                                                                        height:
+                                                                            25,
+                                                                        width:
+                                                                            25,
+                                                                        decoration: BoxDecoration(
+                                                                            borderRadius: BorderRadius.circular(
+                                                                                5),
+                                                                            color: Color.fromRGBO(
+                                                                                102,
+                                                                                126,
+                                                                                234,
+                                                                                0.7)),
+                                                                        child:
+                                                                            Center(
+                                                                          child: Text(
+                                                                              kidsSnap.docs[index]['size'].split('')[0],
+                                                                              style: TextStyle(fontFamily: 'Segoe', fontWeight: FontWeight.bold)),
+                                                                        ),
+                                                                      ),
+                                                                      Container(
+                                                                        height:
+                                                                            25,
+                                                                        width:
+                                                                            25,
+                                                                        decoration: BoxDecoration(
+                                                                            borderRadius: BorderRadius.circular(
+                                                                                5),
+                                                                            color: Color.fromRGBO(
+                                                                                102,
+                                                                                126,
+                                                                                234,
+                                                                                0.7)),
+                                                                        child:
+                                                                            Center(
+                                                                          child: Text(
+                                                                              kidsSnap.docs[index]['size'].split('')[1],
+                                                                              style: TextStyle(fontFamily: 'Segoe', fontWeight: FontWeight.bold)),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  )
+                                                                : kidsSnap.docs[index]['size']
+                                                                            .split('')
+                                                                            .length ==
+                                                                        1
+                                                                    ? Column(
+                                                                        crossAxisAlignment:
+                                                                            CrossAxisAlignment.start,
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.spaceEvenly,
+                                                                        children: [
+                                                                          Container(
+                                                                            height:
+                                                                                25,
+                                                                            width:
+                                                                                25,
+                                                                            decoration:
+                                                                                BoxDecoration(borderRadius: BorderRadius.circular(5), color: Color.fromRGBO(102, 126, 234, 0.7)),
+                                                                            child:
+                                                                                Center(
+                                                                              child: Text(kidsSnap.docs[index]['size'].split('')[0], style: TextStyle(fontFamily: 'Segoe', fontWeight: FontWeight.bold)),
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      )
+                                                                    : Container()),
+                                              ),
+                                              Column(
+                                                children: [
+                                                  Expanded(
+                                                    flex: 1,
+                                                    child: Align(
+                                                      alignment:
+                                                          Alignment.topRight,
+                                                      child: Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius.only(
+                                                                  topRight: Radius
+                                                                      .circular(
+                                                                          10),
+                                                                  bottomLeft:
+                                                                      Radius.circular(
+                                                                          10)),
+                                                          color:
+                                                              Colors.grey[300],
+                                                        ),
+                                                        width: 110,
+                                                        child: Center(
+                                                          child: Text(
+                                                              kidsSnap
+                                                                          .docs[
+                                                                              index]
+                                                                          .id ==
+                                                                      null
+                                                                  ? ''
+                                                                  : 'ID: ' +
+                                                                      kidsSnap
+                                                                          .docs[
+                                                                              index]
+                                                                          .id,
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontFamily:
+                                                                    'Segoe',
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              )),
+                                                        ),
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                              ),
-                                              SizedBox(height: 15),
-                                              Expanded(
-                                                flex: 1,
-                                                child: Align(
-                                                  alignment:
-                                                      Alignment.bottomRight,
-                                                  child: Container(
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.only(
-                                                              topLeft: Radius
-                                                                  .circular(10),
-                                                              bottomRight:
-                                                                  Radius
+                                                  SizedBox(height: 15),
+                                                  Expanded(
+                                                    flex: 1,
+                                                    child: Align(
+                                                      alignment:
+                                                          Alignment.bottomRight,
+                                                      child: Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius.only(
+                                                                  topLeft: Radius
+                                                                      .circular(
+                                                                          10),
+                                                                  bottomRight: Radius
                                                                       .circular(
                                                                           10)),
-                                                      color: Colors.grey[300],
-                                                    ),
-                                                    width: 110,
-                                                    child: Center(
-                                                      child: Text(
-                                                          kidsSnap.docs[index][
-                                                                      'quantity'] ==
-                                                                  null
-                                                              ? ''
-                                                              : kidsSnap.docs[
-                                                                      index]
-                                                                  ['quantity'],
-                                                          style: TextStyle(
-                                                            color: Colors.black,
-                                                            fontFamily: 'Segoe',
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          )),
+                                                          color:
+                                                              Colors.grey[300],
+                                                        ),
+                                                        width: 110,
+                                                        child: Center(
+                                                          child: Text(
+                                                              kidsSnap.docs[index]
+                                                                          [
+                                                                          'quantity'] ==
+                                                                      null
+                                                                  ? ''
+                                                                  : kidsSnap.docs[
+                                                                          index]
+                                                                      [
+                                                                      'quantity'],
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontFamily:
+                                                                    'Segoe',
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              )),
+                                                        ),
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
+                                                ],
                                               ),
                                             ],
                                           ),
@@ -2882,6 +4604,11 @@ class _VendorProductState extends State<VendorProduct>
           ),
           floatingActionButton: new FloatingActionButton(
             onPressed: () {
+              setState(() {
+                stap = false;
+                ltap = false;
+                mtap = false;
+              });
               showDialog(
                 context: context,
                 builder: (context) {
@@ -2902,10 +4629,11 @@ class _VendorProductState extends State<VendorProduct>
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                height: height * 0.8,
+                                // height: height * 0.8,
                                 width: width * 0.9,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Text(
                                       'Add product',
@@ -2936,7 +4664,7 @@ class _VendorProductState extends State<VendorProduct>
                                       ),
                                     ),
                                     SizedBox(
-                                      height: 5,
+                                      height: 0,
                                     ),
                                     Theme(
                                       data: new ThemeData(
@@ -2958,7 +4686,7 @@ class _VendorProductState extends State<VendorProduct>
                                       ),
                                     ),
                                     SizedBox(
-                                      height: 5,
+                                      height: 0,
                                     ),
                                     Theme(
                                       data: new ThemeData(
@@ -2981,7 +4709,49 @@ class _VendorProductState extends State<VendorProduct>
                                       ),
                                     ),
                                     SizedBox(
-                                      height: 5,
+                                      height: 0,
+                                    ),
+                                    Theme(
+                                      data: new ThemeData(
+                                        primaryColor: Colors.grey[700],
+                                      ),
+                                      child: TextField(
+                                        textInputAction: TextInputAction.next,
+                                        keyboardType: TextInputType.number,
+                                        style: TextStyle(fontFamily: 'Segoe'),
+                                        controller: priCon,
+                                        cursorColor: Colors.grey[700],
+                                        decoration: InputDecoration(
+                                            enabledBorder: UnderlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.black)),
+                                            hintText: 'Enter price',
+                                            hintStyle: TextStyle(
+                                                fontFamily: 'Segoe',
+                                                fontSize: 12)),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 0,
+                                    ),
+                                    Theme(
+                                      data: new ThemeData(
+                                        primaryColor: Colors.grey[700],
+                                      ),
+                                      child: TextField(
+                                        textInputAction: TextInputAction.next,
+                                        style: TextStyle(fontFamily: 'Segoe'),
+                                        controller: desCon,
+                                        cursorColor: Colors.grey[700],
+                                        decoration: InputDecoration(
+                                            enabledBorder: UnderlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.black)),
+                                            hintText: 'Enter description',
+                                            hintStyle: TextStyle(
+                                                fontFamily: 'Segoe',
+                                                fontSize: 12)),
+                                      ),
                                     ),
                                     Theme(
                                       data: new ThemeData(
@@ -3018,30 +4788,260 @@ class _VendorProductState extends State<VendorProduct>
                                       ),
                                     ),
                                     Divider(
+                                      height: 0,
                                       thickness: 1,
                                       color: Colors.black,
                                     ),
-                                    Theme(
-                                      data: new ThemeData(
-                                        primaryColor: Colors.grey[700],
-                                      ),
-                                      child: TextField(
-                                        keyboardType: TextInputType.number,
-                                        style: TextStyle(fontFamily: 'Segoe'),
-                                        controller: priCon,
-                                        cursorColor: Colors.grey[700],
-                                        decoration: InputDecoration(
-                                            enabledBorder: UnderlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: Colors.black)),
-                                            hintText: 'Enter price',
-                                            hintStyle: TextStyle(
-                                                fontFamily: 'Segoe',
-                                                fontSize: 12)),
+                                    SizedBox(
+                                      height: 3,
+                                    ),
+                                    Container(
+                                      height: 40,
+                                      width: width * 0.9,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            'Select size',
+                                            style: TextStyle(
+                                              fontFamily: 'Segoe',
+                                              fontSize: 13,
+                                              color:
+                                                  Colors.black.withOpacity(0.6),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            flex: 2,
+                                            child: Align(
+                                              alignment: Alignment.centerRight,
+                                              child: Container(
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        stap == false
+                                                            ? setState(() {
+                                                                stap = true;
+                                                              })
+                                                            : setState(() {
+                                                                stap = false;
+                                                              });
+                                                      },
+                                                      child: Container(
+                                                        height: 35,
+                                                        width: 35,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(5),
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                                color: stap ==
+                                                                        true
+                                                                    ? Color.fromRGBO(
+                                                                        102,
+                                                                        126,
+                                                                        234,
+                                                                        1)
+                                                                    : Colors
+                                                                        .transparent,
+                                                                offset: stap ==
+                                                                        true
+                                                                    ? Offset(
+                                                                        0, 6)
+                                                                    : Offset(
+                                                                        0, 0),
+                                                                blurRadius:
+                                                                    stap == true
+                                                                        ? 3
+                                                                        : 0,
+                                                                spreadRadius:
+                                                                    stap == true
+                                                                        ? -4
+                                                                        : 0)
+                                                          ],
+                                                          color: stap == true
+                                                              ? Color.fromRGBO(
+                                                                  102,
+                                                                  126,
+                                                                  234,
+                                                                  1)
+                                                              : Colors
+                                                                  .grey[300],
+                                                        ),
+                                                        child: Center(
+                                                          child: Text(
+                                                            'S',
+                                                            style: TextStyle(
+                                                                fontFamily:
+                                                                    'Segoe',
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 9,
+                                                    ),
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        mtap == false
+                                                            ? setState(() {
+                                                                mtap = true;
+                                                              })
+                                                            : setState(() {
+                                                                mtap = false;
+                                                              });
+                                                      },
+                                                      child: Container(
+                                                        height: 35,
+                                                        width: 35,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(5),
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                                color: mtap ==
+                                                                        true
+                                                                    ? Color.fromRGBO(
+                                                                        102,
+                                                                        126,
+                                                                        234,
+                                                                        1)
+                                                                    : Colors
+                                                                        .transparent,
+                                                                offset: mtap ==
+                                                                        true
+                                                                    ? Offset(
+                                                                        0, 6)
+                                                                    : Offset(
+                                                                        0, 0),
+                                                                blurRadius:
+                                                                    mtap == true
+                                                                        ? 3
+                                                                        : 0,
+                                                                spreadRadius:
+                                                                    mtap == true
+                                                                        ? -4
+                                                                        : 0)
+                                                          ],
+                                                          color: mtap == true
+                                                              ? Color.fromRGBO(
+                                                                  102,
+                                                                  126,
+                                                                  234,
+                                                                  1)
+                                                              : Colors
+                                                                  .grey[300],
+                                                        ),
+                                                        child: Center(
+                                                          child: Text(
+                                                            'M',
+                                                            style: TextStyle(
+                                                                fontFamily:
+                                                                    'Segoe',
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 9,
+                                                    ),
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        ltap == false
+                                                            ? setState(() {
+                                                                ltap = true;
+                                                              })
+                                                            : setState(() {
+                                                                ltap = false;
+                                                              });
+                                                      },
+                                                      child: Container(
+                                                        height: 35,
+                                                        width: 35,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(5),
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                                color: ltap ==
+                                                                        true
+                                                                    ? Color.fromRGBO(
+                                                                        102,
+                                                                        126,
+                                                                        234,
+                                                                        1)
+                                                                    : Colors
+                                                                        .transparent,
+                                                                offset: ltap ==
+                                                                        true
+                                                                    ? Offset(
+                                                                        0, 6)
+                                                                    : Offset(
+                                                                        0, 0),
+                                                                blurRadius:
+                                                                    ltap == true
+                                                                        ? 3
+                                                                        : 0,
+                                                                spreadRadius:
+                                                                    ltap == true
+                                                                        ? -4
+                                                                        : 0)
+                                                          ],
+                                                          color: ltap == true
+                                                              ? Color.fromRGBO(
+                                                                  102,
+                                                                  126,
+                                                                  234,
+                                                                  1)
+                                                              : Colors
+                                                                  .grey[300],
+                                                        ),
+                                                        child: Center(
+                                                          child: Text(
+                                                            'L',
+                                                            style: TextStyle(
+                                                                fontFamily:
+                                                                    'Segoe',
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                     SizedBox(
-                                      height: 15,
+                                      height: 5,
+                                    ),
+                                    Divider(
+                                      height: 0,
+                                      thickness: 1,
+                                      color: Colors.black,
+                                    ),
+                                    SizedBox(
+                                      height: 10,
                                     ),
                                     GestureDetector(
                                       onTap: () async {
@@ -3086,153 +5086,190 @@ class _VendorProductState extends State<VendorProduct>
                                     SizedBox(
                                       height: 10,
                                     ),
-                                    Expanded(
-                                      child: Align(
-                                        alignment: Alignment.bottomCenter,
-                                        child: Container(
-                                          padding: EdgeInsets.only(right: 10),
-                                          height: 40,
-                                          width: width * 0.9,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
-                                            children: [
-                                              GestureDetector(
-                                                onTap: () {
-                                                  Navigator.pop(context);
-                                                  nameCon.clear();
-                                                  quanCon.clear();
-                                                  priCon.clear();
-                                                  catCon.clear();
-                                                  idCon.clear();
-                                                  setState(() {
-                                                    currentItems = null;
-                                                  });
-                                                },
-                                                child: Text(
-                                                  'Cancel',
-                                                  style: TextStyle(
-                                                    fontFamily: 'Segoe',
-                                                  ),
-                                                ),
+                                    Container(
+                                      padding: EdgeInsets.only(right: 10),
+                                      height: 40,
+                                      width: width * 0.9,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () {
+                                              Navigator.pop(context);
+                                              nameCon.clear();
+                                              quanCon.clear();
+                                              priCon.clear();
+                                              catCon.clear();
+                                              idCon.clear();
+                                              desCon.clear();
+                                              setState(() {
+                                                currentItems = null;
+                                                sizeItems = null;
+                                                stap = false;
+                                                mtap = false;
+                                                ltap = false;
+                                              });
+                                            },
+                                            child: Text(
+                                              'Cancel',
+                                              style: TextStyle(
+                                                fontFamily: 'Segoe',
                                               ),
-                                              SizedBox(
-                                                width: 50,
-                                              ),
-                                              GestureDetector(
-                                                onTap: () async {
-                                                  setState(() {
-                                                    saved = false;
-                                                  });
-                                                  if (idCon.text == '') {
-                                                    Fluttertoast.showToast(
-                                                      msg: "ID cannot be empty",
-                                                      toastLength:
-                                                          Toast.LENGTH_LONG,
-                                                      gravity:
-                                                          ToastGravity.BOTTOM,
-                                                      timeInSecForIosWeb: 3,
-                                                      backgroundColor:
-                                                          Colors.red[400],
-                                                      textColor: Colors.white,
-                                                      fontSize: 15,
-                                                    );
-                                                    setState(() {
-                                                      saved = true;
-                                                    });
-                                                  } else if (nameCon.text ==
-                                                      '') {
-                                                    Fluttertoast.showToast(
-                                                      msg:
-                                                          "Name cannot be empty",
-                                                      toastLength:
-                                                          Toast.LENGTH_LONG,
-                                                      gravity:
-                                                          ToastGravity.BOTTOM,
-                                                      timeInSecForIosWeb: 3,
-                                                      backgroundColor:
-                                                          Colors.red[400],
-                                                      textColor: Colors.white,
-                                                      fontSize: 15,
-                                                    );
-                                                    setState(() {
-                                                      saved = true;
-                                                    });
-                                                  } else if (quanCon.text ==
-                                                      '') {
-                                                    Fluttertoast.showToast(
-                                                      msg:
-                                                          "Quantity cannot be empty",
-                                                      toastLength:
-                                                          Toast.LENGTH_LONG,
-                                                      gravity:
-                                                          ToastGravity.BOTTOM,
-                                                      timeInSecForIosWeb: 3,
-                                                      backgroundColor:
-                                                          Colors.red[400],
-                                                      textColor: Colors.white,
-                                                      fontSize: 15,
-                                                    );
-                                                    setState(() {
-                                                      saved = true;
-                                                    });
-                                                  } else if (currentItems ==
-                                                      null) {
-                                                    Fluttertoast.showToast(
-                                                      msg:
-                                                          "Please select a category",
-                                                      toastLength:
-                                                          Toast.LENGTH_LONG,
-                                                      gravity:
-                                                          ToastGravity.BOTTOM,
-                                                      timeInSecForIosWeb: 3,
-                                                      backgroundColor:
-                                                          Colors.red[400],
-                                                      textColor: Colors.white,
-                                                      fontSize: 15,
-                                                    );
-                                                    setState(() {
-                                                      saved = true;
-                                                    });
-                                                  } else if (priCon.text ==
-                                                      '') {
-                                                    Fluttertoast.showToast(
-                                                      msg:
-                                                          "Price cannot be empty",
-                                                      toastLength:
-                                                          Toast.LENGTH_LONG,
-                                                      gravity:
-                                                          ToastGravity.BOTTOM,
-                                                      timeInSecForIosWeb: 3,
-                                                      backgroundColor:
-                                                          Colors.red[400],
-                                                      textColor: Colors.white,
-                                                      fontSize: 15,
-                                                    );
-                                                    setState(() {
-                                                      saved = true;
-                                                    });
-                                                  } else {
-                                                    print(
-                                                        "Text:" + nameCon.text);
-                                                    bool exit;
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: 50,
+                                          ),
+                                          GestureDetector(
+                                            onTap: () async {
+                                              setState(() {
+                                                saved = false;
+                                              });
+                                              if (idCon.text == '') {
+                                                Fluttertoast.showToast(
+                                                  msg: "ID cannot be empty",
+                                                  toastLength:
+                                                      Toast.LENGTH_LONG,
+                                                  gravity: ToastGravity.BOTTOM,
+                                                  timeInSecForIosWeb: 3,
+                                                  backgroundColor:
+                                                      Colors.red[400],
+                                                  textColor: Colors.white,
+                                                  fontSize: 15,
+                                                );
+                                                setState(() {
+                                                  saved = true;
+                                                });
+                                              } else if (nameCon.text == '') {
+                                                Fluttertoast.showToast(
+                                                  msg: "Name cannot be empty",
+                                                  toastLength:
+                                                      Toast.LENGTH_LONG,
+                                                  gravity: ToastGravity.BOTTOM,
+                                                  timeInSecForIosWeb: 3,
+                                                  backgroundColor:
+                                                      Colors.red[400],
+                                                  textColor: Colors.white,
+                                                  fontSize: 15,
+                                                );
+                                                setState(() {
+                                                  saved = true;
+                                                });
+                                              } else if (quanCon.text == '') {
+                                                Fluttertoast.showToast(
+                                                  msg:
+                                                      "Quantity cannot be empty",
+                                                  toastLength:
+                                                      Toast.LENGTH_LONG,
+                                                  gravity: ToastGravity.BOTTOM,
+                                                  timeInSecForIosWeb: 3,
+                                                  backgroundColor:
+                                                      Colors.red[400],
+                                                  textColor: Colors.white,
+                                                  fontSize: 15,
+                                                );
+                                                setState(() {
+                                                  saved = true;
+                                                });
+                                              } else if (priCon.text == '') {
+                                                Fluttertoast.showToast(
+                                                  msg: "Price cannot be empty",
+                                                  toastLength:
+                                                      Toast.LENGTH_LONG,
+                                                  gravity: ToastGravity.BOTTOM,
+                                                  timeInSecForIosWeb: 3,
+                                                  backgroundColor:
+                                                      Colors.red[400],
+                                                  textColor: Colors.white,
+                                                  fontSize: 15,
+                                                );
+                                                setState(() {
+                                                  saved = true;
+                                                });
+                                              } else if (desCon.text == '') {
+                                                Fluttertoast.showToast(
+                                                  msg:
+                                                      "Description cannot be empty",
+                                                  toastLength:
+                                                      Toast.LENGTH_LONG,
+                                                  gravity: ToastGravity.BOTTOM,
+                                                  timeInSecForIosWeb: 3,
+                                                  backgroundColor:
+                                                      Colors.red[400],
+                                                  textColor: Colors.white,
+                                                  fontSize: 15,
+                                                );
+                                                setState(() {
+                                                  saved = true;
+                                                });
+                                              } else if (currentItems == null) {
+                                                Fluttertoast.showToast(
+                                                  msg:
+                                                      "Please select a category",
+                                                  toastLength:
+                                                      Toast.LENGTH_LONG,
+                                                  gravity: ToastGravity.BOTTOM,
+                                                  timeInSecForIosWeb: 3,
+                                                  backgroundColor:
+                                                      Colors.red[400],
+                                                  textColor: Colors.white,
+                                                  fontSize: 15,
+                                                );
+                                                setState(() {
+                                                  saved = true;
+                                                });
+                                              } else if (stap == false &&
+                                                  ltap == false &&
+                                                  mtap == false) {
+                                                Fluttertoast.showToast(
+                                                  msg: "Please select a size",
+                                                  toastLength:
+                                                      Toast.LENGTH_LONG,
+                                                  gravity: ToastGravity.BOTTOM,
+                                                  timeInSecForIosWeb: 3,
+                                                  backgroundColor:
+                                                      Colors.red[400],
+                                                  textColor: Colors.white,
+                                                  fontSize: 15,
+                                                );
+                                                setState(() {
+                                                  saved = true;
+                                                });
+                                              } else if (_image == null) {
+                                                Fluttertoast.showToast(
+                                                  msg: "Please select an image",
+                                                  toastLength:
+                                                      Toast.LENGTH_LONG,
+                                                  gravity: ToastGravity.BOTTOM,
+                                                  timeInSecForIosWeb: 3,
+                                                  backgroundColor:
+                                                      Colors.red[400],
+                                                  textColor: Colors.white,
+                                                  fontSize: 15,
+                                                );
+                                                setState(() {
+                                                  saved = true;
+                                                });
+                                              } else {
+                                                print("Text:" + nameCon.text);
+                                                bool exit;
 
-                                                    try {
-                                                      final result =
-                                                          await InternetAddress
-                                                              .lookup(
-                                                                  'google.com');
-                                                      if (result.isNotEmpty &&
-                                                          result[0]
-                                                              .rawAddress
-                                                              .isNotEmpty) {
-                                                        print('connected');
-                                                        User user = FirebaseAuth
-                                                            .instance
-                                                            .currentUser;
-                                                        if (user != null) {
-                                                          try {
-                                                            QuerySnapshot snap = await FirebaseFirestore
+                                                try {
+                                                  final result =
+                                                      await InternetAddress
+                                                          .lookup('google.com');
+                                                  if (result.isNotEmpty &&
+                                                      result[0]
+                                                          .rawAddress
+                                                          .isNotEmpty) {
+                                                    print('connected');
+                                                    User user = FirebaseAuth
+                                                        .instance.currentUser;
+                                                    if (user != null) {
+                                                      try {
+                                                        QuerySnapshot snap =
+                                                            await FirebaseFirestore
                                                                 .instance
                                                                 .collection(
                                                                     'product')
@@ -3245,185 +5282,247 @@ class _VendorProductState extends State<VendorProduct>
                                                                         .toString()
                                                                         .toLowerCase())
                                                                 .get();
-                                                            print(snap
-                                                                .docs.length);
-                                                            int checkAlreadyExist =
-                                                                0;
-                                                            snap.docs
-                                                                .forEach((doc) {
-                                                              if (doc.id ==
-                                                                  idCon.text) {
-                                                                checkAlreadyExist++;
-                                                              } else {}
-                                                            });
-                                                            if (checkAlreadyExist ==
-                                                                0) {
+                                                        print(snap.docs.length);
+                                                        int checkAlreadyExist =
+                                                            0;
+                                                        snap.docs
+                                                            .forEach((doc) {
+                                                          if (doc.id ==
+                                                              idCon.text) {
+                                                            checkAlreadyExist++;
+                                                          } else {}
+                                                        });
+                                                        if (checkAlreadyExist ==
+                                                            0) {
+                                                          try {
+                                                            await uploadFile(
+                                                                    idCon.text,
+                                                                    currentItems)
+                                                                .then((value) {
                                                               try {
-                                                                await uploadFile(
-                                                                        idCon
-                                                                            .text,
-                                                                        currentItems)
-                                                                    .then(
-                                                                        (value) {
-                                                                  try {
-                                                                    FirebaseFirestore
-                                                                        .instance
-                                                                        .collection(
-                                                                            'product')
-                                                                        .doc(
-                                                                            'admin1@gmail.com')
-                                                                        .collection(
-                                                                            'products')
-                                                                        .doc(
-                                                                            'category')
-                                                                        .collection(currentItems
-                                                                            .toString()
-                                                                            .toLowerCase())
-                                                                        .doc(idCon
-                                                                            .text)
-                                                                        .set({
-                                                                      'name': nameCon
+                                                                FirebaseFirestore
+                                                                    .instance
+                                                                    .collection(
+                                                                        'product')
+                                                                    .doc(
+                                                                        'admin1@gmail.com')
+                                                                    .collection(
+                                                                        'products')
+                                                                    .doc(
+                                                                        'category')
+                                                                    .collection(currentItems
+                                                                        .toString()
+                                                                        .toLowerCase())
+                                                                    .doc(idCon
+                                                                        .text)
+                                                                    .set({
+                                                                  'name':
+                                                                      nameCon
                                                                           .text,
-                                                                      'quantity':
-                                                                          quanCon
-                                                                              .text,
-                                                                      'price':
-                                                                          priCon
-                                                                              .text,
-                                                                      'image_path':
-                                                                          imagePath,
-                                                                      'bucket':
-                                                                          metaData
-                                                                              .bucket,
-                                                                      'full_path':
-                                                                          metaData
-                                                                              .fullPath
-                                                                    });
-                                                                    setState(
-                                                                        () {
-                                                                      saved =
-                                                                          true;
-                                                                    });
-                                                                    getProducts();
-                                                                    Fluttertoast
-                                                                        .showToast(
-                                                                      msg:
-                                                                          "Product added successfully",
-                                                                      toastLength:
-                                                                          Toast
-                                                                              .LENGTH_LONG,
-                                                                      gravity:
-                                                                          ToastGravity
-                                                                              .BOTTOM,
-                                                                      timeInSecForIosWeb:
-                                                                          3,
-                                                                      backgroundColor:
-                                                                          Colors
-                                                                              .green,
-                                                                      textColor:
-                                                                          Colors
-                                                                              .white,
-                                                                      fontSize:
-                                                                          15,
-                                                                    );
-                                                                    setState(
-                                                                        () {
-                                                                      _image =
-                                                                          null;
-                                                                    });
-
-                                                                    exit = true;
-                                                                  } catch (e) {
-                                                                    print(e);
-                                                                  }
+                                                                  'quantity':
+                                                                      quanCon
+                                                                          .text,
+                                                                  'price':
+                                                                      priCon
+                                                                          .text,
+                                                                  'description':
+                                                                      desCon
+                                                                          .text,
+                                                                  'size': stap == true &&
+                                                                          mtap ==
+                                                                              false &&
+                                                                          ltap ==
+                                                                              false
+                                                                      ? 'S'
+                                                                      : stap == false &&
+                                                                              mtap == true &&
+                                                                              ltap == false
+                                                                          ? 'M'
+                                                                          : stap == false && mtap == false && ltap == true
+                                                                              ? 'L'
+                                                                              : stap == true && mtap == true && ltap == false
+                                                                                  ? 'SM'
+                                                                                  : stap == true && mtap == false && ltap == true
+                                                                                      ? 'SL'
+                                                                                      : stap == false && mtap == true && ltap == true
+                                                                                          ? 'ML'
+                                                                                          : stap == true && mtap == true && ltap == true
+                                                                                              ? 'SML'
+                                                                                              : 'nothing',
+                                                                  'image_path':
+                                                                      imagePath,
+                                                                  'bucket':
+                                                                      metaData
+                                                                          .bucket,
+                                                                  'full_path':
+                                                                      metaData
+                                                                          .fullPath
                                                                 });
-                                                              } catch (e) {
-                                                                print(
-                                                                    "Ex: " + e);
-                                                                exit = false;
-                                                              }
-                                                            } else {
-                                                              Fluttertoast
-                                                                  .showToast(
-                                                                msg:
-                                                                    "Product with this ID already exist",
-                                                                toastLength: Toast
-                                                                    .LENGTH_LONG,
-                                                                gravity:
-                                                                    ToastGravity
-                                                                        .BOTTOM,
-                                                                timeInSecForIosWeb:
-                                                                    3,
-                                                                backgroundColor:
-                                                                    Colors.red[
-                                                                        400],
-                                                                textColor:
-                                                                    Colors
-                                                                        .white,
-                                                                fontSize: 15,
-                                                              );
-                                                              setState(() {
-                                                                saved = true;
-                                                              });
-                                                              exit = false;
-                                                            }
-                                                          } catch (e) {
-                                                            print(
-                                                                "Exception: " +
-                                                                    e);
-                                                            exit = false;
-                                                            setState(() {
-                                                              saved = true;
-                                                            });
-                                                          }
-                                                        }
-                                                        if (exit == false) {
-                                                          return null;
-                                                        } else {
-                                                          Navigator.pop(
-                                                              context);
-                                                        }
-                                                        nameCon.clear();
-                                                        quanCon.clear();
-                                                        priCon.clear();
-                                                        catCon.clear();
-                                                        idCon.clear();
-                                                      }
-                                                    } on SocketException catch (_) {
-                                                      Navigator.pop(context);
+                                                                setState(() {
+                                                                  saved = true;
+                                                                });
+                                                                getProducts();
+                                                                Fluttertoast
+                                                                    .showToast(
+                                                                  msg:
+                                                                      "Product added successfully",
+                                                                  toastLength: Toast
+                                                                      .LENGTH_LONG,
+                                                                  gravity:
+                                                                      ToastGravity
+                                                                          .BOTTOM,
+                                                                  timeInSecForIosWeb:
+                                                                      3,
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .green,
+                                                                  textColor:
+                                                                      Colors
+                                                                          .white,
+                                                                  fontSize: 15,
+                                                                );
+                                                                setState(() {
+                                                                  _image = null;
+                                                                });
 
-                                                      print('not connected');
-                                                      setState(() {
-                                                        saved = true;
-                                                      });
-                                                      Fluttertoast.showToast(
-                                                        msg:
-                                                            "You're not connected to the internet",
-                                                        toastLength:
-                                                            Toast.LENGTH_LONG,
-                                                        gravity:
-                                                            ToastGravity.BOTTOM,
-                                                        timeInSecForIosWeb: 3,
-                                                        backgroundColor:
-                                                            Colors.red[400],
-                                                        textColor: Colors.white,
-                                                        fontSize: 15,
-                                                      );
+                                                                exit = true;
+                                                              } catch (e) {
+                                                                print(e);
+                                                                Fluttertoast
+                                                                    .showToast(
+                                                                  msg: e,
+                                                                  toastLength: Toast
+                                                                      .LENGTH_LONG,
+                                                                  gravity:
+                                                                      ToastGravity
+                                                                          .BOTTOM,
+                                                                  timeInSecForIosWeb:
+                                                                      3,
+                                                                  backgroundColor:
+                                                                      Colors.red[
+                                                                          400],
+                                                                  textColor:
+                                                                      Colors
+                                                                          .white,
+                                                                  fontSize: 15,
+                                                                );
+                                                              }
+                                                            });
+                                                          } catch (e) {
+                                                            print("Ex: " + e);
+                                                            Fluttertoast
+                                                                .showToast(
+                                                              msg: e,
+                                                              toastLength: Toast
+                                                                  .LENGTH_LONG,
+                                                              gravity:
+                                                                  ToastGravity
+                                                                      .BOTTOM,
+                                                              timeInSecForIosWeb:
+                                                                  3,
+                                                              backgroundColor:
+                                                                  Colors
+                                                                      .red[400],
+                                                              textColor:
+                                                                  Colors.white,
+                                                              fontSize: 15,
+                                                            );
+                                                            exit = false;
+                                                          }
+                                                        } else {
+                                                          Fluttertoast
+                                                              .showToast(
+                                                            msg:
+                                                                "Product with this ID already exist",
+                                                            toastLength: Toast
+                                                                .LENGTH_LONG,
+                                                            gravity:
+                                                                ToastGravity
+                                                                    .BOTTOM,
+                                                            timeInSecForIosWeb:
+                                                                3,
+                                                            backgroundColor:
+                                                                Colors.red[400],
+                                                            textColor:
+                                                                Colors.white,
+                                                            fontSize: 15,
+                                                          );
+                                                          setState(() {
+                                                            saved = true;
+                                                          });
+                                                          exit = false;
+                                                        }
+                                                      } catch (e) {
+                                                        print(
+                                                            "Exception: " + e);
+                                                        Fluttertoast.showToast(
+                                                          msg: e,
+                                                          toastLength:
+                                                              Toast.LENGTH_LONG,
+                                                          gravity: ToastGravity
+                                                              .BOTTOM,
+                                                          timeInSecForIosWeb: 3,
+                                                          backgroundColor:
+                                                              Colors.red[400],
+                                                          textColor:
+                                                              Colors.white,
+                                                          fontSize: 15,
+                                                        );
+                                                        exit = false;
+                                                        setState(() {
+                                                          saved = true;
+                                                        });
+                                                      }
                                                     }
+                                                    if (exit == false) {
+                                                      return null;
+                                                    } else {
+                                                      Navigator.pop(context);
+                                                    }
+                                                    nameCon.clear();
+                                                    quanCon.clear();
+                                                    priCon.clear();
+                                                    catCon.clear();
+                                                    idCon.clear();
+                                                    desCon.clear();
+                                                    setState(() {
+                                                      stap = false;
+                                                      mtap = false;
+                                                      ltap = false;
+                                                    });
                                                   }
-                                                },
-                                                child: Text(
-                                                  'Add',
-                                                  style: TextStyle(
-                                                      fontFamily: 'Segoe',
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.green),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        ),
+                                                } on SocketException catch (_) {
+                                                  Navigator.pop(context);
+
+                                                  print('not connected');
+                                                  setState(() {
+                                                    saved = true;
+                                                  });
+                                                  Fluttertoast.showToast(
+                                                    msg:
+                                                        "You're not connected to the internet",
+                                                    toastLength:
+                                                        Toast.LENGTH_LONG,
+                                                    gravity:
+                                                        ToastGravity.BOTTOM,
+                                                    timeInSecForIosWeb: 3,
+                                                    backgroundColor:
+                                                        Colors.red[400],
+                                                    textColor: Colors.white,
+                                                    fontSize: 15,
+                                                  );
+                                                }
+                                              }
+                                            },
+                                            child: Text(
+                                              'Add',
+                                              style: TextStyle(
+                                                  fontFamily: 'Segoe',
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.green),
+                                            ),
+                                          )
+                                        ],
                                       ),
                                     ),
                                   ],
@@ -3455,8 +5554,13 @@ class _VendorProductState extends State<VendorProduct>
                 priCon.clear();
                 catCon.clear();
                 idCon.clear();
+                desCon.clear();
                 setState(() {
                   currentItems = null;
+                  sizeItems = null;
+                  stap = false;
+                  mtap = false;
+                  ltap = false;
                 });
               });
             },
@@ -3528,4 +5632,139 @@ Widget editDismiss() {
       alignment: Alignment.centerLeft,
     ),
   );
+}
+
+class ScrollingText extends StatefulWidget {
+  final String text;
+  final TextStyle textStyle;
+  final Axis scrollAxis;
+  final double ratioOfBlankToScreen;
+
+  ScrollingText({
+    @required this.text,
+    this.textStyle,
+    this.scrollAxis: Axis.horizontal,
+    this.ratioOfBlankToScreen: 0.25,
+  }) : assert(
+          text != null,
+        );
+
+  @override
+  State<StatefulWidget> createState() {
+    return ScrollingTextState();
+  }
+}
+
+class ScrollingTextState extends State<ScrollingText>
+    with SingleTickerProviderStateMixin {
+  ScrollController scrollController;
+  double screenWidth;
+  double screenHeight;
+  double position = 0.0;
+  Timer timer;
+  final double _moveDistance = 3.0;
+  final int _timerRest = 100;
+  GlobalKey _key = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    scrollController = ScrollController();
+    WidgetsBinding.instance.addPostFrameCallback((callback) {
+      startTimer();
+    });
+  }
+
+  void startTimer() {
+    if (_key.currentContext != null) {
+      double widgetWidth =
+          _key.currentContext.findRenderObject().paintBounds.size.width;
+      double widgetHeight =
+          _key.currentContext.findRenderObject().paintBounds.size.height;
+
+      timer = Timer.periodic(Duration(milliseconds: _timerRest), (timer) {
+        double maxScrollExtent = scrollController.position.maxScrollExtent;
+        double pixels = scrollController.position.pixels;
+        if (pixels + _moveDistance >= maxScrollExtent) {
+          if (widget.scrollAxis == Axis.horizontal) {
+            position = (maxScrollExtent -
+                        screenWidth * widget.ratioOfBlankToScreen +
+                        widgetWidth) /
+                    2 -
+                widgetWidth +
+                pixels -
+                maxScrollExtent;
+          } else {
+            position = (maxScrollExtent -
+                        screenHeight * widget.ratioOfBlankToScreen +
+                        widgetHeight) /
+                    2 -
+                widgetHeight +
+                pixels -
+                maxScrollExtent;
+          }
+          scrollController.jumpTo(position);
+        }
+        position += _moveDistance;
+        scrollController.animateTo(position,
+            duration: Duration(milliseconds: _timerRest), curve: Curves.linear);
+      });
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    screenWidth = MediaQuery.of(context).size.width;
+    screenHeight = MediaQuery.of(context).size.height;
+  }
+
+  Widget getBothEndsChild() {
+    if (widget.scrollAxis == Axis.vertical) {
+      String newString = widget.text.split("").join("\n");
+      return Center(
+        child: Text(
+          newString,
+          style: widget.textStyle,
+          textAlign: TextAlign.center,
+        ),
+      );
+    }
+    return Center(
+        child: Text(
+      widget.text,
+      style: widget.textStyle,
+    ));
+  }
+
+  Widget getCenterChild() {
+    if (widget.scrollAxis == Axis.horizontal) {
+      return Container(width: screenWidth * widget.ratioOfBlankToScreen);
+    } else {
+      return Container(height: screenHeight * widget.ratioOfBlankToScreen);
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    if (timer != null) {
+      timer.cancel();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      key: _key,
+      scrollDirection: widget.scrollAxis,
+      controller: scrollController,
+      physics: NeverScrollableScrollPhysics(),
+      children: <Widget>[
+        getBothEndsChild(),
+        getCenterChild(),
+        getBothEndsChild(),
+      ],
+    );
+  }
 }
